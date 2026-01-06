@@ -60,7 +60,9 @@ class NewsController extends Controller
         $validated['slug'] = Str::slug($validated['title']);
 
         if ($request->hasFile('thumbnail')) {
-            $validated['thumbnail'] = $request->file('thumbnail')->store('news-thumbnails', 'public');
+            $file = $request->file('thumbnail');
+            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $validated['thumbnail'] = $file->storeAs('news-thumbnails', $filename, 'public');
         }
 
         if ($validated['status'] === 'published') {
@@ -110,7 +112,9 @@ class NewsController extends Controller
             if ($post->thumbnail) {
                 Storage::disk('public')->delete($post->thumbnail);
             }
-            $validated['thumbnail'] = $request->file('thumbnail')->store('news-thumbnails', 'public');
+            $file = $request->file('thumbnail');
+            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $validated['thumbnail'] = $file->storeAs('news-thumbnails', $filename, 'public');
         }
 
         if ($validated['status'] === 'published' && !$post->published_at) {
@@ -167,7 +171,10 @@ class NewsController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('news-content', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('news-content', $filename, 'public');
+
             return response()->json([
                 'url' => asset('storage/' . $path)
             ]);
