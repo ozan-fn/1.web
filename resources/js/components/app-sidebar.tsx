@@ -13,7 +13,15 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Settings } from 'lucide-react';
+import {
+    BookOpen,
+    FileText,
+    Folder,
+    LayoutGrid,
+    ListTree,
+    Settings,
+    Tags,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -27,6 +35,26 @@ const mainNavItems: NavItem[] = [
         title: 'Site Settings',
         href: '/dashboard/site-settings',
         icon: Settings,
+    },
+    {
+        title: 'Categories',
+        href: '/dashboard/categories',
+        icon: Tags,
+    },
+    {
+        title: 'Sub Categories',
+        href: '/dashboard/sub-categories',
+        icon: ListTree,
+    },
+    {
+        title: 'Tags',
+        href: '/dashboard/tags',
+        icon: Tags,
+    },
+    {
+        title: 'Posts',
+        href: '/dashboard/posts',
+        icon: FileText,
     },
 ];
 

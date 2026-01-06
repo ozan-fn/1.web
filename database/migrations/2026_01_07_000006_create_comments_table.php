@@ -12,10 +12,11 @@ return new class extends Migration {
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
-            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
-            $table->text('content');
+            $table->foreignId('news_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('name')->nullable(); // For guest comments
+            $table->string('email')->nullable(); // For guest comments
+            $table->text('comment');
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
         });
