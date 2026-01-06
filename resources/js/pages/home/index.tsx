@@ -20,52 +20,52 @@ interface VideoItem {
 
 const HERO_NEWS: NewsItem = {
     id: 1,
-    category: 'Internasional',
-    title: 'BNN Berhasil Bongkar Pabrik Narkoba Jaringan Internasional di Apartemen Ancol Jakarta Utara',
+    category: 'Kampus',
+    title: 'Mahasiswa Berprestasi Lensapublik.ac.id Raih Penghargaan Internasional di Ajang Inovasi Teknologi',
     imageUrl: 'https://placehold.co/800x500',
 };
 
 const SIDE_HERO_NEWS: NewsItem[] = [
     {
         id: 2,
-        category: 'Ekonomi',
-        title: 'Universitas Paramadina: Peluang dan Tantangan Dinamika Ekonomi',
+        category: 'Akademik',
+        title: 'Rektorat Umumkan Kebijakan Baru Terkait Kurikulum Merdeka Belajar',
         imageUrl: 'https://placehold.co/400x250',
     },
     {
         id: 3,
-        category: 'DPR',
-        title: 'Nurhayati Ali Assegaf Jauhkan Diri dari Politik Nasional',
+        category: 'Beasiswa',
+        title: 'Pendaftaran Beasiswa Unggulan Telah Dibuka, Simak Syarat Lengkapnya',
         imageUrl: 'https://placehold.co/400x250',
     },
 ];
 
 const NASIONAL_NEWS: NewsItem[] = Array.from({ length: 4 }).map((_, i) => ({
     id: i + 10,
-    category: i % 2 === 0 ? 'Politik' : 'Hukrim',
-    title: 'Judul Berita Nasional yang Cukup Panjang untuk Menguji Tampilan Responsif Line Clamp',
+    category: i % 2 === 0 ? 'Pendidikan' : 'Riset',
+    title: 'Kementerian Pendidikan Dorong Digitalisasi Kampus di Seluruh Indonesia',
     imageUrl: `https://placehold.co/300x200?text=News+${i + 10}`,
     timestamp: `${i + 1} Jam yang lalu`,
 }));
 
 const LINTAS_DAERAH: NewsItem[] = Array.from({ length: 4 }).map((_, i) => ({
     id: i + 20,
-    category: 'Desa',
-    title: 'Program Ketapang Tahun 2026 Desa Binong Berjalan Lancar dan Sukses',
+    category: 'Pengabdian',
+    title: 'KKN Mahasiswa di Desa Binong Berhasil Tingkatkan UMKM Lokal',
     imageUrl: `https://placehold.co/400x300?text=Daerah+${i + 20}`,
     timestamp: '3 Hari yang lalu',
 }));
 
 const CATEGORIES = [
     'Trending',
-    'Hukrim',
+    'Akademik',
     'Mahasiswa',
-    'BPJS',
-    'Desa',
-    'BNN',
-    'Hiburan',
-    'Serang Raya',
-    'Ekonomi',
+    'Beasiswa',
+    'Riset',
+    'Pengabdian',
+    'Opini',
+    'Kampus',
+    'Teknologi',
 ];
 
 // --- 3. REUSABLE COMPONENTS ---
@@ -188,11 +188,11 @@ export default function Index() {
                         </button>
                         {/* Logo */}
                         <div className="flex flex-col leading-none">
-                            <span className="text-2xl font-black tracking-tighter text-[#3357a7]">
-                                SERANGTIMUR
+                            <span className="text-2xl font-black tracking-tighter text-[#3357a7] uppercase">
+                                LENSAPUBLIK
                             </span>
                             <span className="text-[9px] tracking-widest text-gray-500 uppercase">
-                                News Portal
+                                Academic News Portal
                             </span>
                         </div>
                     </div>
@@ -201,7 +201,7 @@ export default function Index() {
                     <div className="mx-8 hidden max-w-md flex-1 rounded-full border border-gray-200 bg-gray-100 px-4 py-2 transition-colors focus-within:border-[#3357a7] md:flex">
                         <input
                             type="text"
-                            placeholder="Cari berita terkini..."
+                            placeholder="Cari berita, jurnal, atau kegiatan..."
                             className="w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
                         />
                         <button className="text-gray-400 hover:text-[#3357a7]">
@@ -246,7 +246,7 @@ export default function Index() {
                 {/* Banner Ad */}
                 <div className="mb-8 w-full overflow-hidden rounded-xl shadow-sm">
                     <img
-                        src="https://placehold.co/1200x150?text=Iklan+Banner+Utama"
+                        src="https://placehold.co/1200x150?text=Iklan+Penerimaan+Mahasiswa+Baru"
                         alt="Ads"
                         className="h-auto min-h-[100px] w-full object-cover"
                     />
@@ -263,7 +263,7 @@ export default function Index() {
 
                 {/* HERO SECTION */}
                 <section className="mb-12">
-                    <SectionHeader title="HEADLINE UTAMA" />
+                    <SectionHeader title="FOKUS UTAMA" />
                     <div className="grid h-auto grid-cols-1 gap-6 lg:h-[500px] lg:grid-cols-12">
                         {/* Main Feature (Kiri) */}
                         <div className="h-[400px] lg:col-span-8 lg:h-full">
@@ -289,7 +289,7 @@ export default function Index() {
                     <div className="space-y-10 lg:col-span-8">
                         {/* Nasional */}
                         <div>
-                            <SectionHeader title="Nasional" />
+                            <SectionHeader title="Kabar Kampus & Nasional" />
                             <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
                                 {NASIONAL_NEWS.map((item) => (
                                     <ListCard key={item.id} item={item} />
@@ -301,7 +301,7 @@ export default function Index() {
                         <div className="relative overflow-hidden rounded-xl bg-gray-900 p-6 text-white shadow-lg">
                             <div className="relative z-10">
                                 <SectionHeader
-                                    title="Serangtimur TV"
+                                    title="LensaPublik TV"
                                     color="bg-[#dd0000]"
                                     textColor="text-white"
                                 />
@@ -322,8 +322,8 @@ export default function Index() {
                                         </div>
                                         <div className="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent p-4">
                                             <h3 className="text-sm leading-tight font-bold md:text-base">
-                                                Live Report: Situasi Terkini di
-                                                Banten
+                                                Live Streaming: Wisuda Angkatan
+                                                XX
                                             </h3>
                                         </div>
                                     </div>
@@ -346,8 +346,8 @@ export default function Index() {
                                                         Video
                                                     </span>
                                                     <h4 className="line-clamp-2 text-xs font-medium text-gray-300 group-hover:text-white">
-                                                        Liputan Khusus Lapangan{' '}
-                                                        {v}
+                                                        Dokumenter Kegiatan
+                                                        Kampus Part {v}
                                                     </h4>
                                                 </div>
                                             </div>
@@ -359,14 +359,14 @@ export default function Index() {
 
                         {/* Gaya Hidup */}
                         <div>
-                            <SectionHeader title="Gaya Hidup" />
+                            <SectionHeader title="Prestasi & Inovasi" />
                             <div className="flex flex-col gap-6 md:flex-row">
                                 <div className="h-80 md:h-auto md:w-2/3">
                                     <OverlayCard
                                         item={{
                                             id: 99,
-                                            category: 'Health',
-                                            title: 'RSPP dan NalaGenetics Resmikan Klinik Genomik Terintegrasi',
+                                            category: 'Teknologi',
+                                            title: 'Mahasiswa Teknik Ciptakan Robot Pemilah Sampah Otomatis',
                                             imageUrl:
                                                 'https://placehold.co/600x400',
                                         }}
@@ -377,7 +377,10 @@ export default function Index() {
                                     {NASIONAL_NEWS.slice(0, 3).map((item) => (
                                         <ListCard
                                             key={item.id}
-                                            item={{ ...item, category: 'Tips' }}
+                                            item={{
+                                                ...item,
+                                                category: 'Sains',
+                                            }}
                                         />
                                     ))}
                                 </div>
@@ -386,12 +389,12 @@ export default function Index() {
 
                         {/* Horizontal Ad */}
                         <div className="flex aspect-[5/1] w-full items-center justify-center rounded-lg border border-gray-300 bg-gray-200 font-bold text-gray-400">
-                            SPACE IKLAN 100%
+                            SPACE IKLAN KAMPUS
                         </div>
 
                         {/* Lintas Daerah (Grid Cards) */}
                         <div>
-                            <SectionHeader title="Lintas Daerah" />
+                            <SectionHeader title="Pengabdian Masyarakat" />
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 {LINTAS_DAERAH.map((item) => (
                                     <div
@@ -440,7 +443,7 @@ export default function Index() {
                         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
                             <div className="border-b border-l-4 border-[#3357a7] border-gray-100 bg-gray-50 px-5 py-4">
                                 <h3 className="text-lg font-bold text-gray-800">
-                                    Trending Now
+                                    Populer Minggu Ini
                                 </h3>
                             </div>
                             <div className="p-0">
@@ -457,9 +460,9 @@ export default function Index() {
                                                 Viral
                                             </span>
                                             <h4 className="mt-1 text-sm leading-snug font-medium text-gray-700 decoration-1 underline-offset-2 group-hover:text-black group-hover:underline">
-                                                Berita trending nomor {i} yang
+                                                Artikel populer nomor {i}{' '}
+                                                tentang kegiatan akademik yang
                                                 sedang hangat diperbincangkan
-                                                netizen
                                             </h4>
                                         </div>
                                     </div>
@@ -471,12 +474,12 @@ export default function Index() {
                         <div className="w-full rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
                             <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg bg-gray-100">
                                 <img
-                                    src="https://placehold.co/400x400?text=Iklan+Square"
+                                    src="https://placehold.co/400x400?text=Info+Seminar"
                                     className="h-full w-full object-cover"
                                     alt="Ads"
                                 />
                                 <span className="absolute top-2 right-2 rounded bg-white/80 px-1 text-[10px] text-gray-400">
-                                    Ad
+                                    Info
                                 </span>
                             </div>
                         </div>
@@ -485,7 +488,7 @@ export default function Index() {
                         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
                             <div className="border-b border-l-4 border-[#dd0000] border-gray-100 bg-gray-50 px-5 py-4">
                                 <h3 className="text-lg font-bold text-gray-800">
-                                    Update Terbaru
+                                    Terbaru
                                 </h3>
                             </div>
                             <div className="flex flex-col gap-2 p-4">
@@ -494,8 +497,8 @@ export default function Index() {
                                         key={i}
                                         item={{
                                             id: i + 100,
-                                            category: 'Kabar Daerah',
-                                            title: 'BUMDES Desa Situterate Tanam Jagung Perdana, Dorong Ketahanan Pangan',
+                                            category: 'Agenda',
+                                            title: 'Jadwal Ujian Akhir Semester Genap Tahun Ajaran 2025/2026',
                                             imageUrl: `https://placehold.co/150x150?text=Update+${i}`,
                                             timestamp: `${i * 10} Menit lalu`,
                                         }}
@@ -511,13 +514,13 @@ export default function Index() {
                             </h3>
                             <div className="flex flex-wrap gap-2">
                                 {[
-                                    'Pemilu 2024',
-                                    'Timnas Indonesia',
-                                    'Korupsi',
-                                    'Crypto',
-                                    'Viral',
+                                    'Kampus Merdeka',
+                                    'Beasiswa',
+                                    'Jurnal',
+                                    'Wisuda',
                                     'Teknologi',
-                                    'Wisata Banten',
+                                    'Sains',
+                                    'Mahasiswa',
                                 ].map((tag) => (
                                     <span
                                         key={tag}
@@ -538,13 +541,13 @@ export default function Index() {
                     <div className="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
                         {/* Brand Info */}
                         <div className="col-span-1">
-                            <h2 className="mb-4 text-3xl font-black tracking-tighter text-white">
-                                SERANGTIMUR
+                            <h2 className="mb-4 text-3xl font-black tracking-tighter text-white uppercase">
+                                LENSAPUBLIK
                             </h2>
                             <p className="mb-6 text-sm leading-relaxed">
-                                Menyajikan informasi terkini dari Serang dan
-                                sekitarnya dengan semangat jurnalisme yang
-                                independen, akurat, dan terpercaya.
+                                Portal berita akademik terpercaya menyajikan
+                                informasi terkini seputar dunia pendidikan,
+                                riset, dan pengabdian masyarakat.
                             </p>
                             <div className="flex gap-3">
                                 {['FB', 'IG', 'TW', 'YT'].map((social) => (
@@ -567,11 +570,11 @@ export default function Index() {
                             </h3>
                             <ul className="space-y-3 text-sm">
                                 {[
-                                    'Peristiwa',
-                                    'Hukrim',
-                                    'Pemerintahan',
-                                    'Ekonomi Bisnis',
-                                    'Olahraga',
+                                    'Berita Kampus',
+                                    'Akademik',
+                                    'Kemahasiswaan',
+                                    'Riset & Inovasi',
+                                    'Pengumuman',
                                 ].map((link) => (
                                     <li key={link}>
                                         <a
@@ -596,7 +599,7 @@ export default function Index() {
                                     'Redaksi',
                                     'Pedoman Media Siber',
                                     'Disclaimer',
-                                    'Kontak Iklan',
+                                    'Kerjasama',
                                 ].map((link) => (
                                     <li key={link}>
                                         <a
@@ -634,7 +637,7 @@ export default function Index() {
 
                     <div className="flex flex-col items-center justify-between border-t border-gray-800 pt-8 text-xs md:flex-row">
                         <p>
-                            &copy; 2026 Serangtimur.co.id. All Rights Reserved.
+                            &copy; 2026 lensapublik.ac.id. All Rights Reserved.
                         </p>
                         <div className="mt-4 flex gap-4 md:mt-0">
                             <a href="#" className="hover:text-white">
