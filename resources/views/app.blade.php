@@ -31,7 +31,7 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'Lensa Publik') }}</title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -47,6 +47,16 @@
     @if (isset($meta))
         <meta name="description" content="{{ $meta }}">
     @endif
+
+    {{-- Google tag (gtag.js) --}}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4N8JCVN8LN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-4N8JCVN8LN');
+    </script>
 </head>
 
 <body class="font-sans antialiased">
