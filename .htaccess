@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Arahkan semua request yang masuk ke folder /public
+    # Jika request belum diawali dengan /public, tambahkan secara internal
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # 2. Opsional: Tambahkan header untuk keamanan
+    # Menghindari sniffing MIME type oleh browser
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
