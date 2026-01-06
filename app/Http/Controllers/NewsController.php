@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
 
 class NewsController extends Controller
 {
@@ -72,6 +73,9 @@ class NewsController extends Controller
             $news->tags()->sync($request->tags);
         }
 
+        // Trigger cleanup to remove orphaned images uploaded during creation but not used
+        Artisan::call('images:cleanup');
+
         return redirect()->route('dashboard.posts.index')->with('success', 'Post created successfully');
     }
 
@@ -113,6 +117,18 @@ class NewsController extends Controller
             $validated['published_at'] = now();
         }
 
+        // Efficient Logic: Compare old and new content for removed images
+        $oldImages = $this->extractImages($post->content);
+        $newImages = $this->extractImages($validated['content']);
+
+        $removedImages = array_diff($oldImages, $newImages);
+        foreach ($removedImages as $imageUrl) {
+            $path = str_replace(asset('storage/'), '', $imageUrl);
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
         $post->update($validated);
 
         if ($request->tags) {
@@ -129,8 +145,43 @@ class NewsController extends Controller
         if ($post->thumbnail) {
             Storage::disk('public')->delete($post->thumbnail);
         }
+
+        // Delete images from content
+        $images = $this->extractImages($post->content);
+        foreach ($images as $imageUrl) {
+            $path = str_replace(asset('storage/'), '', $imageUrl);
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
         $post->delete();
 
         return redirect()->back()->with('success', 'Post deleted successfully');
+    }
+
+    public function uploadEditorImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('news-content', 'public');
+            return response()->json([
+                'url' => asset('storage/' . $path)
+            ]);
+        }
+
+        return response()->json(['error' => 'Upload failed'], 400);
+    }
+
+    private function extractImages($html)
+    {
+        if (empty($html))
+            return [];
+
+        preg_match_all('/<img[^>]+src="([^">]+)"/i', $html, $matches);
+        return $matches[1] ?? [];
     }
 }

@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'destroy' => 'dashboard.tags.destroy',
     ]);
 
+    Route::post('dashboard/posts/upload-image', [NewsController::class, 'uploadEditorImage'])->name('dashboard.posts.upload-image');
     Route::resource('dashboard/posts', NewsController::class)->names([
         'index' => 'dashboard.posts.index',
         'create' => 'dashboard.posts.create',

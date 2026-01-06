@@ -19,11 +19,15 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { resizeImage } from '@/lib/image-compression';
 import dashboard from '@/routes/dashboard';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import axios from 'axios';
 import { ChevronLeft, Loader2, Upload } from 'lucide-react';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 interface Category {
     id: number;
@@ -68,6 +72,7 @@ export default function PostForm({
     tags,
 }: FormProps) {
     const isEdit = !!post;
+    const quillRef = useRef<ReactQuill>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -117,11 +122,24 @@ export default function PostForm({
         }
     }, [data.category_id, subCategories]);
 
-    const handleThumbnailChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleThumbnailChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setData('thumbnail', file);
-            setPreviewUrl(URL.createObjectURL(file));
+            try {
+                // Resize thumbnail to max 1200px width, height auto
+                const resizedFile = await resizeImage(
+                    file,
+                    1200,
+                    undefined,
+                    0.8,
+                );
+                setData('thumbnail', resizedFile);
+                setPreviewUrl(URL.createObjectURL(resizedFile));
+            } catch (error) {
+                console.error('Image processing failed:', error);
+                setData('thumbnail', file);
+                setPreviewUrl(URL.createObjectURL(file));
+            }
         }
     };
 
@@ -135,6 +153,64 @@ export default function PostForm({
         }
         setData('tags', currentTags);
     };
+
+    const imageHandler = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files?.[0];
+            if (file) {
+                try {
+                    // Resize content image to width 800px, height auto
+                    const resizedFile = await resizeImage(
+                        file,
+                        800,
+                        undefined,
+                        0.7,
+                    );
+                    const formData = new FormData();
+                    formData.append('image', resizedFile);
+
+                    const res = await axios.post(
+                        '/dashboard/posts/upload-image',
+                        formData,
+                    );
+                    const url = res.data.url;
+
+                    const quill = quillRef.current?.getEditor();
+                    if (quill) {
+                        const range = quill.getSelection();
+                        if (range) {
+                            quill.insertEmbed(range.index, 'image', url);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Image upload failed:', error);
+                }
+            }
+        };
+    };
+
+    const modules = useMemo(
+        () => ({
+            toolbar: {
+                container: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image', 'blockquote', 'code-block'],
+                    ['clean'],
+                ],
+                handlers: {
+                    image: imageHandler,
+                },
+            },
+        }),
+        [],
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -155,7 +231,7 @@ export default function PostForm({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Post' : 'Create Post'} />
 
-            <div className="mx-auto flex max-w-5xl flex-col gap-4 p-2 sm:p-4 md:p-6">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-2 sm:p-4 md:p-6">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
                         <Link href={dashboard.posts.index().url}>
@@ -218,16 +294,18 @@ export default function PostForm({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="content">Content</Label>
-                                    <Textarea
-                                        id="content"
-                                        value={data.content}
-                                        onChange={(e) =>
-                                            setData('content', e.target.value)
-                                        }
-                                        placeholder="Full story goes here..."
-                                        rows={15}
-                                        required
-                                    />
+                                    <div className="min-h-[400px] rounded-md border bg-background">
+                                        <ReactQuill
+                                            ref={quillRef}
+                                            theme="snow"
+                                            value={data.content}
+                                            onChange={(val) =>
+                                                setData('content', val)
+                                            }
+                                            modules={modules}
+                                            className="mb-12 h-[350px] sm:mb-10"
+                                        />
+                                    </div>
                                     {errors.content && (
                                         <p className="text-sm text-red-500">
                                             {errors.content}
