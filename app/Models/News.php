@@ -73,6 +73,14 @@ class News extends Model
     }
 
     /**
+     * Get the content images for the news.
+     */
+    public function contentImages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NewsImage::class);
+    }
+
+    /**
      * Static helper to extract images from HTML content.
      */
     public static function extractImagesFromHtml($html): array
@@ -94,10 +102,10 @@ class News extends Model
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($post->thumbnail);
             }
 
-            // Delete all images referenced in content
-            foreach (self::extractImagesFromHtml($post->content) as $url) {
-                $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            // Delete all images from related news_images table and storage
+            foreach ($post->contentImages as $image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->path);
+                $image->delete();
             }
         });
     }

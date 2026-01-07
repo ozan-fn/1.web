@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
 
     Route::post('dashboard/posts/upload-image', [NewsController::class, 'uploadEditorImage'])->name('dashboard.posts.upload-image');
+    Route::post('dashboard/posts/delete-image', [NewsController::class, 'deleteEditorImage'])->name('dashboard.posts.delete-image');
     Route::resource('dashboard/posts', NewsController::class)->names([
         'index' => 'dashboard.posts.index',
         'create' => 'dashboard.posts.create',

@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Artisan;
 
 class NewsController extends Controller
 {
@@ -74,7 +73,6 @@ class NewsController extends Controller
         if ($request->tags)
             $news->tags()->sync($request->tags);
 
-        Artisan::call('images:cleanup');
         return redirect()->route('dashboard.posts.index')->with('success', 'Post created successfully');
     }
 
@@ -98,12 +96,14 @@ class NewsController extends Controller
             $validated['published_at'] = now();
         }
 
-        // Cleanup removed images from content
-        $oldImages = News::extractImagesFromHtml($post->content);
-        $newImages = News::extractImagesFromHtml($validated['content']);
-        foreach (array_diff($oldImages, $newImages) as $url) {
-            $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
-            Storage::disk('public')->delete($path);
+        // Sync missing images from news_images table
+        $currentImagesInContent = News::extractImagesFromHtml($validated['content']);
+        foreach ($post->contentImages as $image) {
+            $imageUrl = '/storage/' . $image->path;
+            if (!in_array($imageUrl, $currentImagesInContent)) {
+                Storage::disk('public')->delete($image->path);
+                $image->delete();
+            }
         }
 
         $post->update($validated);
@@ -120,18 +120,39 @@ class NewsController extends Controller
 
     public function uploadEditorImage(Request $request)
     {
-        $request->validate(['image' => 'required|image|max:2048']);
+        $request->validate([
+            'image' => 'required|image|max:2048',
+            'news_id' => 'required|exists:news,id'
+        ]);
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('news-content', $filename, 'public');
 
+            \App\Models\NewsImage::create([
+                'news_id' => $request->news_id,
+                'path' => $path
+            ]);
+
             return response()->json([
-                'url' => '/storage/' . $path // Gunakan relative path tanpa host
+                'url' => '/storage/' . $path
             ]);
         }
         return response()->json(['error' => 'Upload failed'], 400);
+    }
+
+    public function deleteEditorImage(Request $request)
+    {
+        $request->validate(['url' => 'required|string']);
+        $path = str_replace('/storage/', '', parse_url($request->url, PHP_URL_PATH));
+
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+            \App\Models\NewsImage::where('path', $path)->delete();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['error' => 'Image not found'], 404);
     }
 
     private function extractImages($html)

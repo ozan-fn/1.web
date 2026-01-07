@@ -73,6 +73,7 @@ export default function PostForm({
 }: FormProps) {
     const isEdit = !!post;
     const quillRef = useRef<ReactQuill>(null);
+    const prevImagesRef = useRef<string[]>([]);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -109,6 +110,50 @@ export default function PostForm({
     const [previewUrl, setPreviewUrl] = useState<string | null>(
         post?.thumbnail ? `/storage/${post.thumbnail}` : null,
     );
+
+    useEffect(() => {
+        const extractImages = (html: string) => {
+            const matches = html.match(/<img[^>]+src="([^">]+)"/g);
+            if (!matches) return [];
+            return matches
+                .map((m) => {
+                    const srcMatch = m.match(/src="([^">]+)"/);
+                    return srcMatch ? srcMatch[1] : null;
+                })
+                .filter(Boolean) as string[];
+        };
+
+        const currentImages = extractImages(data.content || '');
+
+        // If it's the first run, just populate the ref
+        if (
+            prevImagesRef.current.length === 0 &&
+            (data.content || '').length > 0 &&
+            !post
+        ) {
+            // This is for new post that just started
+            prevImagesRef.current = currentImages;
+        } else if (prevImagesRef.current.length === 0 && post) {
+            // Initial load for existing post
+            prevImagesRef.current = currentImages;
+        }
+
+        const deletedImages = prevImagesRef.current.filter(
+            (src) => !currentImages.includes(src),
+        );
+
+        deletedImages.forEach((src) => {
+            if (src.includes('/storage/news-content/')) {
+                axios
+                    .post('/dashboard/posts/delete-image', { url: src })
+                    .catch((err) =>
+                        console.error('Failed to delete removed image:', err),
+                    );
+            }
+        });
+
+        prevImagesRef.current = currentImages;
+    }, [data.content]);
 
     useEffect(() => {
         if (data.category_id) {
@@ -173,6 +218,9 @@ export default function PostForm({
                     );
                     const formData = new FormData();
                     formData.append('image', resizedFile);
+                    if (post) {
+                        formData.append('news_id', post.id.toString());
+                    }
 
                     const res = await axios.post(
                         '/dashboard/posts/upload-image',
