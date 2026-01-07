@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\News;
+use App\Models\SiteSetting;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -11,62 +12,61 @@ class HomeController extends Controller
 {
     public function index(): Response
     {
-        $heroNews = News::with(['category', 'user'])
-            ->where('status', 'published')
-            ->where('is_featured', true)
-            ->latest('published_at')
-            ->first();
+        $siteSettings = SiteSetting::first();
 
-        // If no featured news, just get the latest one
-        if (!$heroNews) {
-            $heroNews = News::with(['category', 'user'])
-                ->where('status', 'published')
-                ->latest('published_at')
-                ->first();
-        }
-
-        $sideHeroNews = News::with(['category', 'user'])
-            ->where('status', 'published')
-            ->where('id', '!=', $heroNews?->id)
-            ->latest('published_at')
-            ->take(2)
+        // Get hero and side hero news in one query
+        $heroNewsItems = News::published()
+            ->with(['category', 'user'])
+            ->orderBy('is_featured', 'desc')
+            ->recent()
+            ->take(3)
             ->get();
 
-        $nationalNews = News::with(['category', 'user'])
-            ->where('status', 'published')
-            ->whereNotIn('id', array_filter([$heroNews?->id, ...$sideHeroNews->pluck('id')->toArray()]))
-            ->latest('published_at')
-            ->take(4)
-            ->get();
+        $heroNews = $heroNewsItems->shift();
+        $sideHeroNews = $heroNewsItems;
 
-        $trendingNews = News::with(['category'])
-            ->where('status', 'published')
+        $trendingNews = News::published()
+            ->with(['category'])
             ->orderBy('views', 'desc')
             ->take(5)
             ->get();
 
-        $latestNews = News::with(['category'])
-            ->where('status', 'published')
-            ->latest('published_at')
+        $latestNews = News::published()
+            ->with(['category'])
+            ->recent()
             ->take(3)
             ->get();
 
-        $categories = Category::all();
+        $categories = Category::where('is_nav', true)
+            ->orderBy('order')
+            ->get();
 
-        $videoNews = News::with(['category'])
-            ->where('status', 'published')
-            ->latest('published_at')
+        $homepageCategories = Category::where('is_homepage', true)
+            ->with([
+                'news' => function ($query) {
+                    $query->published()
+                        ->recent()
+                        ->take(4);
+                }
+            ])
+            ->orderBy('order')
+            ->get();
+
+        $videoNews = News::published()
+            ->with(['category'])
+            ->recent()
             ->take(5)
             ->get();
 
         return Inertia::render('home/index', [
             'heroNews' => $heroNews,
             'sideHeroNews' => $sideHeroNews,
-            'nationalNews' => $nationalNews,
             'trendingNews' => $trendingNews,
             'latestNews' => $latestNews,
             'videoNews' => $videoNews,
             'categories' => $categories,
+            'homepageCategories' => $homepageCategories,
+            'siteSettings' => $siteSettings,
         ]);
     }
 }

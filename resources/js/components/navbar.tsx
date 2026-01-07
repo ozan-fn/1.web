@@ -7,11 +7,26 @@ interface Category {
     slug: string;
 }
 
-interface Props {
-    categories: Category[];
+interface SiteSettings {
+    site_name: string;
+    tagline: string | null;
+    logo: string | null;
 }
 
-const Navbar: React.FC<Props> = ({ categories }) => {
+interface Props {
+    categories: Category[];
+    siteSettings?: SiteSettings | null;
+}
+
+const Navbar: React.FC<Props> = ({ categories, siteSettings }) => {
+    // Split site name for styling if it has multiple words
+    const siteNameParts = siteSettings?.site_name.split(' ') || [
+        'NEWS',
+        'PORTAL',
+    ];
+    const firstPart = siteNameParts[0];
+    const restParts = siteNameParts.slice(1).join(' ');
+
     return (
         <header className="sticky top-0 z-50 bg-white shadow-sm">
             {/* Top Bar */}
@@ -27,12 +42,26 @@ const Navbar: React.FC<Props> = ({ categories }) => {
                     </button>
                     {/* Logo */}
                     <Link href="/" className="flex flex-col leading-none">
-                        <span className="text-2xl font-black tracking-tighter text-red-600 uppercase italic">
-                            NEWS<span className="text-gray-900">PORTAL</span>
-                        </span>
-                        <span className="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-                            Informasi Terpercaya
-                        </span>
+                        {siteSettings?.logo ? (
+                            <img
+                                src={`/storage/${siteSettings.logo}`}
+                                alt={siteSettings.site_name}
+                                className="h-10 w-auto object-contain"
+                            />
+                        ) : (
+                            <>
+                                <span className="text-2xl font-black tracking-tighter text-red-600 uppercase italic">
+                                    {firstPart}
+                                    <span className="text-gray-900">
+                                        {restParts ? ` ${restParts}` : ''}
+                                    </span>
+                                </span>
+                                <span className="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase">
+                                    {siteSettings?.tagline ||
+                                        'Informasi Terpercaya'}
+                                </span>
+                            </>
+                        )}
                     </Link>
                 </div>
 

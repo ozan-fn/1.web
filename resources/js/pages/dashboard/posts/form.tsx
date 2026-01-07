@@ -246,10 +246,13 @@ export default function PostForm({
         () => ({
             toolbar: {
                 container: [
-                    [{ header: [1, 2, 3, false] }],
+                    [{ header: [1, 2, 3, 4, 5, 6, false] }],
                     ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
                     [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['link', 'image', 'blockquote', 'code-block'],
+                    [{ indent: '-1' }, { indent: '+1' }],
+                    ['link', 'image', 'video', 'blockquote', 'code-block'],
                     ['clean'],
                 ],
                 handlers: {

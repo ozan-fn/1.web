@@ -33,6 +33,30 @@ class News extends Model
     ];
 
     /**
+     * Scope a query to only include published news.
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+
+    /**
+     * Scope a query to only include featured news.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    /**
+     * Scope a query to order by published date.
+     */
+    public function scopeRecent($query)
+    {
+        return $query->latest('published_at');
+    }
+
+    /**
      * Get the user that authored the news.
      */
     public function user(): BelongsTo

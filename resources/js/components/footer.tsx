@@ -6,11 +6,40 @@ interface Category {
     slug: string;
 }
 
-interface Props {
-    categories?: Category[];
+interface SiteSettings {
+    site_name: string;
+    tagline: string | null;
+    description: string | null;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    social_facebook: string | null;
+    social_instagram: string | null;
+    social_twitter: string | null;
+    social_youtube: string | null;
 }
 
-const Footer: React.FC<Props> = ({ categories = [] }) => {
+interface Props {
+    categories?: Category[];
+    siteSettings?: SiteSettings | null;
+}
+
+const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
+    // Split site name for styling
+    const siteNameParts = siteSettings?.site_name.split(' ') || [
+        'NEWS',
+        'PORTAL',
+    ];
+    const firstPart = siteNameParts[0];
+    const restParts = siteNameParts.slice(1).join(' ');
+
+    const socials = [
+        { key: 'FB', url: siteSettings?.social_facebook },
+        { key: 'IG', url: siteSettings?.social_instagram },
+        { key: 'TW', url: siteSettings?.social_twitter },
+        { key: 'YT', url: siteSettings?.social_youtube },
+    ].filter((s) => s.url);
+
     return (
         <footer className="mt-20 border-t-4 border-red-600 bg-black pt-16 pb-12 text-gray-500">
             <div className="container mx-auto max-w-7xl px-4">
@@ -19,30 +48,67 @@ const Footer: React.FC<Props> = ({ categories = [] }) => {
                     <div className="col-span-1">
                         <div className="mb-6">
                             <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                NEWS
-                                <span className="text-gray-400">PORTAL</span>
+                                {firstPart}
+                                <span className="text-gray-400">
+                                    {' '}
+                                    {restParts}
+                                </span>
                             </h2>
                             <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-red-600 uppercase">
-                                Informasi Terpercaya
+                                {siteSettings?.tagline ||
+                                    'Informasi Terpercaya'}
                             </p>
                         </div>
-                        <p className="mb-8 text-sm leading-relaxed text-gray-400">
-                            Portal berita masa kini yang menyajikan informasi
-                            tercepat, akurat, dan mendalam dari seluruh penjuru
-                            negeri hingga mancanegara.
+                        <p className="mb-6 text-sm leading-relaxed text-gray-400">
+                            {siteSettings?.description ||
+                                'Portal berita masa kini yang menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri hingga mancanegara.'}
                         </p>
-                        <div className="flex gap-4">
-                            {['FB', 'IG', 'TW', 'YT'].map((social) => (
-                                <div
-                                    key={social}
-                                    className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-red-600 hover:bg-red-600 hover:text-white"
-                                >
-                                    <span className="text-[10px] font-black">
-                                        {social}
-                                    </span>
-                                </div>
-                            ))}
+
+                        {siteSettings?.address && (
+                            <p className="mb-4 text-xs leading-normal text-gray-400">
+                                <span className="mb-1 block text-gray-600">
+                                    Kantor:
+                                </span>
+                                {siteSettings.address}
+                            </p>
+                        )}
+
+                        <div className="mb-8 space-y-2">
+                            {siteSettings?.email && (
+                                <p className="text-xs text-gray-400">
+                                    <span className="text-gray-600">
+                                        Email:
+                                    </span>{' '}
+                                    {siteSettings.email}
+                                </p>
+                            )}
+                            {siteSettings?.phone && (
+                                <p className="text-xs text-gray-400">
+                                    <span className="text-gray-600">
+                                        Phone:
+                                    </span>{' '}
+                                    {siteSettings.phone}
+                                </p>
+                            )}
                         </div>
+
+                        {socials.length > 0 && (
+                            <div className="flex gap-4">
+                                {socials.map((social) => (
+                                    <a
+                                        key={social.key}
+                                        href={social.url!}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-red-600 hover:bg-red-600 hover:text-white"
+                                    >
+                                        <span className="text-[10px] font-black">
+                                            {social.key}
+                                        </span>
+                                    </a>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Quick Links */}
@@ -130,7 +196,9 @@ const Footer: React.FC<Props> = ({ categories = [] }) => {
 
                 <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
                     <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © 2026 NEWS PORTAL. ALL RIGHTS RESERVED.
+                        © {new Date().getFullYear()}{' '}
+                        {siteSettings?.site_name || 'NEWS PORTAL'}. ALL RIGHTS
+                        RESERVED.
                     </p>
                     <div className="mt-4 flex justify-center gap-6 md:mt-0">
                         <a

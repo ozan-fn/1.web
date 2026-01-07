@@ -27,10 +27,33 @@ class SiteSettingController extends Controller
             'description' => 'nullable|string',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048',
+            'favicon' => 'nullable|image|max:1024',
+            'social_facebook' => 'nullable|url',
+            'social_instagram' => 'nullable|url',
+            'social_twitter' => 'nullable|url',
+            'social_youtube' => 'nullable|url',
         ]);
 
+        $settings = SiteSetting::first() ?? new SiteSetting();
+
+        if ($request->hasFile('logo')) {
+            if ($settings->logo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($settings->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('site', 'public');
+        }
+
+        if ($request->hasFile('favicon')) {
+            if ($settings->favicon) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($settings->favicon);
+            }
+            $validated['favicon'] = $request->file('favicon')->store('site', 'public');
+        }
+
         SiteSetting::updateOrCreate(
-            ['id' => 1], // Always update the first record
+            ['id' => 1],
             $validated
         );
 

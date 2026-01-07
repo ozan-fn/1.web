@@ -15,5 +15,12 @@ class SiteSetting extends Model
         'description',
         'email',
         'phone',
+        'address',
+        'logo',
+        'favicon',
+        'social_facebook',
+        'social_instagram',
+        'social_twitter',
+        'social_youtube',
     ];
 }

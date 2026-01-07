@@ -17,6 +17,13 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->string('address')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('favicon')->nullable();
+            $table->string('social_facebook')->nullable();
+            $table->string('social_instagram')->nullable();
+            $table->string('social_twitter')->nullable();
+            $table->string('social_youtube')->nullable();
             $table->timestamps();
         });
     }
