@@ -6,7 +6,6 @@ import CategorySection from './partials/category-section';
 import HeroSection from './partials/hero-section';
 import StoryCategories from './partials/story-categories';
 import { Category, NewsItem } from './partials/types';
-import VideoSection from './partials/video-section';
 
 export interface SiteSettings {
     site_name: string;
@@ -102,7 +101,7 @@ export default function Index({
                             />
                         ))}
 
-                        <VideoSection news={videoNews} />
+                        {/* <VideoSection news={videoNews} /> */}
                     </div>
 
                     <Sidebar
