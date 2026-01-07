@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->integer('order')->default(0);
-            $table->boolean('is_show')->default(true);
+            $table->boolean('is_nav')->default(true);
             $table->timestamps();
         });
     }

@@ -36,7 +36,7 @@ class SubCategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'order' => 'required|integer',
-            'is_show' => 'required|boolean',
+            'is_nav' => 'required|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -53,7 +53,7 @@ class SubCategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'order' => 'required|integer',
-            'is_show' => 'required|boolean',
+            'is_nav' => 'required|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);

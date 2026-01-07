@@ -119,7 +119,8 @@ export default function CategoryIndex({
         name: '',
         description: '',
         order: 0,
-        is_show: true,
+        is_nav: true,
+        is_homepage: false,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -141,7 +142,8 @@ export default function CategoryIndex({
             name: category.name,
             description: category.description || '',
             order: category.order,
-            is_show: category.is_show,
+            is_nav: category.is_nav,
+            is_homepage: category.is_homepage,
         });
         setIsOpen(true);
     };
@@ -248,14 +250,28 @@ export default function CategoryIndex({
                                     <div className="flex flex-col justify-end gap-2 pb-2">
                                         <div className="flex items-center space-x-2">
                                             <Switch
-                                                id="is_show"
-                                                checked={data.is_show}
+                                                id="is_nav"
+                                                checked={data.is_nav}
                                                 onCheckedChange={(val) =>
-                                                    setData('is_show', val)
+                                                    setData('is_nav', val)
                                                 }
                                             />
-                                            <Label htmlFor="is_show">
-                                                Visible
+                                            <Label htmlFor="is_nav">
+                                                In Navbar
+                                            </Label>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col justify-end gap-2 pb-2">
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id="is_homepage"
+                                                checked={data.is_homepage}
+                                                onCheckedChange={(val) =>
+                                                    setData('is_homepage', val)
+                                                }
+                                            />
+                                            <Label htmlFor="is_homepage">
+                                                In Home
                                             </Label>
                                         </div>
                                     </div>

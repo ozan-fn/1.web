@@ -124,7 +124,7 @@ export default function SubCategoryIndex({
         name: '',
         description: '',
         order: 0,
-        is_show: true,
+        is_nav: true,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -147,7 +147,7 @@ export default function SubCategoryIndex({
             name: subCategory.name,
             description: subCategory.description || '',
             order: subCategory.order,
-            is_show: subCategory.is_show,
+            is_nav: subCategory.is_nav,
         });
         setIsOpen(true);
     };
@@ -288,14 +288,14 @@ export default function SubCategoryIndex({
                                     <div className="flex flex-col justify-end gap-2 pb-2">
                                         <div className="flex items-center space-x-2">
                                             <Switch
-                                                id="is_show"
-                                                checked={data.is_show}
+                                                id="is_nav"
+                                                checked={data.is_nav}
                                                 onCheckedChange={(val) =>
-                                                    setData('is_show', val)
+                                                    setData('is_nav', val)
                                                 }
                                             />
-                                            <Label htmlFor="is_show">
-                                                Visible
+                                            <Label htmlFor="is_nav">
+                                                In Navbar
                                             </Label>
                                         </div>
                                     </div>

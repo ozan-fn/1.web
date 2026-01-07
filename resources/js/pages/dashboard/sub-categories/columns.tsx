@@ -21,7 +21,7 @@ export interface SubCategory {
     name: string;
     description: string | null;
     order: number;
-    is_show: boolean;
+    is_nav: boolean;
     category: Category;
 }
 
@@ -86,27 +86,15 @@ export const columns = (
         ),
     },
     {
-        accessorKey: 'is_show',
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
-                >
-                    Status
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        accessorKey: 'is_nav',
+        header: 'In Nav',
         cell: ({ row }) => {
-            const isShow = row.getValue('is_show') as boolean;
+            const isNav = row.getValue('is_nav') as boolean;
             return (
                 <span
-                    className={`rounded-full px-2 py-1 text-xs ${isShow ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}
+                    className={`rounded-full px-2 py-1 text-xs ${isNav ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}
                 >
-                    {isShow ? 'Visible' : 'Hidden'}
+                    {isNav ? 'Visible' : 'Hidden'}
                 </span>
             );
         },

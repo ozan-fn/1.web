@@ -15,11 +15,13 @@ class Category extends Model
         'slug',
         'description',
         'order',
-        'is_show',
+        'is_nav',
+        'is_homepage',
     ];
 
     protected $casts = [
-        'is_show' => 'boolean',
+        'is_nav' => 'boolean',
+        'is_homepage' => 'boolean',
         'order' => 'integer',
     ];
 
