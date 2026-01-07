@@ -24,6 +24,7 @@ import AppLayout from '@/layouts/app-layout';
 import dashboard from '@/routes/dashboard';
 import { BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Tag, columns } from './columns';
@@ -47,12 +48,26 @@ export default function TagIndex({
     const [tagToDelete, setTagToDelete] = useState<Tag | null>(null);
     const [search, setSearch] = useState(filters.search || '');
 
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.field
+            ? [{ id: filters.field, desc: filters.direction === 'desc' }]
+            : [],
+    );
+
     useEffect(() => {
         const timer = setTimeout(() => {
             if (search !== (filters.search || '')) {
                 router.get(
                     dashboard.tags.index().url,
-                    { search },
+                    {
+                        search,
+                        field: sorting[0]?.id,
+                        direction: sorting[0]
+                            ? sorting[0].desc
+                                ? 'desc'
+                                : 'asc'
+                            : undefined,
+                    },
                     { preserveState: true, replace: true },
                 );
             }
@@ -60,6 +75,29 @@ export default function TagIndex({
 
         return () => clearTimeout(timer);
     }, [search]);
+
+    const handleSortingChange = (updaterOrValue: any) => {
+        const nextSorting =
+            typeof updaterOrValue === 'function'
+                ? updaterOrValue(sorting)
+                : updaterOrValue;
+
+        setSorting(nextSorting);
+
+        router.get(
+            dashboard.tags.index().url,
+            {
+                search,
+                field: nextSorting[0]?.id,
+                direction: nextSorting[0]
+                    ? nextSorting[0].desc
+                        ? 'desc'
+                        : 'asc'
+                    : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
 
     const {
         data,
@@ -201,7 +239,12 @@ export default function TagIndex({
                     </div>
                 </div>
 
-                <DataTable columns={tableColumns} data={tags} />
+                <DataTable
+                    columns={tableColumns}
+                    data={tags}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                />
 
                 <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                     <AlertDialogContent>

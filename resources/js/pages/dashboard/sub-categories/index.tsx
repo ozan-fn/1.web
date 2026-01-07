@@ -32,6 +32,7 @@ import AppLayout from '@/layouts/app-layout';
 import dashboard from '@/routes/dashboard';
 import { BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Category, columns, SubCategory } from './columns';
@@ -58,12 +59,26 @@ export default function SubCategoryIndex({
         useState<SubCategory | null>(null);
     const [search, setSearch] = useState(filters.search || '');
 
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.field
+            ? [{ id: filters.field, desc: filters.direction === 'desc' }]
+            : [],
+    );
+
     useEffect(() => {
         const timer = setTimeout(() => {
             if (search !== (filters.search || '')) {
                 router.get(
                     dashboard.subCategories.index().url,
-                    { search },
+                    {
+                        search,
+                        field: sorting[0]?.id,
+                        direction: sorting[0]
+                            ? sorting[0].desc
+                                ? 'desc'
+                                : 'asc'
+                            : undefined,
+                    },
                     { preserveState: true, replace: true },
                 );
             }
@@ -71,6 +86,29 @@ export default function SubCategoryIndex({
 
         return () => clearTimeout(timer);
     }, [search]);
+
+    const handleSortingChange = (updaterOrValue: any) => {
+        const nextSorting =
+            typeof updaterOrValue === 'function'
+                ? updaterOrValue(sorting)
+                : updaterOrValue;
+
+        setSorting(nextSorting);
+
+        router.get(
+            dashboard.subCategories.index().url,
+            {
+                search,
+                field: nextSorting[0]?.id,
+                direction: nextSorting[0]
+                    ? nextSorting[0].desc
+                        ? 'desc'
+                        : 'asc'
+                    : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
 
     const {
         data,
@@ -286,7 +324,12 @@ export default function SubCategoryIndex({
                     </div>
                 </div>
 
-                <DataTable columns={tableColumns} data={subCategories} />
+                <DataTable
+                    columns={tableColumns}
+                    data={subCategories}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                />
 
                 <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                     <AlertDialogContent>

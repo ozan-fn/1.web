@@ -54,4 +54,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
 });
 
+// Public Post Routes
+Route::get('/{category}/{post}', [\App\Http\Controllers\PostController::class, 'show'])->name('posts.show');
+Route::get('/{category}/{subcategory}/{post}', [\App\Http\Controllers\PostController::class, 'show'])->name('posts.sub.show');
+
 require __DIR__ . '/settings.php';

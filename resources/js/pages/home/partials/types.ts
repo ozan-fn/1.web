@@ -1,9 +1,24 @@
+export interface Category {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 export interface NewsItem {
     id: number;
-    category: string;
+    category: Category;
+    category_id: number;
+    sub_category?: Category | null;
+    user?: {
+        name: string;
+    };
     title: string;
-    imageUrl: string;
-    timestamp?: string;
+    slug: string;
+    thumbnail: string | null;
+    content: string;
+    published_at: string;
+    timestamp?: string; // For mock/display if needed
+    views?: number;
 }
 
 export interface VideoItem {

@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import React from 'react';
 import { NewsItem } from './types';
 
@@ -7,24 +8,31 @@ interface Props {
 }
 
 const OverlayCard: React.FC<Props> = ({ item, height = 'h-64' }) => (
-    <div
-        className={`group relative overflow-hidden rounded-lg ${height} w-full shadow-md`}
+    <Link
+        href={`/${item.category.slug}/${item.slug}`}
+        className={`group relative block overflow-hidden rounded-sm ${height} w-full shadow-sm`}
     >
-        <img
-            src={item.imageUrl}
-            alt={item.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full p-4 md:p-6">
-            <span className="mb-2 inline-block rounded bg-[#3357a7] px-2 py-1 text-[10px] font-bold tracking-widest text-white uppercase">
-                {item.category}
+        {item.thumbnail ? (
+            <img
+                src={`/storage/${item.thumbnail}`}
+                alt={item.title}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+        ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-xl font-bold text-gray-400 uppercase">
+                No Image
+            </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full p-5 md:p-8">
+            <span className="mb-3 inline-block bg-red-600 px-2 py-1 text-[10px] font-black tracking-widest text-white uppercase sm:text-[11px]">
+                {item.category.name}
             </span>
-            <h3 className="cursor-pointer font-['Roboto'] text-lg leading-snug font-bold text-white hover:underline md:text-xl">
+            <h3 className="cursor-pointer text-xl leading-tight font-black text-white transition-colors group-hover:text-red-100 sm:text-2xl md:text-3xl">
                 {item.title}
             </h3>
         </div>
-    </div>
+    </Link>
 );
 
 export default OverlayCard;

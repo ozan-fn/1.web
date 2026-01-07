@@ -47,11 +47,11 @@ interface Tag {
 
 interface Post {
     id: number;
-    category_id: number;
+    category_id: number | null;
     sub_category_id: number | null;
-    title: string;
+    title: string | null;
     excerpt: string | null;
-    content: string;
+    content: string | null;
     status: 'draft' | 'published' | 'archived';
     is_featured: boolean;
     thumbnail: string | null;

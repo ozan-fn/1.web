@@ -71,4 +71,34 @@ class News extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    /**
+     * Static helper to extract images from HTML content.
+     */
+    public static function extractImagesFromHtml($html): array
+    {
+        if (empty($html))
+            return [];
+        preg_match_all('/<img[^>]+src="([^">]+)"/i', $html, $matches);
+        return $matches[1] ?? [];
+    }
+
+    /**
+     * Boot the model to handle automatic cleanup on deletion.
+     */
+    protected static function booted()
+    {
+        static::deleting(function ($post) {
+            // Delete thumbnail
+            if ($post->thumbnail) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($post->thumbnail);
+            }
+
+            // Delete all images referenced in content
+            foreach (self::extractImagesFromHtml($post->content) as $url) {
+                $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            }
+        });
+    }
 }

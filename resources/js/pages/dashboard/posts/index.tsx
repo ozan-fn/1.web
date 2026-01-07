@@ -14,6 +14,7 @@ import AppLayout from '@/layouts/app-layout';
 import dashboard from '@/routes/dashboard';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Post, columns } from './columns';
@@ -35,12 +36,26 @@ export default function PostIndex({
     const [postToDelete, setPostToDelete] = useState<Post | null>(null);
     const [search, setSearch] = useState(filters.search || '');
 
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.field
+            ? [{ id: filters.field, desc: filters.direction === 'desc' }]
+            : [],
+    );
+
     useEffect(() => {
         const timer = setTimeout(() => {
             if (search !== (filters.search || '')) {
                 router.get(
                     dashboard.posts.index().url,
-                    { search },
+                    {
+                        search,
+                        field: sorting[0]?.id,
+                        direction: sorting[0]
+                            ? sorting[0].desc
+                                ? 'desc'
+                                : 'asc'
+                            : undefined,
+                    },
                     { preserveState: true, replace: true },
                 );
             }
@@ -48,6 +63,29 @@ export default function PostIndex({
 
         return () => clearTimeout(timer);
     }, [search]);
+
+    const handleSortingChange = (updaterOrValue: any) => {
+        const nextSorting =
+            typeof updaterOrValue === 'function'
+                ? updaterOrValue(sorting)
+                : updaterOrValue;
+
+        setSorting(nextSorting);
+
+        router.get(
+            dashboard.posts.index().url,
+            {
+                search,
+                field: nextSorting[0]?.id,
+                direction: nextSorting[0]
+                    ? nextSorting[0].desc
+                        ? 'desc'
+                        : 'asc'
+                    : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
 
     const openDelete = (post: Post) => {
         setPostToDelete(post);
@@ -95,7 +133,12 @@ export default function PostIndex({
                     </div>
                 </div>
 
-                <DataTable columns={tableColumns} data={posts} />
+                <DataTable
+                    columns={tableColumns}
+                    data={posts}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                />
 
                 <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                     <AlertDialogContent>

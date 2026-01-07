@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import React from 'react';
 import { NewsItem } from './types';
 
@@ -6,31 +7,35 @@ interface Props {
 }
 
 const ListCard: React.FC<Props> = ({ item }) => (
-    <div className="group mb-4 flex cursor-pointer items-start gap-4 rounded-lg border border-transparent bg-white p-2 transition-all hover:border-gray-100 hover:shadow-sm">
-        <div className="relative aspect-[4/3] w-1/3 shrink-0 overflow-hidden rounded-md">
-            <img
-                src={item.imageUrl}
-                alt={item.title}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-        </div>
-        <div className="flex h-full w-2/3 flex-col justify-between">
-            <div>
-                <span className="mb-1 block text-[10px] font-bold tracking-widest text-[#3357a7] uppercase">
-                    {item.category}
-                </span>
-                <h3 className="line-clamp-3 font-['Roboto'] text-sm leading-snug font-semibold text-gray-800 transition-colors group-hover:text-[#3357a7]">
-                    {item.title}
-                </h3>
-            </div>
-            {item.timestamp && (
-                <span className="mt-2 flex items-center text-[10px] text-gray-400">
-                    <span className="mr-1 h-1.5 w-1.5 rounded-full bg-gray-300"></span>
-                    {item.timestamp}
-                </span>
+    <Link
+        href={`/${item.category.slug}/${item.slug}`}
+        className="group mb-6 flex cursor-pointer items-start gap-4 border-b border-gray-100 pb-6 last:border-0 last:pb-0"
+    >
+        <div className="relative aspect-[16/9] w-1/3 shrink-0 overflow-hidden rounded-sm bg-gray-100">
+            {item.thumbnail ? (
+                <img
+                    src={`/storage/${item.thumbnail}`}
+                    alt={item.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+            ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gray-200 text-xs font-bold text-gray-400 uppercase">
+                    No Image
+                </div>
             )}
         </div>
-    </div>
+        <div className="flex w-2/3 flex-col gap-1.5">
+            <span className="text-[11px] font-black tracking-wider text-red-600 uppercase">
+                {item.category.name}
+            </span>
+            <h3 className="line-clamp-2 text-[15px] leading-tight font-extrabold text-gray-900 transition-colors group-hover:text-red-700 md:text-lg">
+                {item.title}
+            </h3>
+            <span className="text-[11px] font-medium tracking-tight text-gray-400 uppercase">
+                {new Date(item.published_at).toLocaleDateString('id-ID')}
+            </span>
+        </div>
+    </Link>
 );
 
 export default ListCard;

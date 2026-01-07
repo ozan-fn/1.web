@@ -25,6 +25,7 @@ import AppLayout from '@/layouts/app-layout';
 import dashboard from '@/routes/dashboard';
 import { BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Category, columns } from './columns';
@@ -40,7 +41,11 @@ export default function CategoryIndex({
     filters,
 }: {
     categories: Category[];
-    filters: { search?: string; field?: string; direction?: string };
+    filters: {
+        search?: string;
+        field?: string;
+        direction?: string;
+    };
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -50,12 +55,26 @@ export default function CategoryIndex({
     );
     const [search, setSearch] = useState(filters.search || '');
 
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.field
+            ? [{ id: filters.field, desc: filters.direction === 'desc' }]
+            : [],
+    );
+
     useEffect(() => {
         const timer = setTimeout(() => {
             if (search !== (filters.search || '')) {
                 router.get(
                     dashboard.categories.index().url,
-                    { search },
+                    {
+                        search,
+                        field: sorting[0]?.id,
+                        direction: sorting[0]
+                            ? sorting[0].desc
+                                ? 'desc'
+                                : 'asc'
+                            : undefined,
+                    },
                     { preserveState: true, replace: true },
                 );
             }
@@ -63,6 +82,29 @@ export default function CategoryIndex({
 
         return () => clearTimeout(timer);
     }, [search]);
+
+    const handleSortingChange = (updaterOrValue: any) => {
+        const nextSorting =
+            typeof updaterOrValue === 'function'
+                ? updaterOrValue(sorting)
+                : updaterOrValue;
+
+        setSorting(nextSorting);
+
+        router.get(
+            dashboard.categories.index().url,
+            {
+                search,
+                field: nextSorting[0]?.id,
+                direction: nextSorting[0]
+                    ? nextSorting[0].desc
+                        ? 'desc'
+                        : 'asc'
+                    : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
 
     const {
         data,
@@ -241,7 +283,12 @@ export default function CategoryIndex({
                     </div>
                 </div>
 
-                <DataTable columns={tableColumns} data={categories} />
+                <DataTable
+                    columns={tableColumns}
+                    data={categories}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                />
 
                 <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                     <AlertDialogContent>

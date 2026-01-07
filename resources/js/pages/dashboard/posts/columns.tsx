@@ -14,14 +14,14 @@ import { ArrowUpDown, Edit2, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 
 export interface Post {
     id: number;
-    title: string;
-    slug: string;
+    title: string | null;
+    slug: string | null;
     thumbnail: string | null;
     status: 'draft' | 'published' | 'archived';
     is_featured: boolean;
     views: number;
     created_at: string;
-    category: { name: string };
+    category: { name: string } | null;
     user: { name: string };
 }
 

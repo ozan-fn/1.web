@@ -8,25 +8,24 @@ interface Props {
 
 const SectionHeader: React.FC<Props> = ({
     title,
-    color = 'bg-[#3357a7]',
-    textColor = 'text-black',
+    color = 'bg-red-600',
+    textColor = 'text-gray-900',
 }) => (
     <div
-        className={`mb-4 flex items-center justify-between border-b ${textColor === 'text-white' ? 'border-gray-700' : 'border-gray-200'} pb-2`}
+        className={`mb-6 flex items-center justify-between border-b-2 border-red-600 pb-2`}
     >
         <div className="flex items-center">
-            <div className={`h-8 w-1 ${color} mr-3 rounded-full`}></div>
             <h2
-                className={`font-['Roboto'] text-xl font-bold md:text-2xl ${textColor} uppercase`}
+                className={`text-xl font-black tracking-tighter uppercase ${textColor} md:text-2xl`}
             >
                 {title}
             </h2>
         </div>
         <a
             href="#"
-            className={`text-sm ${textColor} flex items-center opacity-70 transition-opacity hover:opacity-100`}
+            className={`text-[12px] font-bold tracking-wider text-red-600 uppercase transition-colors hover:text-black`}
         >
-            Lihat Semua <span className="ml-1">→</span>
+            Lihat Semua <span className="ml-1">›</span>
         </a>
     </div>
 );

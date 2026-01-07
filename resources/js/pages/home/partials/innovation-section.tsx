@@ -8,34 +8,27 @@ interface Props {
     news: NewsItem[];
 }
 
-const InnovationSection: React.FC<Props> = ({ news }) => (
-    <div>
-        <SectionHeader title="Prestasi & Inovasi" />
-        <div className="flex flex-col gap-6 md:flex-row">
-            <div className="h-80 md:h-auto md:w-2/3">
-                <OverlayCard
-                    item={{
-                        id: 99,
-                        category: 'Teknologi',
-                        title: 'Mahasiswa Teknik Ciptakan Robot Pemilah Sampah Otomatis',
-                        imageUrl: 'https://placehold.co/600x400',
-                    }}
-                    height="h-full"
-                />
-            </div>
-            <div className="flex flex-col gap-2 md:w-1/3">
-                {news.slice(0, 3).map((item) => (
-                    <ListCard
-                        key={item.id}
-                        item={{
-                            ...item,
-                            category: 'Sains',
-                        }}
-                    />
-                ))}
+const InnovationSection: React.FC<Props> = ({ news }) => {
+    if (news.length === 0) return null;
+
+    const featured = news[0];
+    const others = news.slice(1, 4);
+
+    return (
+        <div>
+            <SectionHeader title="Prestasi & Inovasi" />
+            <div className="flex flex-col gap-6 md:flex-row">
+                <div className="h-80 md:h-auto md:w-2/3">
+                    <OverlayCard item={featured} height="h-full" />
+                </div>
+                <div className="flex flex-col gap-2 md:w-1/3">
+                    {others.map((item) => (
+                        <ListCard key={item.id} item={item} />
+                    ))}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default InnovationSection;
