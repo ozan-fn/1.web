@@ -58,13 +58,6 @@ export default function Index({
                         siteSettings?.description || 'Portal Berita Terpercaya'
                     }
                 />
-                {siteSettings?.favicon && (
-                    <link
-                        rel="icon"
-                        type="image/x-icon"
-                        href={`/storage/${siteSettings.favicon}`}
-                    />
-                )}
             </Head>
 
             <Navbar categories={categories} siteSettings={siteSettings} />
