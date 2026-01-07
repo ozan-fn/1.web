@@ -41,12 +41,29 @@ export interface SiteSettings {
     updated_at: string;
 }
 
+export interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    order: number;
+    is_nav: boolean;
+    is_homepage: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     siteSettings: SiteSettings | null;
+    categories: Category[];
     sidebarOpen: boolean;
+    flash: {
+        success: string | null;
+        error: string | null;
+    };
     [key: string]: unknown;
 }
 

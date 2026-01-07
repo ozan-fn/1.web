@@ -40,7 +40,9 @@ class CategoryController extends Controller
 
         Category::create($validated);
 
-        return redirect()->back();
+        \Illuminate\Support\Facades\Cache::forget('nav_categories');
+
+        return redirect()->back()->with('success', 'Category created successfully');
     }
 
     public function update(Request $request, Category $category)
@@ -57,12 +59,17 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return redirect()->back();
+        \Illuminate\Support\Facades\Cache::forget('nav_categories');
+
+        return redirect()->back()->with('success', 'Category updated successfully');
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
-        return redirect()->back();
+
+        \Illuminate\Support\Facades\Cache::forget('nav_categories');
+
+        return redirect()->back()->with('success', 'Category deleted successfully');
     }
 }

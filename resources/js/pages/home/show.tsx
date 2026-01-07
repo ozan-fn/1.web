@@ -32,9 +32,16 @@ interface Post {
 interface ShowProps {
     post: Post;
     relatedPosts: Post[];
+    trendingNews: Post[];
+    latestNews: Post[];
 }
 
-export default function PostShow({ post, relatedPosts }: ShowProps) {
+export default function PostShow({
+    post,
+    relatedPosts,
+    trendingNews,
+    latestNews,
+}: ShowProps) {
     const formattedDate = new Date(post.published_at).toLocaleDateString(
         'id-ID',
         {
@@ -288,7 +295,10 @@ export default function PostShow({ post, relatedPosts }: ShowProps) {
                     {/* Sidebar */}
                     <div className="lg:col-span-4">
                         <div className="sticky top-24 space-y-8">
-                            <Sidebar />
+                            <Sidebar
+                                trendingNews={trendingNews}
+                                latestNews={latestNews}
+                            />
                         </div>
                     </div>
                 </div>

@@ -57,7 +57,7 @@
     <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="{{ isset($title) ? 'article' : 'website' }}">
+    <meta property="og:type" content="{{ isset($published_at) ? 'article' : 'website' }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
@@ -65,11 +65,11 @@
         <meta property="og:image" content="{{ $pageImage }}">
     @endif
 
-    @if(isset($title))
+    @if(isset($published_at))
         <meta property="article:published_time" content="{{ $published_at }}">
         <meta property="article:author" content="{{ $pageAuthor }}">
         <meta property="article:section" content="{{ $category }}">
-        @if(isset($tags))
+        @if(isset($tags) && !empty($tags))
             @foreach(explode(', ', $tags) as $tag)
                 <meta property="article:tag" content="{{ $tag }}">
             @endforeach

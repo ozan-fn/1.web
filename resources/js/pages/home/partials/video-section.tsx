@@ -40,7 +40,7 @@ const VideoSection: React.FC<Props> = ({ news }) => {
                                 </div>
                                 <div className="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/40 to-transparent p-6">
                                     <span className="mb-2 inline-block text-[11px] font-black tracking-widest text-red-500 uppercase">
-                                        {mainVideo.category.name}
+                                        {mainVideo.category?.name || 'Video'}
                                     </span>
                                     <h3 className="text-lg leading-tight font-black sm:text-xl md:text-2xl">
                                         {mainVideo.title}

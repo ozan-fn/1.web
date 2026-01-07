@@ -57,6 +57,8 @@ class SiteSettingController extends Controller
             $validated
         );
 
+        \Illuminate\Support\Facades\Cache::forget('site_settings');
+
         return back()->with('success', 'Pengaturan situs berhasil diperbarui.');
     }
 }

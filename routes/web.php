@@ -62,7 +62,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
 });
 
+// Public Search & Tag Routes
+Route::get('/search', [\App\Http\Controllers\PostController::class, 'search'])->name('search');
+Route::get('/tag/{tag}', [\App\Http\Controllers\PostController::class, 'tag'])->name('tag.show');
+
 // Public Post Routes
+Route::get('/{category}', [\App\Http\Controllers\PostController::class, 'category'])->name('category.show');
 Route::get('/{category}/{post}', [\App\Http\Controllers\PostController::class, 'show'])->name('posts.show');
 Route::get('/{category}/{subcategory}/{post}', [\App\Http\Controllers\PostController::class, 'show'])->name('posts.sub.show');
 

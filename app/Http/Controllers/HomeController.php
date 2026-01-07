@@ -12,11 +12,11 @@ class HomeController extends Controller
 {
     public function index(): Response
     {
-        $siteSettings = SiteSetting::first();
+        $publicData = $this->getPublicData();
 
         // Get hero and side hero news in one query
         $heroNewsItems = News::published()
-            ->with(['category', 'user'])
+            ->with(['category', 'subCategory', 'user'])
             ->orderBy('is_featured', 'desc')
             ->recent()
             ->take(3)
@@ -26,25 +26,22 @@ class HomeController extends Controller
         $sideHeroNews = $heroNewsItems;
 
         $trendingNews = News::published()
-            ->with(['category'])
+            ->with(['category', 'subCategory'])
             ->orderBy('views', 'desc')
             ->take(5)
             ->get();
 
         $latestNews = News::published()
-            ->with(['category'])
+            ->with(['category', 'subCategory'])
             ->recent()
             ->take(3)
-            ->get();
-
-        $categories = Category::where('is_nav', true)
-            ->orderBy('order')
             ->get();
 
         $homepageCategories = Category::where('is_homepage', true)
             ->with([
                 'news' => function ($query) {
                     $query->published()
+                        ->with(['category', 'subCategory', 'user'])
                         ->recent()
                         ->take(4);
                 }
@@ -53,20 +50,18 @@ class HomeController extends Controller
             ->get();
 
         $videoNews = News::published()
-            ->with(['category'])
+            ->with(['category', 'subCategory'])
             ->recent()
             ->take(5)
             ->get();
 
-        return Inertia::render('home/index', [
+        return Inertia::render('home/index', array_merge([
             'heroNews' => $heroNews,
             'sideHeroNews' => $sideHeroNews,
             'trendingNews' => $trendingNews,
             'latestNews' => $latestNews,
             'videoNews' => $videoNews,
-            'categories' => $categories,
             'homepageCategories' => $homepageCategories,
-            'siteSettings' => $siteSettings,
-        ]);
+        ], $publicData));
     }
 }

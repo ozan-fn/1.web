@@ -1,3 +1,4 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -21,10 +22,16 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { resizeImage } from '@/lib/image-compression';
 import dashboard from '@/routes/dashboard';
-import { BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { BreadcrumbItem, SharedData } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { ChevronLeft, Loader2, Upload } from 'lucide-react';
+import {
+    AlertCircle,
+    CheckCircle2,
+    ChevronLeft,
+    Loader2,
+    Upload,
+} from 'lucide-react';
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -71,6 +78,7 @@ export default function PostForm({
     subCategories,
     tags,
 }: FormProps) {
+    const { flash } = usePage<SharedData>().props;
     const isEdit = !!post;
     const quillRef = useRef<ReactQuill>(null);
     const prevImagesRef = useRef<string[]>([]);
@@ -266,15 +274,19 @@ export default function PostForm({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Laravel doesn't support multipart/form-data with PUT/PATCH easily,
-        // using _method: PUT with post() is a common Inertia workaround but Inertia handles it automatically with post() if you use useForm's data.
+        const formData = {
+            ...data,
+            sub_category_id:
+                data.sub_category_id === 'none' ? null : data.sub_category_id,
+        };
+
         if (isEdit && post) {
             router.post(dashboard.posts.update(post.id).url, {
-                ...data,
+                ...formData,
                 _method: 'PUT',
             });
         } else {
-            postReq(dashboard.posts.store().url);
+            router.post(dashboard.posts.store().url, formData);
         }
     };
 
@@ -283,6 +295,36 @@ export default function PostForm({
             <Head title={isEdit ? 'Edit Post' : 'Create Post'} />
 
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-2 sm:p-4 md:p-6">
+                {flash.success && (
+                    <Alert
+                        variant="default"
+                        className="border-green-500/50 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400"
+                    >
+                        <CheckCircle2 className="h-4 w-4" />
+                        <AlertTitle>Success</AlertTitle>
+                        <AlertDescription>{flash.success}</AlertDescription>
+                    </Alert>
+                )}
+
+                {flash.error && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{flash.error}</AlertDescription>
+                    </Alert>
+                )}
+
+                {Object.keys(errors).length > 0 && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Validation Error</AlertTitle>
+                        <AlertDescription>
+                            Please fix the errors below before submitting the
+                            form.
+                        </AlertDescription>
+                    </Alert>
+                )}
+
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
                         <Link href={dashboard.posts.index().url}>

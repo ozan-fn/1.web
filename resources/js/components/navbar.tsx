@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
-import React from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
+import React, { useState } from 'react';
 
 interface Category {
     id: number;
@@ -14,11 +14,26 @@ interface SiteSettings {
 }
 
 interface Props {
-    categories: Category[];
+    categories?: Category[];
     siteSettings?: SiteSettings | null;
 }
 
-const Navbar: React.FC<Props> = ({ categories, siteSettings }) => {
+const Navbar: React.FC<Props> = ({
+    categories: propCategories,
+    siteSettings: propSiteSettings,
+}) => {
+    const { url, props } = usePage<any>();
+    const categories = propCategories || props.categories || [];
+    const siteSettings = propSiteSettings || props.siteSettings;
+    const [search, setSearch] = useState('');
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (search.trim()) {
+            router.get(`/search?q=${encodeURIComponent(search.trim())}`);
+        }
+    };
+
     // Split site name for styling if it has multiple words
     const siteNameParts = siteSettings?.site_name.split(' ') || [
         'NEWS',
@@ -65,13 +80,21 @@ const Navbar: React.FC<Props> = ({ categories, siteSettings }) => {
                 </div>
 
                 {/* Search Bar (Hidden on Mobile) */}
-                <div className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-gray-200 bg-white px-2 py-2 transition-colors focus-within:border-red-600 md:flex">
+                <form
+                    onSubmit={handleSearch}
+                    className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-gray-200 bg-white px-2 py-2 transition-colors focus-within:border-red-600 md:flex"
+                >
                     <input
                         type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                         placeholder="Cari berita..."
                         className="w-full bg-transparent text-sm font-medium text-gray-800 placeholder-gray-400 outline-none"
                     />
-                    <button className="px-2 text-gray-400 transition-colors hover:text-red-600">
+                    <button
+                        type="submit"
+                        className="px-2 text-gray-400 transition-colors hover:text-red-600"
+                    >
                         <svg
                             className="h-4 w-4 fill-none stroke-current stroke-2"
                             viewBox="0 0 24 24"
@@ -80,7 +103,7 @@ const Navbar: React.FC<Props> = ({ categories, siteSettings }) => {
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                     </button>
-                </div>
+                </form>
 
                 {/* Social / Auth */}
                 <div className="flex items-center gap-3">
@@ -96,22 +119,35 @@ const Navbar: React.FC<Props> = ({ categories, siteSettings }) => {
             {/* Navigation Menu (Scrollable) */}
             <nav className="border-t border-gray-100 bg-white">
                 <div className="no-scrollbar container mx-auto max-w-7xl overflow-x-auto px-4">
-                    <div className="flex gap-8 py-3 text-[13px] font-black tracking-tight whitespace-nowrap text-gray-900 uppercase">
+                    <div className="flex gap-8 py-3 text-[13px] font-black tracking-tight whitespace-nowrap uppercase">
                         <Link
                             href="/"
-                            className="border-b-2 border-red-600 text-red-600"
+                            className={`border-b-2 py-1 transition-colors ${
+                                url === '/'
+                                    ? 'border-red-600 text-red-600'
+                                    : 'border-transparent text-gray-900 hover:text-red-600'
+                            }`}
                         >
                             Home
                         </Link>
-                        {categories.map((cat) => (
-                            <Link
-                                key={cat.id}
-                                href={`/${cat.slug}`}
-                                className="transition-colors hover:text-red-600"
-                            >
-                                {cat.name}
-                            </Link>
-                        ))}
+                        {categories.map((cat) => {
+                            const href = `/${cat.slug}`;
+                            const isActive =
+                                url === href || url.startsWith(`${href}/`);
+                            return (
+                                <Link
+                                    key={cat.id}
+                                    href={href}
+                                    className={`border-b-2 py-1 transition-colors ${
+                                        isActive
+                                            ? 'border-red-600 text-red-600'
+                                            : 'border-transparent text-gray-900 hover:text-red-600'
+                                    }`}
+                                >
+                                    {cat.name}
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             </nav>

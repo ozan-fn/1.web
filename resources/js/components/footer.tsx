@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     Facebook,
     Instagram,
@@ -34,7 +34,14 @@ interface Props {
     siteSettings?: SiteSettings | null;
 }
 
-const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
+const Footer: React.FC<Props> = ({
+    categories: propCategories,
+    siteSettings: propSiteSettings,
+}) => {
+    const { props } = usePage<any>();
+    const categories = propCategories || props.categories || [];
+    const siteSettings = propSiteSettings || props.siteSettings;
+
     // Split site name for styling
     const siteNameParts = siteSettings?.site_name.split(' ') || [
         'NEWS',

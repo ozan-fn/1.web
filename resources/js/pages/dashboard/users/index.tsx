@@ -21,10 +21,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { SortingState } from '@tanstack/react-table';
-import { Plus, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { columns, User } from './columns';
 import { DataTable } from './data-table';
 
@@ -45,6 +47,8 @@ export default function UserIndex({
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
     const [search, setSearch] = useState(filters.search || '');
+    const { flash } = usePage<{ flash: { success?: string; error?: string } }>()
+        .props;
 
     const [sorting, setSorting] = useState<SortingState>(
         filters.field
@@ -162,7 +166,26 @@ export default function UserIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
-            <div className="flex flex-col gap-4 p-4 sm:p-6">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-2 sm:p-4 md:p-6">
+                {flash.success && (
+                    <Alert
+                        variant="default"
+                        className="border-green-500/50 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400"
+                    >
+                        <CheckCircle2 className="h-4 w-4" />
+                        <AlertTitle>Success</AlertTitle>
+                        <AlertDescription>{flash.success}</AlertDescription>
+                    </Alert>
+                )}
+
+                {flash.error && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{flash.error}</AlertDescription>
+                    </Alert>
+                )}
+
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold tracking-tight">
                         Manage Users

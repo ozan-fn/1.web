@@ -37,7 +37,7 @@ class TagController extends Controller
 
         Tag::create($validated);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Tag created successfully');
     }
 
     public function update(Request $request, Tag $tag)
@@ -51,13 +51,13 @@ class TagController extends Controller
 
         $tag->update($validated);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Tag updated successfully');
     }
 
     public function destroy(Tag $tag)
     {
         $tag->delete();
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Tag deleted successfully');
     }
 }

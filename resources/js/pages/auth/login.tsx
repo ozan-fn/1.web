@@ -1,5 +1,6 @@
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface LoginProps {
     status?: string;
@@ -28,6 +30,17 @@ export default function Login({
         >
             <Head title="Log in" />
 
+            {status && (
+                <Alert
+                    variant="default"
+                    className="border-green-500/50 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400"
+                >
+                    <CheckCircle2 className="h-4 w-4" />
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription>{status}</AlertDescription>
+                </Alert>
+            )}
+
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
@@ -35,6 +48,18 @@ export default function Login({
             >
                 {({ processing, errors }) => (
                     <>
+                        {Object.keys(errors).length > 0 &&
+                            !errors.email &&
+                            !errors.password && (
+                                <Alert variant="destructive">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>Error</AlertTitle>
+                                    <AlertDescription>
+                                        Terjadi kesalahan saat mencoba masuk.
+                                        Silakan periksa kembali data Anda.
+                                    </AlertDescription>
+                                </Alert>
+                            )}
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
@@ -103,12 +128,6 @@ export default function Login({
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </AuthLayout>
     );
 }

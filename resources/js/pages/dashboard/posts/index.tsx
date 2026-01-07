@@ -1,3 +1,4 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,10 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import dashboard from '@/routes/dashboard';
-import { BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { BreadcrumbItem, SharedData } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { SortingState } from '@tanstack/react-table';
-import { Plus, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Post, columns } from './columns';
 import { DataTable } from './data-table';
@@ -32,6 +33,7 @@ export default function PostIndex({
     posts: Post[];
     filters: { search?: string; field?: string; direction?: string };
 }) {
+    const { flash } = usePage<SharedData>().props;
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [postToDelete, setPostToDelete] = useState<Post | null>(null);
     const [search, setSearch] = useState(filters.search || '');
@@ -109,6 +111,25 @@ export default function PostIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Posts" />
             <div className="flex flex-col gap-4 p-4 sm:p-6">
+                {flash.success && (
+                    <Alert
+                        variant="default"
+                        className="border-green-500/50 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400"
+                    >
+                        <CheckCircle2 className="h-4 w-4" />
+                        <AlertTitle>Success</AlertTitle>
+                        <AlertDescription>{flash.success}</AlertDescription>
+                    </Alert>
+                )}
+
+                {flash.error && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{flash.error}</AlertDescription>
+                    </Alert>
+                )}
+
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold tracking-tight">
                         Manage Posts

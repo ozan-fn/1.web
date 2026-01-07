@@ -43,7 +43,7 @@ class SubCategoryController extends Controller
 
         SubCategory::create($validated);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Subcategory created successfully');
     }
 
     public function update(Request $request, SubCategory $subCategory)
@@ -60,13 +60,13 @@ class SubCategoryController extends Controller
 
         $subCategory->update($validated);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Subcategory updated successfully');
     }
 
     public function destroy(SubCategory $subCategory)
     {
         $subCategory->delete();
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Subcategory deleted successfully');
     }
 }

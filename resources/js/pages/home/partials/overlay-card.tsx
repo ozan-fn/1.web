@@ -9,7 +9,11 @@ interface Props {
 
 const OverlayCard: React.FC<Props> = ({ item, height = 'h-64' }) => (
     <Link
-        href={`/${item.category.slug}/${item.slug}`}
+        href={
+            item.sub_category
+                ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}`
+                : `/${item.category?.slug}/${item.slug}`
+        }
         className={`group relative block overflow-hidden rounded-sm ${height} w-full shadow-sm`}
     >
         {item.thumbnail ? (
@@ -26,7 +30,7 @@ const OverlayCard: React.FC<Props> = ({ item, height = 'h-64' }) => (
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full p-5 md:p-8">
             <span className="mb-3 inline-block bg-red-600 px-2 py-1 text-[10px] font-black tracking-widest text-white uppercase sm:text-[11px]">
-                {item.category.name}
+                {item.category?.name || 'Berita'}
             </span>
             <h3 className="cursor-pointer text-xl leading-tight font-black text-white transition-colors group-hover:text-red-100 sm:text-2xl md:text-3xl">
                 {item.title}
