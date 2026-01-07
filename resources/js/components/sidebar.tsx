@@ -40,20 +40,6 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingNews, latestNews }) => {
                 </div>
             </div>
 
-            {/* Sidebar Ad (Square) */}
-            <div className="overflow-hidden rounded-sm border border-gray-100 bg-gray-50">
-                <div className="border-b border-gray-100 bg-white py-1 text-center text-[9px] font-bold tracking-[0.2em] text-gray-300 uppercase">
-                    ADVERTISEMENT
-                </div>
-                <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden">
-                    <img
-                        src="https://placehold.co/400x400?text=Banner+Iklan"
-                        className="h-full w-full object-cover opacity-90 transition-opacity hover:opacity-100"
-                        alt="Ads"
-                    />
-                </div>
-            </div>
-
             {/* Widget: Terbaru (Cards) */}
             <div>
                 <div className="mb-6 flex items-center justify-between border-b-2 border-red-600 pb-2">

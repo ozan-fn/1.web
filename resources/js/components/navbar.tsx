@@ -41,27 +41,26 @@ const Navbar: React.FC<Props> = ({ categories, siteSettings }) => {
                         </div>
                     </button>
                     {/* Logo */}
-                    <Link href="/" className="flex flex-col leading-none">
-                        {siteSettings?.logo ? (
+                    <Link href="/" className="flex items-center gap-3">
+                        {siteSettings?.logo && (
                             <img
                                 src={`/storage/${siteSettings.logo}`}
                                 alt={siteSettings.site_name}
                                 className="h-10 w-auto object-contain"
                             />
-                        ) : (
-                            <>
-                                <span className="text-2xl font-black tracking-tighter text-red-600 uppercase italic">
-                                    {firstPart}
-                                    <span className="text-gray-900">
-                                        {restParts ? ` ${restParts}` : ''}
-                                    </span>
-                                </span>
-                                <span className="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-                                    {siteSettings?.tagline ||
-                                        'Informasi Terpercaya'}
-                                </span>
-                            </>
                         )}
+                        <div className="flex flex-col leading-none">
+                            <span className="text-2xl font-black tracking-tighter text-red-600 uppercase italic">
+                                {firstPart}
+                                <span className="text-gray-900">
+                                    {restParts ? ` ${restParts}` : ''}
+                                </span>
+                            </span>
+                            <span className="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase">
+                                {siteSettings?.tagline ||
+                                    'Informasi Terpercaya'}
+                            </span>
+                        </div>
                     </Link>
                 </div>
 

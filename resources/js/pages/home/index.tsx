@@ -64,18 +64,6 @@ export default function Index({
 
             {/* MAIN CONTENT */}
             <main className="container mx-auto max-w-7xl px-4 py-6">
-                {/* Banner Ad */}
-                <div className="mb-10 w-full overflow-hidden rounded-sm border border-gray-100 bg-gray-50">
-                    <div className="border-b border-gray-100 py-1 text-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                        Advertisement
-                    </div>
-                    <img
-                        src="https://placehold.co/1200x150?text=Iklan+News+Portal"
-                        alt="Ads"
-                        className="h-auto min-h-[100px] w-full object-cover"
-                    />
-                </div>
-
                 <StoryCategories categories={categoryNames} />
 
                 {heroNews && (
@@ -97,17 +85,6 @@ export default function Index({
                         ))}
 
                         <VideoSection news={videoNews} />
-
-                        {/* Horizontal Ad */}
-                        <div className="flex w-full flex-col overflow-hidden rounded-sm border border-gray-100 bg-gray-50">
-                            <div className="border-b border-gray-100 bg-white py-1 text-center text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-                                ADVERTISEMENT
-                            </div>
-                            <div className="flex aspect-[5/1] items-center justify-center text-xl font-black tracking-tighter text-gray-300 uppercase italic">
-                                {siteSettings?.site_name || 'News Portal'}
-                                <span className="text-gray-200"> Ad Space</span>
-                            </div>
-                        </div>
                     </div>
 
                     <Sidebar

@@ -1,3 +1,13 @@
+import { Link } from '@inertiajs/react';
+import {
+    Facebook,
+    Instagram,
+    Mail,
+    MapPin,
+    Phone,
+    Twitter,
+    Youtube,
+} from 'lucide-react';
 import React from 'react';
 
 interface Category {
@@ -34,10 +44,14 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
     const restParts = siteNameParts.slice(1).join(' ');
 
     const socials = [
-        { key: 'FB', url: siteSettings?.social_facebook },
-        { key: 'IG', url: siteSettings?.social_instagram },
-        { key: 'TW', url: siteSettings?.social_twitter },
-        { key: 'YT', url: siteSettings?.social_youtube },
+        { key: 'facebook', icon: Facebook, url: siteSettings?.social_facebook },
+        {
+            key: 'instagram',
+            icon: Instagram,
+            url: siteSettings?.social_instagram,
+        },
+        { key: 'twitter', icon: Twitter, url: siteSettings?.social_twitter },
+        { key: 'youtube', icon: Youtube, url: siteSettings?.social_youtube },
     ].filter((s) => s.url);
 
     return (
@@ -47,13 +61,15 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
                     {/* Brand Info */}
                     <div className="col-span-1">
                         <div className="mb-6">
-                            <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                {firstPart}
-                                <span className="text-gray-400">
-                                    {' '}
-                                    {restParts}
-                                </span>
-                            </h2>
+                            <Link href="/">
+                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
+                                    {firstPart}
+                                    <span className="text-gray-400">
+                                        {' '}
+                                        {restParts}
+                                    </span>
+                                </h2>
+                            </Link>
                             <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-red-600 uppercase">
                                 {siteSettings?.tagline ||
                                     'Informasi Terpercaya'}
@@ -61,39 +77,33 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
                         </div>
                         <p className="mb-6 text-sm leading-relaxed text-gray-400">
                             {siteSettings?.description ||
-                                'Portal berita masa kini yang menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri hingga mancanegara.'}
+                                `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}
                         </p>
 
-                        {siteSettings?.address && (
-                            <p className="mb-4 text-xs leading-normal text-gray-400">
-                                <span className="mb-1 block text-gray-600">
-                                    Kantor:
-                                </span>
-                                {siteSettings.address}
-                            </p>
-                        )}
+                        <div className="mb-8 space-y-4">
+                            {siteSettings?.address && (
+                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
+                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-red-600" />
+                                    <span>{siteSettings.address}</span>
+                                </div>
+                            )}
 
-                        <div className="mb-8 space-y-2">
                             {siteSettings?.email && (
-                                <p className="text-xs text-gray-400">
-                                    <span className="text-gray-600">
-                                        Email:
-                                    </span>{' '}
-                                    {siteSettings.email}
-                                </p>
+                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
+                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-red-600" />
+                                    <span>{siteSettings.email}</span>
+                                </div>
                             )}
                             {siteSettings?.phone && (
-                                <p className="text-xs text-gray-400">
-                                    <span className="text-gray-600">
-                                        Phone:
-                                    </span>{' '}
-                                    {siteSettings.phone}
-                                </p>
+                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
+                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-red-600" />
+                                    <span>{siteSettings.phone}</span>
+                                </div>
                             )}
                         </div>
 
                         {socials.length > 0 && (
-                            <div className="flex gap-4">
+                            <div className="flex gap-3">
                                 {socials.map((social) => (
                                     <a
                                         key={social.key}
@@ -102,9 +112,7 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
                                         rel="noopener noreferrer"
                                         className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-red-600 hover:bg-red-600 hover:text-white"
                                     >
-                                        <span className="text-[10px] font-black">
-                                            {social.key}
-                                        </span>
+                                        <social.icon className="h-4 w-4" />
                                     </a>
                                 ))}
                             </div>
@@ -116,36 +124,24 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
                         <h3 className="mb-8 border-l-4 border-red-600 pl-4 text-sm font-black tracking-widest text-white uppercase">
                             Kategori Populer
                         </h3>
-                        <ul className="grid grid-cols-1 gap-4 text-xs font-bold tracking-tight uppercase">
-                            {categories.length > 0
-                                ? categories.slice(0, 6).map((cat) => (
-                                      <li key={cat.id}>
-                                          <a
-                                              href={`/${cat.slug}`}
-                                              className="transition-colors hover:text-red-600"
-                                          >
-                                              {cat.name}
-                                          </a>
-                                      </li>
-                                  ))
-                                : [
-                                      'Nasional',
-                                      'Ekonomi',
-                                      'Teknologi',
-                                      'Otomotif',
-                                      'Hiburan',
-                                      'Gaya Hidup',
-                                  ].map((link) => (
-                                      <li key={link}>
-                                          <a
-                                              href="#"
-                                              className="transition-colors hover:text-red-600"
-                                          >
-                                              {link}
-                                          </a>
-                                      </li>
-                                  ))}
-                        </ul>
+                        {categories.length > 0 ? (
+                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
+                                {categories.slice(0, 10).map((cat) => (
+                                    <li key={cat.id}>
+                                        <Link
+                                            href={`/${cat.slug}`}
+                                            className="transition-colors hover:text-red-600"
+                                        >
+                                            {cat.name}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-xs text-gray-500 italic">
+                                Belum ada kategori.
+                            </p>
+                        )}
                     </div>
 
                     {/* Info Links */}
@@ -155,41 +151,48 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
                         </h3>
                         <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
                             {[
-                                'Tentang Kami',
-                                'Redaksi',
-                                'Pedoman Media Siber',
-                                'Disclaimer',
-                                'Kebijakan Privasi',
+                                { title: 'Tentang Kami', url: '#' },
+                                { title: 'Redaksi', url: '#' },
+                                { title: 'Pedoman Media Siber', url: '#' },
+                                { title: 'Disclaimer', url: '#' },
+                                { title: 'Kebijakan Privasi', url: '#' },
+                                { title: 'Kontak Kami', url: '#' },
                             ].map((link) => (
-                                <li key={link}>
-                                    <a
-                                        href="#"
+                                <li key={link.title}>
+                                    <Link
+                                        href={link.url}
                                         className="transition-colors hover:text-red-500"
                                     >
-                                        {link}
-                                    </a>
+                                        {link.title}
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* Newsletter */}
+                    {/* Redaksi / Office */}
                     <div className="col-span-1">
                         <h3 className="mb-8 border-l-4 border-red-600 pl-4 text-sm font-black tracking-widest text-white uppercase">
-                            Newsletter
+                            Bantuan & Redaksi
                         </h3>
-                        <p className="mb-6 text-sm text-gray-400">
-                            Langganan berita harian pilihan kami.
+                        <p className="mb-6 text-sm leading-relaxed text-gray-400">
+                            Punya informasi berita atau ingin bekerjasama dengan
+                            redaksi kami? Silakan hubungi kami melalui saluran
+                            berikut.
                         </p>
-                        <div className="flex flex-col gap-3">
-                            <input
-                                type="email"
-                                placeholder="Email Anda"
-                                className="rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs text-white transition-colors outline-none focus:border-red-600"
-                            />
-                            <button className="rounded-sm bg-red-600 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:bg-white hover:text-black">
-                                Berlangganan
-                            </button>
+                        <div className="space-y-3">
+                            <Link
+                                href="#"
+                                className="flex w-full items-center justify-center rounded-sm bg-red-600 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:bg-white hover:text-black"
+                            >
+                                Kirim Berita (WA)
+                            </Link>
+                            <Link
+                                href="#"
+                                className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-red-600 hover:bg-red-600"
+                            >
+                                Media Kit & Iklan
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -197,28 +200,16 @@ const Footer: React.FC<Props> = ({ categories = [], siteSettings }) => {
                 <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
                     <p className="text-[11px] font-medium tracking-widest uppercase">
                         © {new Date().getFullYear()}{' '}
-                        {siteSettings?.site_name || 'NEWS PORTAL'}. ALL RIGHTS
-                        RESERVED.
+                        {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak
+                        Cipta Dilindungi.
                     </p>
                     <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <a
-                            href="#"
-                            className="text-[10px] font-bold uppercase hover:text-white"
+                        <Link
+                            href="/login"
+                            className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-red-600"
                         >
-                            Terms
-                        </a>
-                        <a
-                            href="#"
-                            className="text-[10px] font-bold uppercase hover:text-white"
-                        >
-                            Privacy
-                        </a>
-                        <a
-                            href="#"
-                            className="text-[10px] font-bold uppercase hover:text-white"
-                        >
-                            Cookies
-                        </a>
+                            Admin Login
+                        </Link>
                     </div>
                 </div>
             </div>
