@@ -49,6 +49,24 @@ export default function PostShow({ post, relatedPosts }: ShowProps) {
             <Head>
                 <title>{post.title}</title>
                 <meta name="description" content={post.title} />
+                <meta property="og:title" content={post.title} />
+                <meta property="og:description" content={post.title} />
+                {post.thumbnail && (
+                    <meta
+                        property="og:image"
+                        content={`/storage/${post.thumbnail}`}
+                    />
+                )}
+                <meta property="og:type" content="article" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={post.title} />
+                <meta name="twitter:description" content={post.title} />
+                {post.thumbnail && (
+                    <meta
+                        name="twitter:image"
+                        content={`/storage/${post.thumbnail}`}
+                    />
+                )}
             </Head>
 
             <Navbar />

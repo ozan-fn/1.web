@@ -31,13 +31,59 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Lensa Publik') }}</title>
-
     @php
         $siteSettings = \App\Models\SiteSetting::first();
+        $siteName = $siteSettings->site_name ?? config('app.name', 'Lensa Publik');
+        $siteDescription = $siteSettings->description ?? 'Portal Berita Terpercaya';
         $favicon = $siteSettings && $siteSettings->favicon ? asset('storage/' . $siteSettings->favicon) : null;
-        // dd($siteSettings);
+        $logo = $siteSettings && $siteSettings->logo ? asset('storage/' . $siteSettings->logo) : null;
+
+        // Metadata override from controller
+        $pageTitle = isset($title) ? $title . ' - ' . $siteName : $siteName;
+        $pageDescription = $meta ?? $siteDescription;
+        $pageImage = isset($image) ? asset('storage/' . $image) : $logo;
+        $pageAuthor = $author ?? $siteName;
+        $pageKeywords = $tags ?? '';
     @endphp
+
+    <title inertia>{{ $pageTitle }}</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{{ $pageDescription }}">
+    @if($pageKeywords)
+        <meta name="keywords" content="{{ $pageKeywords }}">
+    @endif
+    <meta name="author" content="{{ $pageAuthor }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="{{ isset($title) ? 'article' : 'website' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    @if($pageImage)
+        <meta property="og:image" content="{{ $pageImage }}">
+    @endif
+
+    @if(isset($title))
+        <meta property="article:published_time" content="{{ $published_at }}">
+        <meta property="article:author" content="{{ $pageAuthor }}">
+        <meta property="article:section" content="{{ $category }}">
+        @if(isset($tags))
+            @foreach(explode(', ', $tags) as $tag)
+                <meta property="article:tag" content="{{ $tag }}">
+            @endforeach
+        @endif
+    @endif
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    @if($pageImage)
+        <meta name="twitter:image" content="{{ $pageImage }}">
+    @endif
 
     @if($favicon)
         <link rel="icon" href="{{ $favicon }}">
@@ -54,10 +100,6 @@
     @viteReactRefresh
     @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
     @inertiaHead
-
-    @if (isset($meta))
-        <meta name="description" content="{{ $meta }}">
-    @endif
 
     <script type="text/javascript">
         (function (c, l, a, r, i, t, y) {

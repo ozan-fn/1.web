@@ -55,6 +55,14 @@ class PostController extends Controller
         return Inertia::render('home/show', [
             'post' => $post,
             'relatedPosts' => $relatedPosts
-        ]);
+        ])->withViewData([
+                    'title' => $post->title,
+                    'meta' => $post->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160),
+                    'image' => $post->thumbnail,
+                    'author' => $post->user->name,
+                    'published_at' => $post->published_at,
+                    'category' => $post->category->name,
+                    'tags' => $post->tags->pluck('name')->join(', '),
+                ]);
     }
 }

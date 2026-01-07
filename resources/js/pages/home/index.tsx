@@ -58,6 +58,24 @@ export default function Index({
                         siteSettings?.description || 'Portal Berita Terpercaya'
                     }
                 />
+                <meta
+                    property="og:title"
+                    content={siteSettings?.site_name || 'Lensa Publik'}
+                />
+                <meta
+                    property="og:description"
+                    content={
+                        siteSettings?.description || 'Portal Berita Terpercaya'
+                    }
+                />
+                {siteSettings?.logo && (
+                    <meta
+                        property="og:image"
+                        content={`/storage/${siteSettings.logo}`}
+                    />
+                )}
+                <meta property="og:type" content="website" />
+                <meta name="twitter:card" content="summary_large_image" />
             </Head>
 
             <Navbar categories={categories} siteSettings={siteSettings} />
