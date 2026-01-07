@@ -162,12 +162,8 @@ export default function SiteSettings({ settings }: SiteSettingsProps) {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end border-t border-gray-100 pt-6 dark:border-gray-800">
-                                <Button
-                                    type="submit"
-                                    className="bg-[#3357a7] hover:bg-blue-800"
-                                    disabled={processing}
-                                >
+                            <div className="flex justify-end pt-6">
+                                <Button type="submit" disabled={processing}>
                                     {processing
                                         ? 'Menyimpan...'
                                         : 'Simpan Perubahan'}

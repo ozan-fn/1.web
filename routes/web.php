@@ -53,6 +53,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'update' => 'dashboard.posts.update',
         'destroy' => 'dashboard.posts.destroy',
     ]);
+
+    Route::resource('dashboard/users', \App\Http\Controllers\UserController::class)->names([
+        'index' => 'dashboard.users.index',
+        'store' => 'dashboard.users.store',
+        'update' => 'dashboard.users.update',
+        'destroy' => 'dashboard.users.destroy',
+    ]);
 });
 
 // Public Post Routes

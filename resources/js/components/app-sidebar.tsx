@@ -20,6 +20,7 @@ import {
     LayoutGrid,
     ListTree,
     Settings,
+    Shield,
     Tags,
 } from 'lucide-react';
 import AppLogo from './app-logo';
@@ -55,6 +56,11 @@ const mainNavItems: NavItem[] = [
         title: 'Posts',
         href: '/dashboard/posts',
         icon: FileText,
+    },
+    {
+        title: 'Users',
+        href: '/dashboard/users',
+        icon: Shield,
     },
 ];
 
