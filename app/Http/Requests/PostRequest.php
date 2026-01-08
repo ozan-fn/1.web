@@ -21,9 +21,9 @@ class PostRequest extends FormRequest
             'content' => 'required|string',
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'required|boolean',
-            'thumbnail' => 'nullable|image|max:2048',
+            'thumbnail' => 'nullable|image|max:10240',
             'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
+            'tags.*' => 'nullable|string|max:100',
         ];
     }
 }

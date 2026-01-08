@@ -34,6 +34,7 @@ export interface NewsItem {
     title: string;
     slug: string;
     thumbnail: string | null;
+    thumbnail_url: string | null;
     content: string;
     excerpt?: string | null;
     published_at: string;
@@ -108,9 +109,9 @@ export default function CategoryPage({
                                 href={`/${item.category.slug}/${item.slug}`}
                                 className="relative h-48 overflow-hidden bg-gray-100"
                             >
-                                {item.thumbnail ? (
+                                {item.thumbnail_url ? (
                                     <img
-                                        src={`/storage/${item.thumbnail}`}
+                                        src={item.thumbnail_url}
                                         alt={item.title}
                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />

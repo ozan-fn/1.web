@@ -16,9 +16,9 @@ const OverlayCard: React.FC<Props> = ({ item, height = 'h-64' }) => (
         }
         className={`group relative block overflow-hidden rounded-sm ${height} w-full shadow-sm`}
     >
-        {item.thumbnail ? (
+        {item.thumbnail_url ? (
             <img
-                src={`/storage/${item.thumbnail}`}
+                src={item.thumbnail_url}
                 alt={item.title}
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />

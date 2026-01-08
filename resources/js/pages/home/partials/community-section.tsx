@@ -17,7 +17,7 @@ const CommunitySection: React.FC<Props> = ({ news }) => (
                 >
                     <div className="relative mb-4 aspect-video overflow-hidden rounded-sm bg-gray-100">
                         <img
-                            src={`/storage/${item.thumbnail}`}
+                            src={item.thumbnail_url || ''}
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                             alt={item.title}
                         />

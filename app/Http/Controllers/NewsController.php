@@ -70,8 +70,18 @@ class NewsController extends Controller
         }
 
         $news = News::create($validated);
-        if ($request->tags)
-            $news->tags()->sync($request->tags);
+
+        $tagIds = [];
+        if ($request->tags) {
+            foreach ($request->tags as $tagName) {
+                $tag = Tag::firstOrCreate(
+                    ['name' => $tagName],
+                    ['slug' => Str::slug($tagName)]
+                );
+                $tagIds[] = $tag->id;
+            }
+        }
+        $news->tags()->sync($tagIds);
 
         $this->syncContentImages($news);
 
@@ -85,32 +95,30 @@ class NewsController extends Controller
 
         foreach ($currentImagesInContent as $url) {
             if (str_contains($url, 'news-content/')) {
-                // Get path after 'news-content/' and prepend it back to ensure it starts with news-content/
                 $filename = Str::after($url, 'news-content/');
-                // Remove any query params or fragments if they exist in the extracted URL
                 $filename = parse_url($filename, PHP_URL_PATH);
                 $path = 'news-content/' . $filename;
-
                 $storagePathsInContent[] = $path;
 
-                // Create record if missing
-                \App\Models\NewsImage::firstOrCreate([
-                    'path' => $path
-                ], [
-                    'news_id' => $post->id
-                ]);
+                // Create or update record to ensure news_id is set
+                \App\Models\NewsImage::updateOrCreate(
+                    ['path' => $path],
+                    ['news_id' => $post->id]
+                );
             }
         }
 
-        // Cleanup orphaned records for THIS post (images removed from content)
-        foreach ($post->contentImages as $image) {
-            if (!in_array($image->path, $storagePathsInContent)) {
-                // Sanitize path before deletion to be absolutely sure
-                $cleanPath = str_replace(['../', './'], '', $image->path);
-                if (Storage::disk('public')->exists($cleanPath)) {
-                    Storage::disk('public')->delete($cleanPath);
+        // Only cleanup if images were correctly identified in content OR if content is truly empty of any images
+        // To be safe, we only delete if the post actually has some images registered.
+        if ($post->contentImages()->count() > 0) {
+            foreach ($post->contentImages as $image) {
+                if (!in_array($image->path, $storagePathsInContent)) {
+                    $cleanPath = str_replace(['../', './'], '', $image->path);
+                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($cleanPath);
+                    }
+                    $image->delete();
                 }
-                $image->delete();
             }
         }
     }
@@ -136,7 +144,18 @@ class NewsController extends Controller
         }
 
         $post->update($validated);
-        $post->tags()->sync($request->tags ?? []);
+
+        $tagIds = [];
+        if ($request->tags) {
+            foreach ($request->tags as $tagName) {
+                $tag = Tag::firstOrCreate(
+                    ['name' => $tagName],
+                    ['slug' => Str::slug($tagName)]
+                );
+                $tagIds[] = $tag->id;
+            }
+        }
+        $post->tags()->sync($tagIds);
 
         $this->syncContentImages($post);
 
@@ -197,14 +216,5 @@ class NewsController extends Controller
             return response()->json(['success' => true]);
         }
         return response()->json(['error' => 'Image not found'], 404);
-    }
-
-    private function extractImages($html)
-    {
-        if (empty($html))
-            return [];
-
-        preg_match_all('/<img[^>]+src="([^">]+)"/i', $html, $matches);
-        return $matches[1] ?? [];
     }
 }

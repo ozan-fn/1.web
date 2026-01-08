@@ -17,6 +17,7 @@ export interface Post {
     title: string | null;
     slug: string | null;
     thumbnail: string | null;
+    thumbnail_url: string | null;
     status: 'draft' | 'published' | 'archived';
     is_featured: boolean;
     views: number;
@@ -35,10 +36,10 @@ export const columns = (onDelete: (post: Post) => void): ColumnDef<Post>[] => [
         accessorKey: 'thumbnail',
         header: 'Thumbnail',
         cell: ({ row }) => {
-            const thumbnail = row.getValue('thumbnail') as string;
-            return thumbnail ? (
+            const thumbnailUrl = row.original.thumbnail_url;
+            return thumbnailUrl ? (
                 <img
-                    src={`/storage/${thumbnail}`}
+                    src={thumbnailUrl}
                     alt="Thumbnail"
                     className="h-10 w-16 rounded object-cover"
                 />

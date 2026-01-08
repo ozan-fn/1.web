@@ -16,9 +16,9 @@ const ListCard: React.FC<Props> = ({ item }) => (
         className="group mb-6 flex cursor-pointer items-start gap-4 border-b border-gray-100 pb-6 transition-colors last:border-0 last:pb-0 dark:border-gray-800"
     >
         <div className="relative aspect-[16/9] w-1/3 shrink-0 overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-900">
-            {item.thumbnail ? (
+            {item.thumbnail_url ? (
                 <img
-                    src={`/storage/${item.thumbnail}`}
+                    src={item.thumbnail_url}
                     alt={item.title}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />

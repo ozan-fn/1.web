@@ -21,6 +21,7 @@ interface Post {
     slug: string;
     content: string;
     thumbnail: string | null;
+    thumbnail_url: string | null;
     published_at: string;
     views: number;
     category: Category;
@@ -61,21 +62,15 @@ export default function PostShow({
                 <meta name="description" content={post.title} />
                 <meta property="og:title" content={post.title} />
                 <meta property="og:description" content={post.title} />
-                {post.thumbnail && (
-                    <meta
-                        property="og:image"
-                        content={`/storage/${post.thumbnail}`}
-                    />
+                {post.thumbnail_url && (
+                    <meta property="og:image" content={post.thumbnail_url} />
                 )}
                 <meta property="og:type" content="article" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={post.title} />
                 <meta name="twitter:description" content={post.title} />
-                {post.thumbnail && (
-                    <meta
-                        name="twitter:image"
-                        content={`/storage/${post.thumbnail}`}
-                    />
+                {post.thumbnail_url && (
+                    <meta name="twitter:image" content={post.thumbnail_url} />
                 )}
             </Head>
 
@@ -197,11 +192,11 @@ export default function PostShow({
                                 </div>
                             </div>
 
-                            {post.thumbnail && (
+                            {post.thumbnail_url && (
                                 <figure className="mb-8">
                                     <div className="overflow-hidden rounded-lg shadow-sm">
                                         <img
-                                            src={`/storage/${post.thumbnail}`}
+                                            src={post.thumbnail_url}
                                             alt={post.title}
                                             className="h-auto w-full object-cover"
                                         />
@@ -263,10 +258,12 @@ export default function PostShow({
                                         className="group"
                                     >
                                         <div className="flex flex-col gap-4">
-                                            {related.thumbnail && (
+                                            {related.thumbnail_url && (
                                                 <div className="aspect-[16/9] overflow-hidden rounded-md shadow-sm">
                                                     <img
-                                                        src={`/storage/${related.thumbnail}`}
+                                                        src={
+                                                            related.thumbnail_url
+                                                        }
                                                         alt={related.title}
                                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     />

@@ -32,6 +32,24 @@ class News extends Model
         'views' => 'integer',
     ];
 
+    protected $appends = ['thumbnail_url'];
+
+    /**
+     * Get the full URL for the thumbnail.
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (!$this->thumbnail) {
+            return null;
+        }
+
+        if (filter_var($this->thumbnail, FILTER_VALIDATE_URL)) {
+            return $this->thumbnail;
+        }
+
+        return asset('storage/' . $this->thumbnail);
+    }
+
     /**
      * Scope a query to only include published news.
      */
@@ -111,7 +129,7 @@ class News extends Model
     {
         if (empty($html))
             return [];
-        preg_match_all('/<img[^>]+src="([^">]+)"/i', $html, $matches);
+        preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', $html, $matches);
         return $matches[1] ?? [];
     }
 

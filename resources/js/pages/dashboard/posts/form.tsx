@@ -1,4 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -7,7 +8,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -31,7 +31,9 @@ import {
     CheckCircle2,
     ChevronLeft,
     Loader2,
+    Plus,
     Upload,
+    X,
 } from 'lucide-react';
 import {
     ChangeEvent,
@@ -59,6 +61,7 @@ export default function PostForm() {
 
     const isEdit = Boolean(post);
     const editorRef = useRef<any>(null);
+    const tagContainerRef = useRef<HTMLDivElement>(null);
     const prevImagesRef = useRef<Set<string>>(new Set());
     const dataRef = useRef<any>(null);
 
@@ -74,9 +77,22 @@ export default function PostForm() {
             .filter(Boolean);
     };
 
-    const [previewUrl, setPreviewUrl] = useState<string | null>(
-        (post && (post.thumbnail_url || post.thumbnail)) || null,
-    );
+    const [previewUrl, setPreviewUrl] = useState<string | null>(() => {
+        if (!post) return null;
+        if (post.thumbnail_url) return post.thumbnail_url;
+        if (post.thumbnail) {
+            if (
+                post.thumbnail.startsWith('http') ||
+                post.thumbnail.startsWith('/')
+            ) {
+                return post.thumbnail;
+            }
+            return `/storage/${post.thumbnail}`;
+        }
+        return null;
+    });
+    const [tagInput, setTagInput] = useState('');
+    const [showTagSuggestions, setShowTagSuggestions] = useState(false);
 
     const [isSmallScreen, setIsSmallScreen] = useState<boolean>(() =>
         typeof window !== 'undefined'
@@ -87,6 +103,22 @@ export default function PostForm() {
     const useDarkMode =
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                tagContainerRef.current &&
+                !tagContainerRef.current.contains(event.target as Node)
+            ) {
+                setShowTagSuggestions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -135,7 +167,7 @@ export default function PostForm() {
         status: post?.status || 'draft',
         is_featured: post?.is_featured || false,
         thumbnail: null as File | null,
-        tags: post?.tags?.map((t: any) => t.id) || ([] as number[]),
+        tags: post?.tags?.map((t: any) => t.name) || ([] as string[]),
     });
 
     dataRef.current = data;
@@ -149,7 +181,7 @@ export default function PostForm() {
         status: string;
         is_featured: boolean;
         thumbnail: File | null;
-        tags: number[];
+        tags: string[];
     }
 
     const imageHandler = useCallback(
@@ -328,17 +360,27 @@ export default function PostForm() {
         }
     };
 
-    const handleTagToggle = (id: number) => {
-        const current = data.tags || [];
-        if (current.includes(id)) {
-            setData(
-                'tags',
-                current.filter((t: number) => t !== id),
-            );
-        } else {
-            setData('tags', [...current, id]);
+    const addTag = (tagName: string) => {
+        const normalized = tagName.trim();
+        if (normalized && !data.tags.includes(normalized)) {
+            setData('tags', [...data.tags, normalized]);
         }
+        setTagInput('');
+        setShowTagSuggestions(false);
     };
+
+    const removeTag = (tagName: string) => {
+        setData(
+            'tags',
+            data.tags.filter((t) => t !== tagName),
+        );
+    };
+
+    const filteredTags = (tags || []).filter(
+        (tag: any) =>
+            tag.name.toLowerCase().includes(tagInput.toLowerCase()) &&
+            !data.tags.includes(tag.name),
+    );
 
     const filteredSubCategories = (sub_categories || []).filter(
         (s: any) => s.category_id === data.category_id,
@@ -352,19 +394,30 @@ export default function PostForm() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const formData = {
+        // Ensure state is up to date with editor content
+        const latestContent = editorRef.current?.getContent() || data.content;
+
+        const finalData = {
             ...data,
+            content: latestContent,
             sub_category_id:
                 data.sub_category_id === 'none' ? null : data.sub_category_id,
         };
 
         if (isEdit && post) {
-            router.post(dashboard.posts.update(post.id).url, {
-                ...formData,
-                _method: 'PUT',
-            });
+            router.post(
+                dashboard.posts.update(post.id).url,
+                {
+                    ...finalData,
+                    _method: 'PUT',
+                },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                },
+            );
         } else {
-            router.post(dashboard.posts.store().url, formData);
+            router.post(dashboard.posts.store().url, finalData);
         }
     };
 
@@ -403,30 +456,35 @@ export default function PostForm() {
                     </Alert>
                 )}
 
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" asChild>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        className="-ml-2"
+                    >
                         <Link href={dashboard.posts.index().url}>
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-5 w-5" />
                         </Link>
                     </Button>
-                    <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
+                    <h1 className="text-2xl font-semibold tracking-tight">
                         {isEdit ? 'Edit Post' : 'Create New Post'}
-                    </h2>
+                    </h1>
                 </div>
 
                 <form
                     onSubmit={handleSubmit}
-                    className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6"
+                    className="grid grid-cols-1 gap-6 lg:grid-cols-3"
                 >
-                    <div className="space-y-4 lg:col-span-2 lg:space-y-6">
+                    <div className="space-y-6 lg:col-span-2">
                         <Card>
-                            <CardHeader className="p-4 sm:p-6">
+                            <CardHeader>
                                 <CardTitle>Post Content</CardTitle>
                                 <CardDescription>
                                     Write the main information for your post.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+                            <CardContent className="space-y-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="title">Title</Label>
                                     <Input
@@ -527,15 +585,15 @@ export default function PostForm() {
                         </Card>
                     </div>
 
-                    <div className="space-y-4 lg:space-y-6">
+                    <div className="space-y-6">
                         <Card>
-                            <CardHeader className="p-4 sm:p-6">
+                            <CardHeader>
                                 <CardTitle>Settings</CardTitle>
                                 <CardDescription>
                                     Classification and Status
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+                            <CardContent className="space-y-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="category">Category</Label>
                                     <Select
@@ -664,10 +722,10 @@ export default function PostForm() {
                         </Card>
 
                         <Card>
-                            <CardHeader className="p-4 sm:p-6">
+                            <CardHeader>
                                 <CardTitle>Thumbnail</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+                            <CardContent className="space-y-4">
                                 <div className="flex flex-col items-center gap-4">
                                     {previewUrl ? (
                                         <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
@@ -708,42 +766,103 @@ export default function PostForm() {
                         </Card>
 
                         <Card>
-                            <CardHeader className="p-4 sm:p-6">
+                            <CardHeader>
                                 <CardTitle>Tags</CardTitle>
+                                <CardDescription>
+                                    Add tags to categorize your post.
+                                </CardDescription>
                             </CardHeader>
-                            <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
-                                <div className="grid max-h-[200px] grid-cols-2 gap-2 overflow-y-auto pr-2">
-                                    {tags.map((tag: any) => (
-                                        <div
-                                            key={tag.id}
-                                            className="flex items-center space-x-2"
+                            <CardContent className="space-y-4">
+                                <div className="flex flex-wrap gap-2">
+                                    {data.tags.map((tagName) => (
+                                        <Badge
+                                            key={tagName}
+                                            variant="secondary"
+                                            className="flex items-center gap-1 px-2 py-1"
                                         >
-                                            <Checkbox
-                                                id={`tag-${tag.id}`}
-                                                checked={data.tags.includes(
-                                                    tag.id,
-                                                )}
-                                                onCheckedChange={() =>
-                                                    handleTagToggle(tag.id)
+                                            {tagName}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeTag(tagName)
                                                 }
-                                            />
-                                            <Label
-                                                htmlFor={`tag-${tag.id}`}
-                                                className="cursor-pointer text-sm font-normal"
+                                                className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                                             >
-                                                {tag.name}
-                                            </Label>
-                                        </div>
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </Badge>
                                     ))}
                                 </div>
+
+                                <div className="relative" ref={tagContainerRef}>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            placeholder="Type a tag name..."
+                                            value={tagInput}
+                                            onChange={(e) => {
+                                                setTagInput(e.target.value);
+                                                setShowTagSuggestions(true);
+                                            }}
+                                            onFocus={() =>
+                                                setShowTagSuggestions(true)
+                                            }
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    addTag(tagInput);
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => addTag(tagInput)}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
+                                    {showTagSuggestions && tagInput && (
+                                        <Card className="absolute right-0 left-0 z-50 mt-1 max-h-[200px] overflow-y-auto border shadow-lg">
+                                            <div className="p-1">
+                                                {filteredTags.length > 0 ? (
+                                                    filteredTags.map(
+                                                        (tag: any) => (
+                                                            <button
+                                                                key={tag.id}
+                                                                type="button"
+                                                                className="w-full rounded-sm px-3 py-2 text-left text-sm hover:bg-muted"
+                                                                onClick={() =>
+                                                                    addTag(
+                                                                        tag.name,
+                                                                    )
+                                                                }
+                                                            >
+                                                                {tag.name}
+                                                            </button>
+                                                        ),
+                                                    )
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className="w-full px-3 py-2 text-left text-sm text-muted-foreground"
+                                                        onClick={() =>
+                                                            addTag(tagInput)
+                                                        }
+                                                    >
+                                                        Create new tag "
+                                                        {tagInput}"
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </Card>
+                                    )}
+                                </div>
+
                                 {errors.tags && (
-                                    <p className="mt-2 text-sm text-red-500">
+                                    <p className="text-sm text-red-500">
                                         {errors.tags}
-                                    </p>
-                                )}
-                                {tags.length === 0 && (
-                                    <p className="text-sm text-muted-foreground">
-                                        No tags available.
                                     </p>
                                 )}
                             </CardContent>

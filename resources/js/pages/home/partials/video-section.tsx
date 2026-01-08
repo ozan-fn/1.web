@@ -24,7 +24,7 @@ const VideoSection: React.FC<Props> = ({ news }) => {
                         {mainVideo ? (
                             <>
                                 <img
-                                    src={`/storage/${mainVideo.thumbnail}`}
+                                    src={mainVideo.thumbnail_url || ''}
                                     className="aspect-video w-full object-cover opacity-80 transition-opacity duration-500 group-hover:opacity-100"
                                     alt={mainVideo.title}
                                 />
@@ -60,7 +60,7 @@ const VideoSection: React.FC<Props> = ({ news }) => {
                             >
                                 <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-sm bg-gray-800">
                                     <img
-                                        src={`/storage/${item.thumbnail}`}
+                                        src={item.thumbnail_url || ''}
                                         className="h-full w-full object-cover opacity-70 transition-opacity group-hover:opacity-100"
                                         alt={item.title}
                                     />

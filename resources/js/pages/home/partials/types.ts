@@ -16,6 +16,7 @@ export interface NewsItem {
     title: string;
     slug: string;
     thumbnail: string | null;
+    thumbnail_url: string | null;
     content: string;
     published_at: string;
     timestamp?: string; // For mock/display if needed
