@@ -55,6 +55,52 @@ export default function PostShow({
     // Check both snake_case and camelCase just in case
     const subCategory = post.sub_category || (post as any).subCategory;
 
+    const handleShare = (
+        platform: 'facebook' | 'twitter' | 'whatsapp' | 'copy',
+    ) => {
+        const url = window.location.href;
+        const title = post.title;
+        const text = `${title}\n\nBaca selengkapnya di: ${url}`;
+
+        switch (platform) {
+            case 'facebook':
+                window.open(
+                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+                    '_blank',
+                );
+                break;
+            case 'twitter':
+                window.open(
+                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
+                    '_blank',
+                );
+                break;
+            case 'whatsapp':
+                window.open(
+                    `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,
+                    '_blank',
+                );
+                break;
+            case 'copy':
+                if (navigator.share) {
+                    navigator
+                        .share({
+                            title: title,
+                            text: title,
+                            url: url,
+                        })
+                        .catch(() => {
+                            navigator.clipboard.writeText(url);
+                            alert('Link berhasil disalin!');
+                        });
+                } else {
+                    navigator.clipboard.writeText(url);
+                    alert('Link berhasil disalin!');
+                }
+                break;
+        }
+    };
+
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
             <Head>
@@ -152,12 +198,17 @@ export default function PostShow({
                                         WIB
                                     </span>
                                 </div>
-                                <div className="mt-6 flex items-center gap-4 border-y border-gray-100 py-4">
-                                    <span className="text-[11px] font-black tracking-widest text-gray-400 uppercase">
+                                <div className="mt-6 flex items-center gap-4 border-y border-gray-100 py-4 dark:border-gray-800">
+                                    <span className="text-[11px] font-black tracking-widest text-gray-400 uppercase dark:text-gray-500">
                                         BAGIKAN:
                                     </span>
                                     <div className="flex gap-2">
-                                        <button className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1877F2] text-white transition-transform hover:-translate-y-1">
+                                        <button
+                                            onClick={() =>
+                                                handleShare('facebook')
+                                            }
+                                            className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1877F2] text-white transition-transform hover:-translate-y-1"
+                                        >
                                             <svg
                                                 className="h-4 w-4 fill-current"
                                                 viewBox="0 0 24 24"
@@ -165,7 +216,12 @@ export default function PostShow({
                                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                             </svg>
                                         </button>
-                                        <button className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1DA1F2] text-white transition-transform hover:-translate-y-1">
+                                        <button
+                                            onClick={() =>
+                                                handleShare('twitter')
+                                            }
+                                            className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1DA1F2] text-white transition-transform hover:-translate-y-1"
+                                        >
                                             <svg
                                                 className="h-4 w-4 fill-current"
                                                 viewBox="0 0 24 24"
@@ -173,7 +229,12 @@ export default function PostShow({
                                                 <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                                             </svg>
                                         </button>
-                                        <button className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#25D366] text-white transition-transform hover:-translate-y-1">
+                                        <button
+                                            onClick={() =>
+                                                handleShare('whatsapp')
+                                            }
+                                            className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#25D366] text-white transition-transform hover:-translate-y-1"
+                                        >
                                             <svg
                                                 className="h-4 w-4 fill-current"
                                                 viewBox="0 0 24 24"
@@ -181,11 +242,14 @@ export default function PostShow({
                                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.27 9.27 0 01-4.487-1.159l-.323-.192-3.33.873.888-3.245-.211-.336a9.28 9.28 0 01-1.424-4.916c0-5.11 4.156-9.265 9.268-9.265a9.245 9.245 0 016.551 2.716 9.22 9.22 0 012.718 6.556c0 5.11-4.156 9.265-9.268 9.265M12 2.182a10.3 10.3 0 00-10.324 10.311 10.27 10.27 0 001.603 5.53L2 22l4.285-1.124a10.25 10.25 0 005.711 1.698l.004-.001c5.696 0 10.327-4.631 10.327-10.323 0-2.744-1.069-5.323-3.012-7.266A10.23 10.23 0 0012 2.182z" />
                                             </svg>
                                         </button>
-                                        <button className="flex h-8 w-8 items-center justify-center rounded-sm bg-gray-100 text-gray-500 transition-colors hover:bg-gray-900 hover:text-white">
+                                        <button
+                                            onClick={() => handleShare('copy')}
+                                            className="flex h-8 w-8 items-center justify-center rounded-sm bg-gray-100 text-gray-500 transition-colors hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+                                        >
                                             <Share2 className="h-4 w-4" />
                                         </button>
                                     </div>
-                                    <div className="ml-auto flex items-center gap-1.5 text-[12px] font-bold text-gray-400">
+                                    <div className="ml-auto flex items-center gap-1.5 text-[12px] font-bold text-gray-400 dark:text-gray-500">
                                         <Eye className="h-4 w-4" />
                                         <span>{post.views}</span>
                                     </div>
@@ -201,14 +265,14 @@ export default function PostShow({
                                             className="h-auto w-full object-cover"
                                         />
                                     </div>
-                                    <figcaption className="mt-3 text-[13px] leading-relaxed text-gray-500 italic">
+                                    <figcaption className="mt-3 text-[13px] leading-relaxed text-gray-500 italic dark:text-gray-400">
                                         Ilustrasi {post.title}. (Foto: Istimewa)
                                     </figcaption>
                                 </figure>
                             )}
 
                             <div
-                                className="quill-content prose prose-red prose-p:mb-6 prose-strong:text-gray-900 max-w-none text-[17px] leading-[1.8] text-[#333]"
+                                className="quill-content prose prose-red dark:prose-invert prose-p:mb-6 prose-strong:text-gray-900 dark:prose-strong:text-gray-100 max-w-none text-[17px] leading-[1.8] text-[#333] dark:text-gray-300"
                                 dangerouslySetInnerHTML={{
                                     __html: post.content,
                                 }}
@@ -216,8 +280,8 @@ export default function PostShow({
 
                             {/* Tags */}
                             {post.tags.length > 0 && (
-                                <div className="mt-12 border-t border-gray-100 pt-8">
-                                    <h4 className="mb-4 text-sm font-bold tracking-wider text-gray-900 uppercase">
+                                <div className="mt-12 border-t border-gray-100 pt-8 dark:border-gray-800">
+                                    <h4 className="mb-4 text-sm font-bold tracking-wider text-gray-900 uppercase dark:text-gray-100">
                                         TAGS:
                                     </h4>
                                     <div className="flex flex-wrap gap-2">
@@ -225,7 +289,7 @@ export default function PostShow({
                                             <Link
                                                 key={tag.id}
                                                 href={`/tag/${tag.name.toLowerCase()}`}
-                                                className="rounded-sm bg-gray-100 px-3 py-1.5 text-[13px] font-semibold text-gray-700 transition-colors hover:bg-red-600 hover:text-white"
+                                                className="rounded-sm bg-gray-100 px-3 py-1.5 text-[13px] font-semibold text-gray-700 transition-colors hover:bg-red-600 hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-600 dark:hover:text-white"
                                             >
                                                 {tag.name}
                                             </Link>
