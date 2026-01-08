@@ -9,7 +9,7 @@ interface Props {
 const SectionHeader: React.FC<Props> = ({
     title,
     color = 'bg-red-600',
-    textColor = 'text-gray-900',
+    textColor = 'text-gray-900 dark:text-white',
 }) => (
     <div
         className={`mb-6 flex items-center justify-between border-b-2 border-red-600 pb-2`}
@@ -23,7 +23,7 @@ const SectionHeader: React.FC<Props> = ({
         </div>
         <a
             href="#"
-            className={`text-[12px] font-bold tracking-wider text-red-600 uppercase transition-colors hover:text-black`}
+            className={`text-[12px] font-bold tracking-wider text-red-600 uppercase transition-colors hover:text-black dark:hover:text-white`}
         >
             Lihat Semua <span className="ml-1">›</span>
         </a>

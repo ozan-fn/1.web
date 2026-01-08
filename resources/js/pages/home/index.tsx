@@ -4,7 +4,6 @@ import Navbar from '../../components/navbar';
 import Sidebar from '../../components/sidebar';
 import CategorySection from './partials/category-section';
 import HeroSection from './partials/hero-section';
-import StoryCategories from './partials/story-categories';
 import { Category, NewsItem } from './partials/types';
 
 export interface SiteSettings {
@@ -48,7 +47,7 @@ export default function Index({
     const categoryNames = categories.map((cat) => cat.name);
 
     return (
-        <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900">
+        <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
             <Head>
                 <title>{siteSettings?.site_name || 'Lensa Publik'}</title>
                 <meta
@@ -81,7 +80,7 @@ export default function Index({
 
             {/* MAIN CONTENT */}
             <main className="container mx-auto max-w-7xl px-4 py-6">
-                <StoryCategories categories={categoryNames} />
+                {/* <StoryCategories categories={categoryNames} /> */}
 
                 {heroNews && (
                     <HeroSection

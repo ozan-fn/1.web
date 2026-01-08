@@ -9,10 +9,14 @@
     <script>
         (function () {
             const appearance = '{{ $appearance ?? "system" }}';
+            const storageTheme = localStorage.getItem('theme');
 
-            if (appearance === 'system') {
+            if (storageTheme === 'dark' || (!storageTheme && appearance === 'dark')) {
+                document.documentElement.classList.add('dark');
+            } else if (storageTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else if (appearance === 'system') {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
                 if (prefersDark) {
                     document.documentElement.classList.add('dark');
                 }

@@ -43,7 +43,7 @@ const Footer: React.FC<Props> = ({
     const siteSettings = propSiteSettings || props.siteSettings;
 
     // Split site name for styling
-    const siteNameParts = siteSettings?.site_name.split(' ') || [
+    const siteNameParts = siteSettings?.site_name?.split(' ') || [
         'NEWS',
         'PORTAL',
     ];
@@ -62,7 +62,7 @@ const Footer: React.FC<Props> = ({
     ].filter((s) => s.url);
 
     return (
-        <footer className="mt-20 border-t-4 border-red-600 bg-black pt-16 pb-12 text-gray-500">
+        <footer className="mt-20 border-t-4 border-red-600 bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-red-700">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
                     {/* Brand Info */}

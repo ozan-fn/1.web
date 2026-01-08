@@ -61,7 +61,7 @@ export default function CategoryPage({
     siteSettings,
 }: Props) {
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900">
+        <div className="min-h-screen bg-white font-sans text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
             <Head>
                 <title>{`Berita ${category.name} - ${siteSettings?.site_name || 'Lensa Publik'}`}</title>
                 <meta
@@ -90,11 +90,11 @@ export default function CategoryPage({
             <main className="container mx-auto max-w-7xl px-4 py-8">
                 {/* Header */}
                 <div className="mb-10 border-b-4 border-red-600 pb-4">
-                    <h1 className="text-4xl font-black tracking-tighter text-gray-900 uppercase italic">
+                    <h1 className="text-4xl font-black tracking-tighter text-gray-900 uppercase italic dark:text-white">
                         {category.name}
                     </h1>
                     {category.description && (
-                        <p className="mt-2 text-gray-600">
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">
                             {category.description}
                         </p>
                     )}

@@ -51,8 +51,11 @@ export default function PostShow({
         },
     );
 
+    // Check both snake_case and camelCase just in case
+    const subCategory = post.sub_category || (post as any).subCategory;
+
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900">
+        <div className="min-h-screen bg-white font-sans text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
             <Head>
                 <title>{post.title}</title>
                 <meta name="description" content={post.title} />
@@ -83,62 +86,66 @@ export default function PostShow({
                     {/* Main Content */}
                     <div className="lg:col-span-8">
                         {/* Breadcrumbs */}
-                        <nav className="mb-4 flex text-sm text-gray-500">
+                        <nav className="mb-4 flex text-sm text-gray-500 dark:text-gray-400">
                             <Link href="/" className="hover:text-red-600">
                                 Beranda
                             </Link>
                             <span className="mx-2">/</span>
                             <Link
-                                href={`/${post.category.slug}`}
+                                href={`/${post.category?.slug}`}
                                 className="hover:text-red-600"
                             >
-                                {post.category.name}
+                                {post.category?.name}
                             </Link>
-                            {post.sub_category && (
+                            {subCategory && (
                                 <>
                                     <span className="mx-2">/</span>
                                     <Link
-                                        href={`/${post.category.slug}/${post.sub_category.slug}`}
+                                        href={`/${post.category?.slug}/${subCategory.slug}`}
                                         className="hover:text-red-600"
                                     >
-                                        {post.sub_category.name}
+                                        {subCategory.name}
                                     </Link>
                                 </>
                             )}
                         </nav>
 
-                        <article className="bg-white">
+                        <article className="bg-white dark:bg-gray-950">
                             {/* Category Label */}
                             <div className="mb-2 flex items-center gap-2">
                                 <Link
-                                    href={`/${post.category.slug}`}
-                                    className="text-sm font-bold tracking-widest text-red-600 uppercase transition-colors hover:text-red-700"
+                                    href={`/${post.category?.slug}`}
+                                    className="text-sm font-bold tracking-widest text-red-600 uppercase transition-colors hover:text-red-700 dark:text-red-500"
                                 >
-                                    {post.category.name}
+                                    {post.category?.name}
                                 </Link>
-                                {post.sub_category && (
+                                {subCategory && (
                                     <>
-                                        <span className="text-gray-300">|</span>
+                                        <span className="text-gray-300 dark:text-gray-700">
+                                            |
+                                        </span>
                                         <Link
-                                            href={`/${post.category.slug}/${post.sub_category.slug}`}
-                                            className="text-sm font-medium text-gray-500 hover:text-red-600"
+                                            href={`/${post.category?.slug}/${subCategory.slug}`}
+                                            className="text-sm font-medium text-gray-500 hover:text-red-600 dark:text-gray-400"
                                         >
-                                            {post.sub_category.name}
+                                            {subCategory.name}
                                         </Link>
                                     </>
                                 )}
                             </div>
 
-                            <h1 className="mb-4 text-3xl leading-[1.15] font-black text-gray-900 sm:text-4xl md:text-5xl lg:text-[42px]">
+                            <h1 className="mb-4 text-3xl leading-[1.15] font-black text-gray-900 sm:text-4xl md:text-5xl lg:text-[42px] dark:text-white">
                                 {post.title}
                             </h1>
 
                             <div className="mb-6 focus:outline-none">
-                                <div className="flex items-center gap-2 text-[13px] text-gray-500">
-                                    <span className="font-bold text-gray-900 underline decoration-red-600 decoration-2 underline-offset-4">
-                                        {post.user.name}
+                                <div className="flex items-center gap-2 text-[13px] text-gray-500 dark:text-gray-400">
+                                    <span className="font-bold text-gray-900 underline decoration-red-600 decoration-2 underline-offset-4 dark:text-gray-200">
+                                        {post.user?.name}
                                     </span>
-                                    <span className="text-gray-300">|</span>
+                                    <span className="text-gray-300 dark:text-gray-700">
+                                        |
+                                    </span>
                                     <span className="font-medium tracking-tight uppercase">
                                         {formattedDate} |{' '}
                                         {new Date(
