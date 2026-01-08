@@ -142,52 +142,47 @@
     }
 }
 
-/* Quill Content Styles */
-.quill-content {
-    line-height: 1.8;
+/* TinyMCE Content Styles (from requested config) */
+figure.image {
+    display: inline-block;
+    border: 1px solid gray;
+    margin: 0 2px 0 1px;
+    background: #f5f2f0;
 }
-.quill-content ul {
-    list-style-type: disc !important;
-    padding-left: 1.5rem !important;
-    margin-bottom: 1rem;
+
+figure.align-left {
+    float: left;
 }
-.quill-content ol {
-    list-style-type: decimal !important;
-    padding-left: 1.5rem !important;
-    margin-bottom: 1rem;
+
+figure.align-right {
+    float: right;
 }
-.quill-content h1 {
-    font-size: 2.25rem;
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+
+figure.image img {
+    margin: 8px 8px 0 8px;
 }
-.quill-content h2 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+
+figure.image figcaption {
+    margin: 6px 8px 6px 8px;
+    text-align: center;
 }
-.quill-content h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+
+img.align-left {
+    float: left;
 }
-.quill-content p {
-    margin-bottom: 1.5rem;
+
+img.align-right {
+    float: right;
 }
-.quill-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.75rem;
-    margin: 2rem auto;
-    display: block;
+
+.mce-toc {
+    border: 1px solid gray;
 }
-.quill-content blockquote {
-    border-left: 4px solid #ef4444;
-    padding-left: 1rem;
-    font-style: italic;
-    color: #4b5563;
-    margin: 1.5rem 0;
+
+.mce-toc h2 {
+    margin: 4px;
+}
+
+.mce-toc li {
+    list-style-type: none;
 }

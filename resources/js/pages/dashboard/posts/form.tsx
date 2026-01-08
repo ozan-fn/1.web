@@ -24,6 +24,7 @@ import { resizeImage } from '@/lib/image-compression';
 import dashboard from '@/routes/dashboard';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
 import {
     AlertCircle,
@@ -32,62 +33,87 @@ import {
     Loader2,
     Upload,
 } from 'lucide-react';
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import {
+    ChangeEvent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 
 interface Category {
     id: number;
     name: string;
 }
 
-interface SubCategory {
-    id: number;
-    category_id: number;
-    name: string;
-}
+export default function PostForm() {
+    const { props } = usePage<SharedData>();
+    const {
+        categories = [],
+        sub_categories = [],
+        tags = [],
+        post = null,
+        flash = {},
+    } = (props as any) || {};
 
-interface Tag {
-    id: number;
-    name: string;
-}
+    const isEdit = Boolean(post);
+    const editorRef = useRef<any>(null);
+    const prevImagesRef = useRef<Set<string>>(new Set());
+    const dataRef = useRef<any>(null);
 
-interface Post {
-    id: number;
-    category_id: number | null;
-    sub_category_id: number | null;
-    title: string | null;
-    excerpt: string | null;
-    content: string | null;
-    status: 'draft' | 'published' | 'archived';
-    is_featured: boolean;
-    thumbnail: string | null;
-    tags: { id: number }[];
-}
+    const extractImages = (html: string) => {
+        if (!html) return [] as string[];
+        const matches = html.match(/<img[^>]+src=["']([^"']+)["']/gi);
+        if (!matches) return [] as string[];
+        return matches
+            .map((m) => {
+                const srcMatch = /src=["']([^"']+)["']/.exec(m);
+                return srcMatch ? srcMatch[1] : '';
+            })
+            .filter(Boolean);
+    };
 
-interface FormProps {
-    post?: Post;
-    categories: Category[];
-    subCategories: SubCategory[];
-    tags: Tag[];
-}
+    const [previewUrl, setPreviewUrl] = useState<string | null>(
+        (post && (post.thumbnail_url || post.thumbnail)) || null,
+    );
 
-export default function PostForm({
-    post,
-    categories,
-    subCategories,
-    tags,
-}: FormProps) {
-    const { flash } = usePage<SharedData>().props;
-    const isEdit = !!post;
-    const quillRef = useRef<ReactQuill>(null);
-    const prevImagesRef = useRef<string[]>([]);
+    const [isSmallScreen, setIsSmallScreen] = useState<boolean>(() =>
+        typeof window !== 'undefined'
+            ? window.matchMedia('(max-width: 768px)').matches
+            : false,
+    );
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Posts', href: dashboard.posts.index().url },
-        { title: isEdit ? 'Edit Post' : 'Create Post', href: '#' },
-    ];
+    const useDarkMode =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const m = window.matchMedia('(max-width: 768px)');
+        const handler = (ev: MediaQueryListEvent) =>
+            setIsSmallScreen(ev.matches);
+        try {
+            m.addEventListener('change', handler);
+        } catch (e) {
+            // Safari
+            // @ts-ignore
+            m.addListener(handler);
+        }
+        return () => {
+            try {
+                m.removeEventListener('change', handler);
+            } catch (e) {
+                // @ts-ignore
+                m.removeListener(handler);
+            }
+        };
+    }, []);
+
+    // initialize prevImagesRef from initial content so deletions are tracked
+    useEffect(() => {
+        prevImagesRef.current = new Set(extractImages(data.content || ''));
+    }, []);
 
     const {
         data,
@@ -96,7 +122,7 @@ export default function PostForm({
         put,
         processing,
         errors,
-    } = useForm({
+    } = useForm<PostFormData>({
         category_id:
             post?.category_id || (categories.length > 0 ? categories[0].id : 0),
         sub_category_id: (post?.sub_category_id || 'none') as
@@ -109,167 +135,219 @@ export default function PostForm({
         status: post?.status || 'draft',
         is_featured: post?.is_featured || false,
         thumbnail: null as File | null,
-        tags: post?.tags.map((t) => t.id) || ([] as number[]),
+        tags: post?.tags?.map((t: any) => t.id) || ([] as number[]),
     });
 
-    const [filteredSubCategories, setFilteredSubCategories] = useState<
-        SubCategory[]
-    >([]);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(
-        post?.thumbnail ? `/storage/${post.thumbnail}` : null,
+    dataRef.current = data;
+
+    interface PostFormData {
+        category_id: number;
+        sub_category_id: string | number | null;
+        title: string;
+        excerpt: string;
+        content: string;
+        status: string;
+        is_featured: boolean;
+        thumbnail: File | null;
+        tags: number[];
+    }
+
+    const imageHandler = useCallback(
+        async (file: File) => {
+            const resizedFile = await resizeImage(file, 800, undefined, 0.7);
+            const formData = new FormData();
+            formData.append('image', resizedFile);
+            if (post) {
+                formData.append('news_id', post.id.toString());
+            }
+
+            const res = await axios.post(
+                '/dashboard/posts/upload-image',
+                formData,
+            );
+            return res.data.url;
+        },
+        [post],
     );
 
-    useEffect(() => {
-        const extractImages = (html: string) => {
-            const matches = html.match(/<img[^>]+src="([^">]+)"/g);
-            if (!matches) return [];
-            return matches
-                .map((m) => {
-                    const srcMatch = m.match(/src="([^">]+)"/);
-                    return srcMatch ? srcMatch[1] : null;
-                })
-                .filter(Boolean) as string[];
-        };
+    const autoSave = useCallback(
+        (contentOverride?: string) => {
+            const currentData = dataRef.current;
+            const payload = {
+                ...currentData,
+                content: contentOverride ?? currentData.content,
+                sub_category_id:
+                    currentData.sub_category_id === 'none'
+                        ? null
+                        : currentData.sub_category_id,
+            };
 
-        const currentImages = extractImages(data.content || '');
-
-        // If it's the first run, just populate the ref
-        if (
-            prevImagesRef.current.length === 0 &&
-            (data.content || '').length > 0 &&
-            !post
-        ) {
-            // This is for new post that just started
-            prevImagesRef.current = currentImages;
-        } else if (prevImagesRef.current.length === 0 && post) {
-            // Initial load for existing post
-            prevImagesRef.current = currentImages;
-        }
-
-        const deletedImages = prevImagesRef.current.filter(
-            (src) => !currentImages.includes(src),
-        );
-
-        deletedImages.forEach((src) => {
-            if (src.includes('/storage/news-content/')) {
-                axios
-                    .post('/dashboard/posts/delete-image', { url: src })
-                    .catch((err) =>
-                        console.error('Failed to delete removed image:', err),
-                    );
+            if (isEdit && post) {
+                router.post(dashboard.posts.update(post.id).url, {
+                    ...payload,
+                    _method: 'PUT',
+                });
+            } else {
+                router.post(dashboard.posts.store().url, payload);
             }
-        });
+        },
+        [isEdit, post],
+    );
 
-        prevImagesRef.current = currentImages;
-    }, [data.content]);
+    const DEFAULT_HEIGHT = '1200px';
 
-    useEffect(() => {
-        if (data.category_id) {
-            setFilteredSubCategories(
-                subCategories.filter(
-                    (sc) => sc.category_id === Number(data.category_id),
-                ),
+    const tinymceInit = useMemo(
+        () => ({
+            height: DEFAULT_HEIGHT,
+            plugins: [
+                'accordion',
+                'advlist',
+                'anchor',
+                'autolink',
+                'autoresize',
+                'charmap',
+                'code',
+                'codesample',
+                'directionality',
+                'emoticons',
+                'fullscreen',
+                'help',
+                'image',
+                'importcss',
+                'insertdatetime',
+                'link',
+                'lists',
+                'media',
+                'nonbreaking',
+                'pagebreak',
+                'preview',
+                'quickbars',
+                'save',
+                'searchreplace',
+                'table',
+                'visualblocks',
+                'visualchars',
+                'wordcount',
+            ],
+            relative_urls: false,
+            remove_script_host: true,
+            convert_urls: true,
+            automatic_uploads: true,
+            paste_data_images: false,
+            images_upload_handler: (blobInfo: any) => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const file = new File(
+                            [blobInfo.blob()],
+                            blobInfo.filename(),
+                            {
+                                type: blobInfo.blob().type,
+                            },
+                        );
+                        const url = await imageHandler(file);
+                        resolve(url);
+
+                        setTimeout(() => {
+                            const editor = editorRef.current;
+                            if (editor) {
+                                const content = editor.getContent();
+                                setData('content', content);
+                                autoSave(content);
+                            }
+                        }, 500);
+                    } catch (e) {
+                        reject('Image upload failed');
+                    }
+                });
+            },
+            editimage_cors_hosts: ['picsum.photos'],
+            menubar: 'file edit view insert format tools table help',
+            toolbar:
+                'undo redo | fullscreen | accordion accordionremove | blocks fontfamily fontsize | bold italic underline strikethrough | align numlist bullist | link image | table media | lineheight outdent indent| forecolor backcolor removeformat | charmap emoticons | code preview | save print | pagebreak anchor codesample | ltr rtl',
+            image_advtab: true,
+            link_list: [],
+            image_list: [],
+            image_class_list: [
+                { title: 'None', value: '' },
+                { title: 'Responsive', value: 'img-fluid' },
+            ],
+            importcss_append: true,
+            file_picker_callback: async (
+                callback: any,
+                value: any,
+                meta: any,
+            ) => {
+                if (meta.filetype === 'image') {
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.onchange = async function () {
+                        const file = (this as HTMLInputElement).files?.[0];
+                        if (file) {
+                            try {
+                                const url = await imageHandler(file);
+                                callback(url, { alt: file.name });
+
+                                setTimeout(() => {
+                                    const editor = editorRef.current;
+                                    if (editor) {
+                                        const content = editor.getContent();
+                                        setData('content', content);
+                                        autoSave(content);
+                                    }
+                                }, 100);
+                            } catch (e) {
+                                console.error('Upload failed:', e);
+                            }
+                        }
+                    };
+                    input.click();
+                    return;
+                }
+            },
+            image_caption: true,
+            quickbars_selection_toolbar:
+                'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            noneditable_class: 'mceNonEditable',
+            toolbar_mode: 'sliding',
+            contextmenu: 'link image table',
+            skin: useDarkMode ? 'oxide-dark' : 'oxide',
+            content_css: useDarkMode ? 'dark' : 'default',
+            content_style:
+                'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+        }),
+        [imageHandler, autoSave, isSmallScreen, useDarkMode],
+    );
+
+    const handleThumbnailChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        if (file) {
+            setData('thumbnail', file as File);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+    };
+
+    const handleTagToggle = (id: number) => {
+        const current = data.tags || [];
+        if (current.includes(id)) {
+            setData(
+                'tags',
+                current.filter((t: number) => t !== id),
             );
         } else {
-            setFilteredSubCategories([]);
-        }
-    }, [data.category_id, subCategories]);
-
-    const handleThumbnailChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            try {
-                // Resize thumbnail to max 1200px width, height auto
-                const resizedFile = await resizeImage(
-                    file,
-                    1200,
-                    undefined,
-                    0.8,
-                );
-                setData('thumbnail', resizedFile);
-                setPreviewUrl(URL.createObjectURL(resizedFile));
-            } catch (error) {
-                console.error('Image processing failed:', error);
-                setData('thumbnail', file);
-                setPreviewUrl(URL.createObjectURL(file));
-            }
+            setData('tags', [...current, id]);
         }
     };
 
-    const handleTagToggle = (tagId: number) => {
-        const currentTags = [...data.tags];
-        const index = currentTags.indexOf(tagId);
-        if (index > -1) {
-            currentTags.splice(index, 1);
-        } else {
-            currentTags.push(tagId);
-        }
-        setData('tags', currentTags);
-    };
-
-    const imageHandler = () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
-        input.click();
-
-        input.onchange = async () => {
-            const file = input.files?.[0];
-            if (file) {
-                try {
-                    // Resize content image to width 800px, height auto
-                    const resizedFile = await resizeImage(
-                        file,
-                        800,
-                        undefined,
-                        0.7,
-                    );
-                    const formData = new FormData();
-                    formData.append('image', resizedFile);
-                    if (post) {
-                        formData.append('news_id', post.id.toString());
-                    }
-
-                    const res = await axios.post(
-                        '/dashboard/posts/upload-image',
-                        formData,
-                    );
-                    const url = res.data.url;
-
-                    const quill = quillRef.current?.getEditor();
-                    if (quill) {
-                        const range = quill.getSelection();
-                        if (range) {
-                            quill.insertEmbed(range.index, 'image', url);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Image upload failed:', error);
-                }
-            }
-        };
-    };
-
-    const modules = useMemo(
-        () => ({
-            toolbar: {
-                container: [
-                    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ color: [] }, { background: [] }],
-                    [{ align: [] }],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    [{ indent: '-1' }, { indent: '+1' }],
-                    ['link', 'image', 'video', 'blockquote', 'code-block'],
-                    ['clean'],
-                ],
-                handlers: {
-                    image: imageHandler,
-                },
-            },
-        }),
-        [],
+    const filteredSubCategories = (sub_categories || []).filter(
+        (s: any) => s.category_id === data.category_id,
     );
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Dashboard', href: dashboard.posts.index().url },
+        { title: 'Posts', href: dashboard.posts.index().url },
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -387,16 +465,56 @@ export default function PostForm({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="content">Content</Label>
-                                    <div className="min-h-[400px] rounded-md border bg-background">
-                                        <ReactQuill
-                                            ref={quillRef}
-                                            theme="snow"
-                                            value={data.content}
-                                            onChange={(val) =>
-                                                setData('content', val)
+                                    <div className="relative min-h-[400px] rounded-md border bg-background p-2">
+                                        <Editor
+                                            apiKey="0rl4abq6pz1sf2afw9izxs2pxqr7jbh970rxtxb8r85zwil4"
+                                            onInit={(evt, editor) =>
+                                                (editorRef.current = editor)
                                             }
-                                            modules={modules}
-                                            className="mb-12 h-[350px] sm:mb-10"
+                                            value={data.content || ''}
+                                            onEditorChange={async (content) => {
+                                                setData('content', content);
+
+                                                const current = new Set(
+                                                    extractImages(content),
+                                                );
+                                                const prev =
+                                                    prevImagesRef.current;
+                                                const removed: string[] = [];
+
+                                                prev.forEach((url) => {
+                                                    if (!current.has(url))
+                                                        removed.push(url);
+                                                });
+
+                                                prevImagesRef.current = current;
+
+                                                for (const url of removed) {
+                                                    try {
+                                                        if (
+                                                            url.includes(
+                                                                '/storage/',
+                                                            )
+                                                        ) {
+                                                            await axios.post(
+                                                                '/dashboard/posts/delete-image',
+                                                                {
+                                                                    url,
+                                                                    news_id:
+                                                                        post?.id,
+                                                                },
+                                                            );
+                                                        }
+                                                    } catch (e) {
+                                                        console.error(
+                                                            'Failed to delete image',
+                                                            url,
+                                                            e,
+                                                        );
+                                                    }
+                                                }
+                                            }}
+                                            init={tinymceInit as any}
                                         />
                                     </div>
                                     {errors.content && (
@@ -433,7 +551,7 @@ export default function PostForm({
                                             <SelectValue placeholder="Select Category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {categories.map((cat) => (
+                                            {categories.map((cat: any) => (
                                                 <SelectItem
                                                     key={cat.id}
                                                     value={cat.id.toString()}
@@ -475,14 +593,16 @@ export default function PostForm({
                                             <SelectItem value="none">
                                                 None
                                             </SelectItem>
-                                            {filteredSubCategories.map((sc) => (
-                                                <SelectItem
-                                                    key={sc.id}
-                                                    value={sc.id.toString()}
-                                                >
-                                                    {sc.name}
-                                                </SelectItem>
-                                            ))}
+                                            {filteredSubCategories.map(
+                                                (sc: any) => (
+                                                    <SelectItem
+                                                        key={sc.id}
+                                                        value={sc.id.toString()}
+                                                    >
+                                                        {sc.name}
+                                                    </SelectItem>
+                                                ),
+                                            )}
                                         </SelectContent>
                                     </Select>
                                     {errors.sub_category_id && (
@@ -593,7 +713,7 @@ export default function PostForm({
                             </CardHeader>
                             <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                                 <div className="grid max-h-[200px] grid-cols-2 gap-2 overflow-y-auto pr-2">
-                                    {tags.map((tag) => (
+                                    {tags.map((tag: any) => (
                                         <div
                                             key={tag.id}
                                             className="flex items-center space-x-2"
