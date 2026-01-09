@@ -272,7 +272,9 @@ export default function PostShow({
                             )}
 
                             <div
-                                className="quill-content prose prose-red dark:prose-invert prose-p:mb-6 prose-strong:text-gray-900 dark:prose-strong:text-gray-100 max-w-none text-[17px] leading-[1.8] text-[#333] dark:text-gray-300"
+                                className="prose prose-red dark:prose-invert max-w-none text-[17px] leading-[1.8] text-[#333] dark:text-gray-300 
+                                           prose-p:mb-6 prose-strong:text-gray-900 dark:prose-strong:text-gray-100
+                                           prose-img:rounded-xl prose-headings:font-black prose-a:text-red-600 dark:prose-a:text-red-500"
                                 dangerouslySetInnerHTML={{
                                     __html: post.content,
                                 }}
