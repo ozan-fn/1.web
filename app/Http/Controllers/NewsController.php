@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\News;
 use App\Models\SubCategory;
 use App\Models\Tag;
+use App\Models\NewsImage; // 1. Tambah import
+use App\Http\Requests\PostRequest; // 2. Tambah import
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -21,200 +23,173 @@ class NewsController extends Controller
                     $query->where('title', 'like', "%{$search}%")
                         ->orWhere('excerpt', 'like', "%{$search}%");
                 })
-                ->when($request->field && $request->direction, function ($query) use ($request) {
+                ->when($request->filled(['field', 'direction']), function ($query) use ($request) {
                     $query->orderBy($request->field, $request->direction);
                 }, function ($query) {
                     $query->orderBy('created_at', 'desc');
                 })
-                ->get(),
+                ->paginate(10) // 3. Sebaiknya gunakan paginate untuk dashboard
+                ->withQueryString(),
             'filters' => $request->only(['search', 'field', 'direction'])
         ]);
     }
 
     public function create()
     {
-        $post = News::create([
-            'user_id' => auth()->id(),
-            'title' => '',
-            'content' => '',
-            'status' => 'draft',
+        return Inertia::render('dashboard/posts/form', [
+            'post'           => null,
+            'categories'     => Category::orderBy('order')->get(['id', 'name']),
+            // Pastikan nama variabelnya 'sub_categories' (dengan underscore)
+            'sub_categories' => SubCategory::orderBy('order')->get(['id', 'name', 'category_id']),
+            'tags'           => Tag::orderBy('name')->get(['id', 'name']),
         ]);
-
-        return redirect()->route('dashboard.posts.edit', $post->id);
     }
+
+
+
+    public function store(PostRequest $request)
+        {
+            $validated = $request->validated();
+            $validated['user_id'] = auth()->id();
+            $validated['slug'] = $validated['slug'] ?: Str::slug($validated['title']);
+
+            // IMPROVED AUTO EXCERPT
+            if (empty($validated['excerpt'])) {
+                $validated['excerpt'] = $this->generateJosExcerpt($validated['content']);
+            }
+
+            if ($request->hasFile('thumbnail')) {
+                $validated['thumbnail'] = $request->file('thumbnail')->store('news-thumbnails', 'public');
+            }
+
+            $post = News::create($validated);
+            $this->syncTags($post, $request->tags);
+            $this->processContentImages($post);
+
+            return redirect()->route('dashboard.posts.index')->with('success', 'Post created successfully');
+        }
+
+
 
     public function edit(News $post)
     {
         return Inertia::render('dashboard/posts/form', [
-            'post' => $post->load('tags'),
-            'categories' => Category::orderBy('order')->get(),
-            'subCategories' => SubCategory::orderBy('order')->get(),
-            'tags' => Tag::orderBy('name')->get(),
+            'post'           => $post->load('tags'),
+            'categories'     => Category::orderBy('order')->get(['id', 'name']),
+            'sub_categories' => SubCategory::orderBy('order')->get(['id', 'name', 'category_id']),
+            'tags'           => Tag::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
-    public function store(\App\Http\Requests\PostRequest $request)
-    {
-        $validated = $request->validated();
-        $validated['user_id'] = auth()->id();
-        $validated['slug'] = Str::slug($validated['title']);
+    public function update(PostRequest $request, News $post)
+        {
+            $validated = $request->validated();
+            $validated['slug'] = $validated['slug'] ?: Str::slug($validated['title']);
 
-        if ($request->hasFile('thumbnail')) {
-            $file = $request->file('thumbnail');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $validated['thumbnail'] = $file->storeAs('news-thumbnails', $filename, 'public');
-        }
-
-        if ($validated['status'] === 'published') {
-            $validated['published_at'] = now();
-        }
-
-        $news = News::create($validated);
-
-        $tagIds = [];
-        if ($request->tags) {
-            foreach ($request->tags as $tagName) {
-                $tag = Tag::firstOrCreate(
-                    ['name' => $tagName],
-                    ['slug' => Str::slug($tagName)]
-                );
-                $tagIds[] = $tag->id;
+            // IMPROVED AUTO EXCERPT
+            if (empty($validated['excerpt'])) {
+                $validated['excerpt'] = $this->generateJosExcerpt($validated['content']);
             }
+
+            if ($request->hasFile('thumbnail')) {
+                if ($post->thumbnail) Storage::disk('public')->delete($post->thumbnail);
+                $validated['thumbnail'] = $request->file('thumbnail')->store('news-thumbnails', 'public');
+            }
+
+            $post->update($validated);
+            $this->syncTags($post, $request->tags);
+            $this->processContentImages($post);
+
+            return redirect()->back()->with('success', 'Post updated successfully');
         }
-        $news->tags()->sync($tagIds);
 
-        $this->syncContentImages($news);
-
-        return redirect()->route('dashboard.posts.edit', $news->id)->with('success', 'Post created successfully');
-    }
-
-    private function syncContentImages(News $post)
+    private function processContentImages(News $post)
     {
-        $currentImagesInContent = News::extractImagesFromHtml($post->content);
-        $storagePathsInContent = [];
+        $imagesInContent = News::extractImagesFromHtml($post->content);
+        $currentPaths = [];
 
-        foreach ($currentImagesInContent as $url) {
+        foreach ($imagesInContent as $url) {
             if (str_contains($url, 'news-content/')) {
-                $filename = Str::after($url, 'news-content/');
-                $filename = parse_url($filename, PHP_URL_PATH);
-                $path = 'news-content/' . $filename;
-                $storagePathsInContent[] = $path;
+                $path = 'news-content/' . basename(parse_url($url, PHP_URL_PATH));
+                $currentPaths[] = $path;
 
-                // Create or update record to ensure news_id is set
-                \App\Models\NewsImage::updateOrCreate(
-                    ['path' => $path],
-                    ['news_id' => $post->id]
-                );
+                NewsImage::where('path', $path)->update([
+                    'news_id' => $post->id,
+                    'status'  => 'active'
+                ]);
             }
         }
 
-        // Only cleanup if images were correctly identified in content OR if content is truly empty of any images
-        // To be safe, we only delete if the post actually has some images registered.
-        if ($post->contentImages()->count() > 0) {
-            foreach ($post->contentImages as $image) {
-                if (!in_array($image->path, $storagePathsInContent)) {
-                    $cleanPath = str_replace(['../', './'], '', $image->path);
-                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->delete($cleanPath);
-                    }
-                    $image->delete();
-                }
-            }
+        // Cleanup: Hapus gambar yang ada di DB/Storage tapi sudah dihapus dari Editor
+        $orphanedImages = NewsImage::where('news_id', $post->id)
+            ->whereNotIn('path', $currentPaths)
+            ->get();
+
+        foreach ($orphanedImages as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
         }
-    }
-
-    public function update(\App\Http\Requests\PostRequest $request, News $post)
-    {
-        $validated = $request->validated();
-        $validated['slug'] = Str::slug($validated['title']);
-
-        // Handle Thumbnail
-        if ($request->hasFile('thumbnail')) {
-            if ($post->thumbnail)
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($post->thumbnail);
-            $file = $request->file('thumbnail');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $validated['thumbnail'] = $file->storeAs('news-thumbnails', $filename, 'public');
-        } else {
-            $validated['thumbnail'] = $post->thumbnail;
-        }
-
-        if ($validated['status'] === 'published' && !$post->published_at) {
-            $validated['published_at'] = now();
-        }
-
-        $post->update($validated);
-
-        $tagIds = [];
-        if ($request->tags) {
-            foreach ($request->tags as $tagName) {
-                $tag = Tag::firstOrCreate(
-                    ['name' => $tagName],
-                    ['slug' => Str::slug($tagName)]
-                );
-                $tagIds[] = $tag->id;
-            }
-        }
-        $post->tags()->sync($tagIds);
-
-        $this->syncContentImages($post);
-
-        return redirect()->back()->with('success', 'Post updated successfully');
-    }
-
-    public function destroy(News $post)
-    {
-        $post->delete(); // Otomatis trigger file cleanup di Model
-        return redirect()->back()->with('success', 'Post deleted successfully');
     }
 
     public function uploadEditorImage(Request $request)
     {
-        $request->validate([
-            'image' => 'required|image|max:10240',
-            'news_id' => 'nullable|exists:news,id'
+        $request->validate(['image' => 'required|image|max:10240']);
+        $path = $request->file('image')->store('news-content', 'public');
+
+        NewsImage::create([
+            'path'    => $path,
+            'status'  => 'inactive',
+            'news_id' => null
         ]);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('news-content', $filename, 'public');
-
-            if ($request->news_id) {
-                \App\Models\NewsImage::create([
-                    'news_id' => $request->news_id,
-                    'path' => $path
-                ]);
-            }
-
-            return response()->json([
-                'url' => '/storage/' . $path
-            ]);
-        }
-        return response()->json(['error' => 'Upload failed'], 400);
+        return response()->json(['url' => asset('storage/' . $path)]);
     }
 
-    public function deleteEditorImage(Request $request)
+    public function destroy(News $post)
     {
-        $request->validate(['url' => 'required|string']);
+        if ($post->thumbnail) Storage::disk('public')->delete($post->thumbnail);
 
-        $url = $request->url;
-        if (!str_contains($url, 'news-content/')) {
-            return response()->json(['error' => 'Invalid image path'], 400);
+        $images = NewsImage::where('news_id', $post->id)->get();
+        foreach ($images as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
         }
 
-        $filename = \Illuminate\Support\Str::after($url, 'news-content/');
-        $filename = parse_url($filename, PHP_URL_PATH);
-        $path = 'news-content/' . $filename;
-
-        // Final safety check for path traversal
-        $path = str_replace(['../', './'], '', $path);
-
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
-            \App\Models\NewsImage::where('path', $path)->delete();
-            return response()->json(['success' => true]);
-        }
-        return response()->json(['error' => 'Image not found'], 404);
+        $post->delete();
+        return redirect()->back()->with('success', 'Post deleted successfully');
     }
+
+    private function syncTags($post, $tags)
+    {
+        if (is_null($tags)) {
+            $post->tags()->detach();
+            return;
+        }
+
+        $tagIds = collect($tags)->map(fn($name) =>
+            Tag::firstOrCreate(['name' => $name], ['slug' => Str::slug($name)])->id
+        );
+        $post->tags()->sync($tagIds);
+    }
+
+    /**
+         * Helper untuk generate excerpt yang bersih dan rapi
+         */
+        private function generateJosExcerpt($content)
+        {
+            // 1. Ganti tag blok (p, div, h1-h6, br, summary) menjadi spasi agar kata tidak menempel
+            $text = preg_replace('/<(p|br|div|h[1-6]|li|summary|details)[^>]*>/i', ' ', $content);
+
+            // 2. Bersihkan semua tag HTML sisanya
+            $text = strip_tags($text);
+
+            // 3. Decode entitas HTML (seperti &hellip; atau &nbsp; menjadi karakter aslinya)
+            $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
+            // 4. Hapus whitespace berlebih (double space, tab, newline) menjadi satu spasi
+            $text = preg_replace('/\s+/', ' ', $text);
+
+            // 5. Potong 160 karakter dengan rapi
+            return Str::limit(trim($text), 160);
+        }
 }

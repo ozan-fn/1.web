@@ -19,46 +19,28 @@ export interface Category {
     is_homepage: boolean;
 }
 
+// Helper Header Sortable
+const SortableHeader = ({ column, title }: any) => (
+    <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+    >
+        {title} <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+);
+
 export const columns = (
-    onEdit: (category: Category) => void,
-    onDelete: (category: Category) => void,
+    onEdit: (c: Category) => void,
+    onDelete: (c: Category) => void,
 ): ColumnDef<Category>[] => [
-    {
-        id: 'no',
-        header: 'No',
-        cell: ({ row }) => row.index + 1,
-    },
+    { id: 'no', header: 'No', cell: ({ row }) => row.index + 1 },
     {
         accessorKey: 'order',
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
-                >
-                    Order
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        header: (props) => <SortableHeader {...props} title="Order" />,
     },
     {
         accessorKey: 'name',
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
-                >
-                    Name
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        header: (props) => <SortableHeader {...props} title="Name" />,
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue('name')}</div>
         ),
@@ -75,63 +57,39 @@ export const columns = (
     {
         accessorKey: 'is_nav',
         header: 'In Nav',
-        cell: ({ row }) => {
-            const isNav = row.getValue('is_nav') as boolean;
-            return (
-                <span
-                    className={`rounded-full px-2 py-1 text-xs ${isNav ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}
-                >
-                    {isNav ? 'Shown' : 'Hidden'}
-                </span>
-            );
-        },
-    },
-    {
-        accessorKey: 'is_homepage',
-        header: 'In Home',
-        cell: ({ row }) => {
-            const isHome = row.getValue('is_homepage') as boolean;
-            return (
-                <span
-                    className={`rounded-full px-2 py-1 text-xs ${isHome ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
-                >
-                    {isHome ? 'Yes' : 'No'}
-                </span>
-            );
-        },
+        cell: ({ row }) => (
+            <span
+                className={`rounded-full px-2 py-1 text-xs ${row.original.is_nav ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}
+            >
+                {row.original.is_nav ? 'Shown' : 'Hidden'}
+            </span>
+        ),
     },
     {
         id: 'actions',
-        cell: ({ row }) => {
-            const category = row.original;
-
-            return (
-                <div className="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => onEdit(category)}>
-                                <Edit2 className="mr-2 h-4 w-4" />
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                className="text-red-500"
-                                onClick={() => onDelete(category)}
-                            >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            );
-        },
+        cell: ({ row }) => (
+            <div className="text-right">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => onEdit(row.original)}>
+                            <Edit2 className="mr-2 h-4 w-4" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            className="text-red-500"
+                            onClick={() => onDelete(row.original)}
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+        ),
     },
 ];

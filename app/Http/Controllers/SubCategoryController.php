@@ -12,20 +12,30 @@ class SubCategoryController extends Controller
 {
     public function index(Request $request)
     {
+        $subCategories = SubCategory::with('category')
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      // Bonus: Bisa cari berdasarkan nama kategori induk
+                      ->orWhereHas('category', function($cat) use ($search) {
+                          $cat->where('name', 'like', "%{$search}%");
+                      });
+                });
+            })
+            ->when($request->filled(['field', 'direction']), function ($query) use ($request) {
+                $direction = strtolower($request->direction) === 'desc' ? 'desc' : 'asc';
+                $query->orderBy($request->field, $direction);
+            }, function ($query) {
+                $query->orderBy('order');
+            })
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('dashboard/sub-categories/index', [
-            'subCategories' => SubCategory::with('category')
-                ->when($request->search, function ($query, $search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                })
-                ->when($request->field && $request->direction, function ($query) use ($request) {
-                    $query->orderBy($request->field, $request->direction);
-                }, function ($query) {
-                    $query->orderBy('order');
-                })
-                ->get(),
-            'categories' => Category::orderBy('order')->get(),
-            'filters' => $request->only(['search', 'field', 'direction'])
+            'subCategories' => $subCategories,
+            'categories'    => Category::orderBy('order')->get(['id', 'name']),
+            'filters'       => $request->only(['search', 'field', 'direction'])
         ]);
     }
 

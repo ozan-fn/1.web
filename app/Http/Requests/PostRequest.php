@@ -17,6 +17,7 @@ class PostRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'sub_category_id' => 'nullable|exists:sub_categories,id',
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
             'status' => 'required|in:draft,published,archived',
@@ -24,6 +25,7 @@ class PostRequest extends FormRequest
             'thumbnail' => 'nullable|image|max:10240',
             'tags' => 'nullable|array',
             'tags.*' => 'nullable|string|max:100',
+            'published_at' => ['nullable', 'date'],
         ];
     }
 }

@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -8,37 +7,24 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import {
-    ColumnDef,
     flexRender,
     getCoreRowModel,
-    getPaginationRowModel,
-    SortingState,
     useReactTable,
 } from '@tanstack/react-table';
-
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
-    sorting?: SortingState;
-    onSortingChange?: (sorting: SortingState) => void;
-}
 
 export function DataTable<TData, TValue>({
     columns,
     data,
     sorting,
     onSortingChange,
-}: DataTableProps<TData, TValue>) {
+}: any) {
     const table = useReactTable({
         data,
         columns,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        onSortingChange: onSortingChange,
+        onSortingChange,
         manualSorting: true,
-        state: {
-            sorting,
-        },
+        state: { sorting },
+        getCoreRowModel: getCoreRowModel(),
     });
 
     return (
@@ -46,38 +32,30 @@ export function DataTable<TData, TValue>({
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    );
-                                })}
+                        {table.getHeaderGroups().map((hg) => (
+                            <TableRow key={hg.id}>
+                                {hg.headers.map((h) => (
+                                    <TableHead key={h.id}>
+                                        {h.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  h.column.columnDef.header,
+                                                  h.getContext(),
+                                              )}
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((c) => (
+                                        <TableCell key={c.id}>
                                             {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
+                                                c.column.columnDef.cell,
+                                                c.getContext(),
                                             )}
                                         </TableCell>
                                     ))}
@@ -95,24 +73,6 @@ export function DataTable<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <div className="flex items-center justify-end space-x-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
             </div>
         </div>
     );

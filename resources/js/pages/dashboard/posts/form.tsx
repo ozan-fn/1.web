@@ -1,893 +1,261 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { resizeImage } from '@/lib/image-compression';
-import dashboard from '@/routes/dashboard';
+import { resizeImage } from '@/lib/image-compression'; // Fungsi resize Anda
 import { BreadcrumbItem, SharedData } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Editor } from '@tinymce/tinymce-react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import {
-    AlertCircle,
-    CheckCircle2,
-    ChevronLeft,
-    Loader2,
-    Plus,
-    Upload,
-    X,
-} from 'lucide-react';
-import {
-    ChangeEvent,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { CheckCircle2 } from 'lucide-react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
-interface Category {
-    id: number;
-    name: string;
-}
+// Component Imports
+import { CategorySelect } from './components/CategorySelect';
+import { ContentEditor } from './components/ContentEditor';
+import { ExcerptInput } from './components/ExcerptInput';
+import { FeaturedToggle } from './components/FeaturedToggle';
+import { FormActions } from './components/FormActions';
+import { FormHeader } from './components/FormHeader';
+import { PublishDateInput } from './components/PublishDateInput';
+import { StatusSelect } from './components/StatusSelect';
+import { SubCategorySelect } from './components/SubCategorySelect';
+import { TagsInput } from './components/TagsInput';
+import { ThumbnailUpload } from './components/ThumbnailUpload';
+import { TitleSlugInput } from './components/TitleSlugInput';
 
 export default function PostForm() {
     const { props } = usePage<SharedData>();
-    const {
-        categories = [],
-        sub_categories = [],
-        tags = [],
-        post = null,
-        flash = {},
-    } = (props as any) || {};
+    const { categories = [], sub_categories = [], tags = [], post = null, flash = {} } = (props as any) || {};
 
     const isEdit = Boolean(post);
     const editorRef = useRef<any>(null);
-    const tagContainerRef = useRef<HTMLDivElement>(null);
-    const prevImagesRef = useRef<Set<string>>(new Set());
-    const dataRef = useRef<any>(null);
+    const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(post?.thumbnail_url || null);
+    const [isSmallScreen, setIsSmallScreen] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
+    const [useDarkMode, setUseDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
 
-    const extractImages = (html: string) => {
-        if (!html) return [] as string[];
-        const matches = html.match(/<img[^>]+src=["']([^"']+)["']/gi);
-        if (!matches) return [] as string[];
-        return matches
-            .map((m) => {
-                const srcMatch = /src=["']([^"']+)["']/.exec(m);
-                return srcMatch ? srcMatch[1] : '';
-            })
-            .filter(Boolean);
-    };
-
-    const [previewUrl, setPreviewUrl] = useState<string | null>(() => {
-        if (!post) return null;
-        if (post.thumbnail_url) return post.thumbnail_url;
-        if (post.thumbnail) {
-            if (
-                post.thumbnail.startsWith('http') ||
-                post.thumbnail.startsWith('/')
-            ) {
-                return post.thumbnail;
-            }
-            return `/storage/${post.thumbnail}`;
-        }
-        return null;
-    });
-    const [tagInput, setTagInput] = useState('');
-    const [showTagSuggestions, setShowTagSuggestions] = useState(false);
-
-    const [isSmallScreen, setIsSmallScreen] = useState<boolean>(() =>
-        typeof window !== 'undefined'
-            ? window.matchMedia('(max-width: 768px)').matches
-            : false,
-    );
-
-    const useDarkMode =
-        typeof window !== 'undefined' &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                tagContainerRef.current &&
-                !tagContainerRef.current.contains(event.target as Node)
-            ) {
-                setShowTagSuggestions(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const m = window.matchMedia('(max-width: 768px)');
-        const handler = (ev: MediaQueryListEvent) =>
-            setIsSmallScreen(ev.matches);
-        try {
-            m.addEventListener('change', handler);
-        } catch (e) {
-            // Safari
-            // @ts-ignore
-            m.addListener(handler);
-        }
-        return () => {
-            try {
-                m.removeEventListener('change', handler);
-            } catch (e) {
-                // @ts-ignore
-                m.removeListener(handler);
-            }
-        };
-    }, []);
-
-    // initialize prevImagesRef from initial content so deletions are tracked
-    useEffect(() => {
-        prevImagesRef.current = new Set(extractImages(data.content || ''));
-    }, []);
-
-    const {
-        data,
-        setData,
-        post: postReq,
-        put,
-        processing,
-        errors,
-    } = useForm<PostFormData>({
-        category_id:
-            post?.category_id || (categories.length > 0 ? categories[0].id : 0),
-        sub_category_id: (post?.sub_category_id || 'none') as
-            | string
-            | number
-            | null,
+    const { data, setData, processing, errors } = useForm<any>({
+        category_id: post?.category_id || 1,
+        sub_category_id: post?.sub_category_id || null,
         title: post?.title || '',
+        slug: post?.slug || '',
         excerpt: post?.excerpt || '',
         content: post?.content || '',
         status: post?.status || 'draft',
         is_featured: post?.is_featured || false,
-        thumbnail: null as File | null,
-        tags: post?.tags?.map((t: any) => t.name) || ([] as string[]),
+        thumbnail: null,
+        tags: post?.tags.map((t: any) => t.name) || [],
+        published_at: post?.published_at || null,
     });
 
-    dataRef.current = data;
+    const handleTitleChange = useCallback(
+        (value: string) => {
+            setData('title', value);
+            if (!isEdit)
+                setData(
+                    'slug',
+                    value
+                        .toLowerCase()
+                        .trim()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/[\s_-]+/g, '-')
+                        .replace(/^-+|-+$/g, ''),
+                );
+        },
+        [setData, isEdit],
+    );
 
-    interface PostFormData {
-        category_id: number;
-        sub_category_id: string | number | null;
-        title: string;
-        excerpt: string;
-        content: string;
-        status: string;
-        is_featured: boolean;
-        thumbnail: File | null;
-        tags: string[];
-    }
+    // HANDLER THUMBNAIL DENGAN RESIZE
+    const handleThumbnailChange = useCallback(
+        async (e: ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            try {
+                // Kita resize thumbnail ke ukuran standar (misal 1200x800)
+                const resizedBlob = await resizeImage(file, 1200, 800);
+                // Buat File object baru dari blob hasil resize
+                const resizedFile = new File([resizedBlob], file.name, { type: file.type });
+
+                setThumbnailPreview(URL.createObjectURL(resizedFile));
+                setData('thumbnail', resizedFile);
+            } catch (error) {
+                console.error('Failed to resize thumbnail:', error);
+            }
+        },
+        [setData],
+    );
+
+    const addTag = useCallback(
+        (tag: string) => {
+            const normalized = tag.toLowerCase().trim();
+            if (normalized && !data.tags.includes(normalized)) setData('tags', [...data.tags, normalized]);
+        },
+        [data.tags, setData],
+    );
+
+    const removeTag = useCallback(
+        (tag: string) => {
+            setData(
+                'tags',
+                data.tags.filter((t: any) => t !== tag),
+            );
+        },
+        [data.tags, setData],
+    );
 
     const imageHandler = useCallback(
-        async (file: File) => {
-            const resizedFile = await resizeImage(file, 800, undefined, 0.7);
-            const formData = new FormData();
-            formData.append('image', resizedFile);
-            if (post) {
-                formData.append('news_id', post.id.toString());
-            }
-
-            const res = await axios.post(
-                '/dashboard/posts/upload-image',
-                formData,
-            );
-            return res.data.url;
-        },
-        [post],
-    );
-
-    const autoSave = useCallback(
-        (contentOverride?: string) => {
-            const currentData = dataRef.current;
-            const payload = {
-                ...currentData,
-                content: contentOverride ?? currentData.content,
-                sub_category_id:
-                    currentData.sub_category_id === 'none'
-                        ? null
-                        : currentData.sub_category_id,
-            };
-
-            if (isEdit && post) {
-                router.post(dashboard.posts.update(post.id).url, {
-                    ...payload,
-                    _method: 'PUT',
-                });
-            } else {
-                router.post(dashboard.posts.store().url, payload);
+        async (blobInfo: any) => {
+            try {
+                const resized = await resizeImage(blobInfo.blob(), 1200, 800);
+                const formData = new FormData();
+                formData.append('image', resized, blobInfo.filename());
+                if (isEdit && post?.id) formData.append('news_id', post.id.toString());
+                const { data: res } = await axios.post('/dashboard/posts/upload-image', formData);
+                return res.url;
+            } catch {
+                throw new Error('Upload failed');
             }
         },
-        [isEdit, post],
+        [isEdit, post?.id],
     );
-
-    const DEFAULT_HEIGHT = '1200px';
-
-    const tinymceInit = useMemo(
-        () => ({
-            height: DEFAULT_HEIGHT,
-            plugins: [
-                'accordion',
-                'advlist',
-                'anchor',
-                'autolink',
-                'autoresize',
-                'charmap',
-                'code',
-                'codesample',
-                'directionality',
-                'emoticons',
-                'fullscreen',
-                'help',
-                'image',
-                'importcss',
-                'insertdatetime',
-                'link',
-                'lists',
-                'media',
-                'nonbreaking',
-                'pagebreak',
-                'preview',
-                'quickbars',
-                'save',
-                'searchreplace',
-                'table',
-                'visualblocks',
-                'visualchars',
-                'wordcount',
-            ],
-            relative_urls: false,
-            remove_script_host: true,
-            convert_urls: true,
-            automatic_uploads: true,
-            paste_data_images: false,
-            images_upload_handler: (blobInfo: any) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const file = new File(
-                            [blobInfo.blob()],
-                            blobInfo.filename(),
-                            {
-                                type: blobInfo.blob().type,
-                            },
-                        );
-                        const url = await imageHandler(file);
-                        resolve(url);
-
-                        setTimeout(() => {
-                            const editor = editorRef.current;
-                            if (editor) {
-                                const content = editor.getContent();
-                                setData('content', content);
-                                autoSave(content);
-                            }
-                        }, 500);
-                    } catch (e) {
-                        reject('Image upload failed');
-                    }
-                });
-            },
-            editimage_cors_hosts: ['picsum.photos'],
-            menubar: 'file edit view insert format tools table help',
-            toolbar:
-                'undo redo | fullscreen | accordion accordionremove | blocks fontfamily fontsize | bold italic underline strikethrough | align numlist bullist | link image | table media | lineheight outdent indent| forecolor backcolor removeformat | charmap emoticons | code preview | save print | pagebreak anchor codesample | ltr rtl',
-            image_advtab: true,
-            link_list: [],
-            image_list: [],
-            image_class_list: [
-                { title: 'None', value: '' },
-                { title: 'Responsive', value: 'img-fluid' },
-            ],
-            importcss_append: true,
-            file_picker_callback: async (
-                callback: any,
-                value: any,
-                meta: any,
-            ) => {
-                if (meta.filetype === 'image') {
-                    const input = document.createElement('input');
-                    input.setAttribute('type', 'file');
-                    input.setAttribute('accept', 'image/*');
-                    input.onchange = async function () {
-                        const file = (this as HTMLInputElement).files?.[0];
-                        if (file) {
-                            try {
-                                const url = await imageHandler(file);
-                                callback(url, { alt: file.name });
-
-                                setTimeout(() => {
-                                    const editor = editorRef.current;
-                                    if (editor) {
-                                        const content = editor.getContent();
-                                        setData('content', content);
-                                        autoSave(content);
-                                    }
-                                }, 100);
-                            } catch (e) {
-                                console.error('Upload failed:', e);
-                            }
-                        }
-                    };
-                    input.click();
-                    return;
-                }
-            },
-            image_caption: true,
-            quickbars_selection_toolbar:
-                'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-            noneditable_class: 'mceNonEditable',
-            toolbar_mode: 'sliding',
-            contextmenu: 'link image table',
-            skin: useDarkMode ? 'oxide-dark' : 'oxide',
-            content_css: useDarkMode ? 'dark' : 'default',
-            content_style:
-                'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
-        }),
-        [imageHandler, autoSave, isSmallScreen, useDarkMode],
-    );
-
-    const handleThumbnailChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
-        if (file) {
-            setData('thumbnail', file as File);
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
-        }
-    };
-
-    const addTag = (tagName: string) => {
-        const normalized = tagName.trim();
-        if (normalized && !data.tags.includes(normalized)) {
-            setData('tags', [...data.tags, normalized]);
-        }
-        setTagInput('');
-        setShowTagSuggestions(false);
-    };
-
-    const removeTag = (tagName: string) => {
-        setData(
-            'tags',
-            data.tags.filter((t) => t !== tagName),
-        );
-    };
-
-    const filteredTags = (tags || []).filter(
-        (tag: any) =>
-            tag.name.toLowerCase().includes(tagInput.toLowerCase()) &&
-            !data.tags.includes(tag.name),
-    );
-
-    const filteredSubCategories = (sub_categories || []).filter(
-        (s: any) => s.category_id === data.category_id,
-    );
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Dashboard', href: dashboard.posts.index().url },
-        { title: 'Posts', href: dashboard.posts.index().url },
-    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Ensure state is up to date with editor content
-        const latestContent = editorRef.current?.getContent() || data.content;
-
-        const finalData = {
-            ...data,
-            content: latestContent,
-            sub_category_id:
-                data.sub_category_id === 'none' ? null : data.sub_category_id,
-        };
-
-        if (isEdit && post) {
-            router.post(
-                dashboard.posts.update(post.id).url,
-                {
-                    ...finalData,
-                    _method: 'PUT',
-                },
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                },
-            );
-        } else {
-            router.post(dashboard.posts.store().url, finalData);
-        }
+        const content = editorRef.current?.getContent() || data.content;
+        router.post(
+            isEdit ? `/dashboard/posts/${post?.id}` : '/dashboard/posts',
+            {
+                ...data,
+                content,
+                _method: isEdit ? 'PUT' : 'POST',
+            },
+            { forceFormData: true },
+        );
     };
+
+    useEffect(() => {
+        const handleResize = () => setIsSmallScreen(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'Posts', href: '/dashboard/posts' },
+        { title: isEdit ? 'Edit' : 'Create', href: '#' },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isEdit ? 'Edit Post' : 'Create Post'} />
+            <Head title={`${isEdit ? 'Edit' : 'Create'} Post`} />
 
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-2 sm:p-4 md:p-6">
-                {flash.success && (
-                    <Alert
-                        variant="default"
-                        className="border-green-500/50 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400"
-                    >
-                        <CheckCircle2 className="h-4 w-4" />
-                        <AlertTitle>Success</AlertTitle>
-                        <AlertDescription>{flash.success}</AlertDescription>
-                    </Alert>
-                )}
-
-                {flash.error && (
-                    <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Error</AlertTitle>
-                        <AlertDescription>{flash.error}</AlertDescription>
-                    </Alert>
-                )}
-
-                {Object.keys(errors).length > 0 && (
-                    <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Validation Error</AlertTitle>
-                        <AlertDescription>
-                            Please fix the errors below before submitting the
-                            form.
-                        </AlertDescription>
-                    </Alert>
-                )}
-
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        asChild
-                        className="-ml-2"
-                    >
-                        <Link href={dashboard.posts.index().url}>
-                            <ChevronLeft className="h-5 w-5" />
-                        </Link>
-                    </Button>
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        {isEdit ? 'Edit Post' : 'Create New Post'}
-                    </h1>
+            <form onSubmit={handleSubmit} className="mx-auto max-w-[98%] space-y-4 p-4">
+                <div className="flex items-center justify-between">
+                    <FormHeader isEdit={isEdit} />
+                    <FormActions isEdit={isEdit} processing={processing} />
                 </div>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="grid grid-cols-1 gap-6 lg:grid-cols-3"
-                >
-                    <div className="space-y-6 lg:col-span-2">
+                {flash?.success && (
+                    <Alert className="border-green-500/50 bg-green-500/5">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <AlertDescription className="text-green-600">{flash.success}</AlertDescription>
+                    </Alert>
+                )}
+
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                    {/* AREA KIRI: EDITOR UTAMA */}
+                    <div className="space-y-6 lg:col-span-9">
                         <Card>
-                            <CardHeader>
-                                <CardTitle>Post Content</CardTitle>
-                                <CardDescription>
-                                    Write the main information for your post.
-                                </CardDescription>
+                            <CardHeader className="space-y-1">
+                                <CardTitle className="text-lg">Content</CardTitle>
+                                <CardDescription>Write your post title and body here.</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="title">Title</Label>
-                                    <Input
-                                        id="title"
-                                        value={data.title}
-                                        onChange={(e) =>
-                                            setData('title', e.target.value)
-                                        }
-                                        placeholder="Enter post title"
-                                        required
-                                    />
-                                    {errors.title && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.title}
-                                        </p>
-                                    )}
-                                </div>
+                            <CardContent className="grid gap-6">
+                                <TitleSlugInput title={data.title} slug={data.slug} isEdit={isEdit} onTitleChange={handleTitleChange} onSlugChange={(val) => setData('slug', val)} errors={errors} />
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="excerpt">Excerpt</Label>
-                                    <Textarea
-                                        id="excerpt"
-                                        value={data.excerpt || ''}
-                                        onChange={(e) =>
-                                            setData('excerpt', e.target.value)
-                                        }
-                                        placeholder="Short summary of the post"
-                                        rows={3}
-                                    />
-                                    {errors.excerpt && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.excerpt}
-                                        </p>
-                                    )}
+                                    <Label className="text-sm font-semibold">Body Content</Label>
+                                    <ContentEditor ref={editorRef} value={data.content} onChange={(content) => setData('content', content)} imageHandler={imageHandler} useDarkMode={useDarkMode} isSmallScreen={isSmallScreen} error={errors.content} />
                                 </div>
+                            </CardContent>
+                        </Card>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="content">Content</Label>
-                                    <div className="relative min-h-[400px] rounded-md border bg-background p-2">
-                                        <Editor
-                                            apiKey="0rl4abq6pz1sf2afw9izxs2pxqr7jbh970rxtxb8r85zwil4"
-                                            onInit={(evt, editor) =>
-                                                (editorRef.current = editor)
-                                            }
-                                            value={data.content || ''}
-                                            onEditorChange={async (content) => {
-                                                setData('content', content);
-
-                                                const current = new Set(
-                                                    extractImages(content),
-                                                );
-                                                const prev =
-                                                    prevImagesRef.current;
-                                                const removed: string[] = [];
-
-                                                prev.forEach((url) => {
-                                                    if (!current.has(url))
-                                                        removed.push(url);
-                                                });
-
-                                                prevImagesRef.current = current;
-
-                                                for (const url of removed) {
-                                                    try {
-                                                        if (
-                                                            url.includes(
-                                                                '/storage/',
-                                                            )
-                                                        ) {
-                                                            await axios.post(
-                                                                '/dashboard/posts/delete-image',
-                                                                {
-                                                                    url,
-                                                                    news_id:
-                                                                        post?.id,
-                                                                },
-                                                            );
-                                                        }
-                                                    } catch (e) {
-                                                        console.error(
-                                                            'Failed to delete image',
-                                                            url,
-                                                            e,
-                                                        );
-                                                    }
-                                                }
-                                            }}
-                                            init={tinymceInit as any}
-                                        />
-                                    </div>
-                                    {errors.content && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.content}
-                                        </p>
-                                    )}
-                                </div>
+                        <Card>
+                            <CardHeader className="space-y-1">
+                                <CardTitle className="text-lg">Summary</CardTitle>
+                                <CardDescription>Brief summary for SEO. If left empty, it will be generated from content.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-2">
+                                <ExcerptInput value={data.excerpt} onChange={(val) => setData('excerpt', val)} error={errors.excerpt} />
                             </CardContent>
                         </Card>
                     </div>
 
-                    <div className="space-y-6">
+                    {/* AREA KANAN: SIDEBAR SETTINGS */}
+                    <div className="space-y-6 lg:col-span-3">
                         <Card>
-                            <CardHeader>
-                                <CardTitle>Settings</CardTitle>
-                                <CardDescription>
-                                    Classification and Status
-                                </CardDescription>
+                            <CardHeader className="space-y-1">
+                                <CardTitle className="text-base">Publishing</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
+                            <CardContent className="grid gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category">Category</Label>
-                                    <Select
-                                        value={data.category_id.toString()}
-                                        onValueChange={(val) =>
-                                            setData(
-                                                'category_id',
-                                                parseInt(val),
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map((cat: any) => (
-                                                <SelectItem
-                                                    key={cat.id}
-                                                    value={cat.id.toString()}
-                                                >
-                                                    {cat.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.category_id && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.category_id}
-                                        </p>
-                                    )}
+                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">Post Status</Label>
+                                    <StatusSelect value={data.status} onChange={(val) => setData('status', val)} error={errors.status} />
                                 </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="sub_category">
-                                        Sub Category
-                                    </Label>
-                                    <Select
-                                        value={
-                                            data.sub_category_id?.toString() ||
-                                            'none'
-                                        }
-                                        onValueChange={(val) =>
-                                            setData(
-                                                'sub_category_id',
-                                                val === 'none'
-                                                    ? null
-                                                    : parseInt(val),
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Sub Category (Optional)" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">
-                                                None
-                                            </SelectItem>
-                                            {filteredSubCategories.map(
-                                                (sc: any) => (
-                                                    <SelectItem
-                                                        key={sc.id}
-                                                        value={sc.id.toString()}
-                                                    >
-                                                        {sc.name}
-                                                    </SelectItem>
-                                                ),
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.sub_category_id && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.sub_category_id}
-                                        </p>
-                                    )}
-                                </div>
+                                {data.status === 'published' && (
+                                    <div className="grid gap-2">
+                                        <Label className="text-xs tracking-wider text-muted-foreground uppercase">Publish Date</Label>
+                                        <PublishDateInput value={data.published_at} onChange={(val) => setData('published_at', val)} error={errors.published_at} />
+                                    </div>
+                                )}
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="status">Status</Label>
-                                    <Select
-                                        value={data.status}
-                                        onValueChange={(val) =>
-                                            setData('status', val as any)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="draft">
-                                                Draft
-                                            </SelectItem>
-                                            <SelectItem value="published">
-                                                Published
-                                            </SelectItem>
-                                            <SelectItem value="archived">
-                                                Archived
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.status && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.status}
-                                        </p>
-                                    )}
-                                </div>
+                                <FeaturedToggle value={data.is_featured} onChange={(val) => setData('is_featured', val)} />
+                            </CardContent>
+                        </Card>
 
-                                <div className="flex items-center justify-between space-x-2 pt-2">
-                                    <Label
-                                        htmlFor="is_featured"
-                                        className="flex cursor-pointer flex-col gap-1"
-                                    >
-                                        <span>Featured Post</span>
-                                        <span className="text-xs font-normal text-wrap text-muted-foreground">
-                                            Show this post in featured section
-                                        </span>
-                                    </Label>
-                                    <Switch
-                                        id="is_featured"
-                                        checked={data.is_featured}
-                                        onCheckedChange={(val) =>
-                                            setData('is_featured', val)
-                                        }
+                        <Card>
+                            <CardHeader className="space-y-1">
+                                <CardTitle className="text-base">Organization</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                <div className="grid gap-2">
+                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">Category</Label>
+                                    <CategorySelect
+                                        categories={categories}
+                                        value={String(data.category_id)}
+                                        onChange={(val) => {
+                                            setData('category_id', parseInt(val));
+                                            setData('sub_category_id', null);
+                                        }}
+                                        error={errors.category_id}
                                     />
                                 </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Thumbnail</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex flex-col items-center gap-4">
-                                    {previewUrl ? (
-                                        <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                                            <img
-                                                src={previewUrl}
-                                                alt="Thumbnail preview"
-                                                className="h-full w-full object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="flex aspect-video w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
-                                            <Upload className="mb-2 h-8 w-8" />
-                                            <span className="text-xs">
-                                                No image selected
-                                            </span>
-                                        </div>
-                                    )}
-                                    <Label className="w-full cursor-pointer">
-                                        <div className="flex h-9 items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80">
-                                            {previewUrl
-                                                ? 'Change Image'
-                                                : 'Upload Image'}
-                                        </div>
-                                        <Input
-                                            type="file"
-                                            className="hidden"
-                                            accept="image/*"
-                                            onChange={handleThumbnailChange}
-                                        />
-                                    </Label>
-                                    {errors.thumbnail && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.thumbnail}
-                                        </p>
-                                    )}
+                                <div className="grid gap-2">
+                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">Sub Category</Label>
+                                    <SubCategorySelect subCategories={sub_categories} categoryId={data.category_id} value={data.sub_category_id} onChange={(val) => setData('sub_category_id', val)} error={errors.sub_category_id} />
                                 </div>
                             </CardContent>
                         </Card>
 
                         <Card>
-                            <CardHeader>
-                                <CardTitle>Tags</CardTitle>
-                                <CardDescription>
-                                    Add tags to categorize your post.
-                                </CardDescription>
+                            <CardHeader className="space-y-1">
+                                <CardTitle className="text-base">Media & Tags</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex flex-wrap gap-2">
-                                    {data.tags.map((tagName) => (
-                                        <Badge
-                                            key={tagName}
-                                            variant="secondary"
-                                            className="flex items-center gap-1 px-2 py-1"
-                                        >
-                                            {tagName}
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    removeTag(tagName)
-                                                }
-                                                className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
-                                            >
-                                                <X className="h-3 w-3" />
-                                            </button>
-                                        </Badge>
-                                    ))}
+                            <CardContent className="grid gap-4">
+                                <div className="grid gap-2">
+                                    <Label className="text-center text-xs tracking-wider text-muted-foreground uppercase">Thumbnail</Label>
+                                    <ThumbnailUpload previewUrl={thumbnailPreview} onChange={handleThumbnailChange} error={errors.thumbnail} />
                                 </div>
-
-                                <div className="relative" ref={tagContainerRef}>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            placeholder="Type a tag name..."
-                                            value={tagInput}
-                                            onChange={(e) => {
-                                                setTagInput(e.target.value);
-                                                setShowTagSuggestions(true);
-                                            }}
-                                            onFocus={() =>
-                                                setShowTagSuggestions(true)
-                                            }
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    addTag(tagInput);
-                                                }
-                                            }}
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="icon"
-                                            onClick={() => addTag(tagInput)}
-                                        >
-                                            <Plus className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-
-                                    {showTagSuggestions && tagInput && (
-                                        <Card className="absolute right-0 left-0 z-50 mt-1 max-h-[200px] overflow-y-auto border shadow-lg">
-                                            <div className="p-1">
-                                                {filteredTags.length > 0 ? (
-                                                    filteredTags.map(
-                                                        (tag: any) => (
-                                                            <button
-                                                                key={tag.id}
-                                                                type="button"
-                                                                className="w-full rounded-sm px-3 py-2 text-left text-sm hover:bg-muted"
-                                                                onClick={() =>
-                                                                    addTag(
-                                                                        tag.name,
-                                                                    )
-                                                                }
-                                                            >
-                                                                {tag.name}
-                                                            </button>
-                                                        ),
-                                                    )
-                                                ) : (
-                                                    <button
-                                                        type="button"
-                                                        className="w-full px-3 py-2 text-left text-sm text-muted-foreground"
-                                                        onClick={() =>
-                                                            addTag(tagInput)
-                                                        }
-                                                    >
-                                                        Create new tag "
-                                                        {tagInput}"
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </Card>
-                                    )}
+                                <div className="grid gap-2 border-t pt-4">
+                                    <Label className="text-xs tracking-wider text-muted-foreground uppercase">Post Tags</Label>
+                                    <TagsInput tags={data.tags} availableTags={tags} onAddTag={addTag} onRemoveTag={removeTag} error={errors.tags} />
                                 </div>
-
-                                {errors.tags && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.tags}
-                                    </p>
-                                )}
                             </CardContent>
                         </Card>
-
-                        <div className="flex gap-2">
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="flex-1"
-                            >
-                                {processing && (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                )}
-                                {isEdit ? 'Update Post' : 'Save Post'}
-                            </Button>
-                            <Button type="button" variant="outline" asChild>
-                                <Link href={dashboard.posts.index().url}>
-                                    Cancel
-                                </Link>
-                            </Button>
-                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </AppLayout>
     );
 }

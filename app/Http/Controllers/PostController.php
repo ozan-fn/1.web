@@ -4,16 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\News;
-use App\Models\SiteSetting;
 use App\Models\SubCategory;
+use App\Models\Tag;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PostController extends Controller
 {
     /**
-     * Show posts by category.
+     * Helper untuk mengambil data publik secara konsisten (Global Props).
+     */
+     protected function getPublicData(): array
+     {
+         return [
+             'categories' => Category::where('is_nav', true)->orderBy('order')->get(),
+             'siteSettings' => SiteSetting::first(),
+             // JOS: Tambahkan with(['category', 'subCategory']) agar data slug tidak undefined
+             'trendingNews' => News::published()
+                 ->with(['category', 'subCategory'])
+                 ->recent()
+                 ->orderBy('views', 'desc')
+                 ->take(5)
+                 ->get(),
+             'latestNews' => News::published()
+                 ->with(['category', 'subCategory'])
+                 ->recent()
+                 ->take(3)
+                 ->get(),
+         ];
+     }
+
+    /**
+     * Menampilkan daftar berita berdasarkan kategori.
      */
     public function category($categorySlug): Response
     {
@@ -23,7 +48,8 @@ class PostController extends Controller
             ->where('category_id', $category->id)
             ->with(['category', 'subCategory', 'user'])
             ->recent()
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         $publicData = $this->getPublicData();
 
@@ -31,23 +57,21 @@ class PostController extends Controller
             'category' => $category,
             'news' => $news,
         ], $publicData))->withViewData([
-                    'title' => 'Berita ' . $category->name,
-                    'meta' => $category->description ?? 'Portal berita terpercaya menyajikan informasi tercepat, akurat, dan mendalam seputar ' . $category->name . '.',
-                    'image' => $publicData['siteSettings']->logo ?? null,
-                ]);
+            'title' => 'Berita ' . $category->name,
+            'meta' => $category->description ?? 'Portal berita terpercaya seputar ' . $category->name . '.',
+            'image' => $publicData['siteSettings']->logo ? asset('storage/' . $publicData['siteSettings']->logo) : asset('storage/settings/og-default.jpg'),
+        ]);
     }
 
     /**
-     * Show post by category and optionally sub-category.
+     * Menampilkan detail postingan berita.
      */
     public function show($categorySlug, $subCategoryOrSlug, $postSlug = null): Response
     {
-        // Handle /{category}/{post_slug}
         if ($postSlug === null) {
             $postSlug = $subCategoryOrSlug;
             $subCategorySlug = null;
         } else {
-            // Handle /{category}/{subcategory}/{post_slug}
             $subCategorySlug = $subCategoryOrSlug;
         }
 
@@ -66,51 +90,36 @@ class PostController extends Controller
         }
 
         $post = $query->firstOrFail();
-
-        // Increment views
         $post->increment('views');
 
-        // Get related posts (same category, excluding current post)
         $relatedPosts = News::published()
-            ->with(['category', 'subCategory', 'user'])
             ->where('category_id', $category->id)
             ->where('id', '!=', $post->id)
             ->recent()
             ->take(4)
             ->get();
 
-        // Data for Sidebar (Trending & Latest)
-        $trendingNews = News::published()
-            ->with(['category', 'subCategory'])
-            ->orderBy('views', 'desc')
-            ->take(5)
-            ->get();
-
-        $latestNews = News::published()
-            ->with(['category', 'subCategory'])
-            ->recent()
-            ->take(3)
-            ->get();
-
+        // getPublicData sudah mengandung trendingNews & latestNews
         return Inertia::render('home/show', array_merge([
             'post' => $post,
             'relatedPosts' => $relatedPosts,
-            'trendingNews' => $trendingNews,
-            'latestNews' => $latestNews
         ], $this->getPublicData()))->withViewData([
-                    'title' => $post->title,
-                    'meta' => $post->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160),
-                    'image' => $post->thumbnail,
-                    'author' => $post->user->name,
-                    'published_at' => $post->published_at,
-                    'category' => $post->category->name,
-                    'tags' => $post->tags->pluck('name')->join(', '),
-                ]);
+            'title' => $post->title,
+            'meta' => $post->excerpt ?: Str::limit(strip_tags($post->content), 160),
+            'image' => $post->thumbnail_url,
+            'author' => $post->user->name,
+            'published_at' => $post->published_at ? $post->published_at->toIso8601String() : null,
+            'category' => $post->category->name,
+            'tags' => $post->tags->pluck('name')->join(', '),
+        ]);
     }
 
+    /**
+     * Menampilkan berita berdasarkan Tag.
+     */
     public function tag($tagSlug): Response
     {
-        $tag = \App\Models\Tag::where('slug', $tagSlug)->firstOrFail();
+        $tag = Tag::where('slug', $tagSlug)->firstOrFail();
 
         $news = $tag->news()
             ->published()
@@ -122,38 +131,44 @@ class PostController extends Controller
             'category' => [
                 'name' => 'Tag: ' . $tag->name,
                 'slug' => 'tag/' . $tag->slug,
-                'description' => $tag->description ?? 'Kumpulan berita dengan tag ' . $tag->name
+                'description' => 'Kumpulan berita terbaru dengan topik ' . $tag->name
             ],
             'news' => $news,
         ], $this->getPublicData()))->withViewData([
-                    'title' => 'Tag: ' . $tag->name,
-                    'meta' => $tag->description ?? 'Berita terbaru dengan tag ' . $tag->name,
-                ]);
+            'title' => 'Topik: ' . $tag->name,
+            'meta' => 'Baca berita terbaru mengenai ' . $tag->name,
+        ]);
     }
 
+    /**
+     * Fitur Pencarian Berita.
+     */
     public function search(Request $request): Response
     {
-        $query = $request->input('q');
+        $queryText = $request->input('q');
 
         $news = News::published()
-            ->where(function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                    ->orWhere('content', 'like', "%{$query}%");
+            ->where(function ($q) use ($queryText) {
+                $q->where('title', 'like', "%{$queryText}%")
+                  ->orWhere('content', 'like', "%{$queryText}%")
+                  ->orWhere('excerpt', 'like', "%{$queryText}%");
             })
             ->with(['category', 'subCategory', 'user'])
             ->recent()
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         return Inertia::render('home/category', array_merge([
             'category' => [
-                'name' => 'Pencarian: ' . $query,
+                'name' => 'Hasil Pencarian: ' . $queryText,
                 'slug' => 'search',
-                'description' => "Hasil pencarian untuk '{$query}'"
+                'description' => "Menampilkan berita untuk '{$queryText}'"
             ],
             'news' => $news,
+            'searchQuery' => $queryText
         ], $this->getPublicData()))->withViewData([
-                    'title' => 'Pencarian: ' . $query,
-                    'meta' => "Hasil pencarian berita untuk '{$query}'",
-                ]);
+            'title' => 'Cari: ' . $queryText,
+            'meta' => "Hasil pencarian untuk '{$queryText}'",
+        ]);
     }
 }

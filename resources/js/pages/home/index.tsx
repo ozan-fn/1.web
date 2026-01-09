@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import Footer from '../../components/footer';
 import Navbar from '../../components/navbar';
 import Sidebar from '../../components/sidebar';
@@ -10,15 +10,7 @@ export interface SiteSettings {
     site_name: string;
     tagline: string | null;
     description: string | null;
-    email: string | null;
-    phone: string | null;
     logo: string | null;
-    favicon: string | null;
-    address: string | null;
-    social_facebook: string | null;
-    social_instagram: string | null;
-    social_twitter: string | null;
-    social_youtube: string | null;
 }
 
 interface Props {
@@ -26,87 +18,56 @@ interface Props {
     sideHeroNews: NewsItem[];
     trendingNews: NewsItem[];
     latestNews: NewsItem[];
-    videoNews: NewsItem[];
     categories: Category[];
     homepageCategories: Category[];
     siteSettings: SiteSettings | null;
 }
 
-const breadcrumbs = []; // Or remove if not used
-
-export default function Index({
-    heroNews,
-    sideHeroNews,
-    trendingNews,
-    latestNews,
-    videoNews,
-    categories,
-    homepageCategories,
-    siteSettings,
-}: Props) {
-    const categoryNames = categories.map((cat) => cat.name);
-
+export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], latestNews = [], categories = [], homepageCategories = [], siteSettings }: Props) {
     return (
-        <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
+        <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
             <Head>
                 <title>{siteSettings?.site_name || 'Lensa Publik'}</title>
-                <meta
-                    name="description"
-                    content={
-                        siteSettings?.description || 'Portal Berita Terpercaya'
-                    }
-                />
-                <meta
-                    property="og:title"
-                    content={siteSettings?.site_name || 'Lensa Publik'}
-                />
-                <meta
-                    property="og:description"
-                    content={
-                        siteSettings?.description || 'Portal Berita Terpercaya'
-                    }
-                />
-                {siteSettings?.logo && (
-                    <meta
-                        property="og:image"
-                        content={`/storage/${siteSettings.logo}`}
-                    />
-                )}
-                <meta property="og:type" content="website" />
-                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="description" content={siteSettings?.description || 'Portal Berita Terpercaya'} />
             </Head>
 
             <Navbar categories={categories} siteSettings={siteSettings} />
 
-            {/* MAIN CONTENT */}
             <main className="container mx-auto max-w-7xl px-4 py-6">
-                {/* <StoryCategories categories={categoryNames} /> */}
-
-                {heroNews && (
-                    <HeroSection
-                        heroNews={heroNews}
-                        sideHeroNews={sideHeroNews}
-                    />
-                )}
+                {/* HERO SECTION */}
+                {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
 
                 {/* GRID CONTENT LAYOUT */}
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                    {/* LEFT COLUMN (Main Feed) */}
-                    <div className="space-y-10 lg:col-span-8">
+                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
+                    {/* LEFT COLUMN (Daftar Kategori Berita) */}
+                    <div className="space-y-14 lg:col-span-8">
                         {homepageCategories.map((category) => (
-                            <CategorySection
-                                key={category.id}
-                                category={category}
-                            />
-                        ))}
+                            <section key={category.id} className="scroll-mt-20">
+                                {/* HEADER KATEGORI - Dipusatkan di sini untuk menghindari duplikasi */}
+                                <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
+                                    <div className="relative">
+                                        <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
+                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-red-600"></div>
+                                    </div>
 
-                        {/* <VideoSection news={videoNews} /> */}
+                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-red-600">
+                                        Lihat Semua
+                                        <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
+                                    </Link>
+                                </div>
+
+                                {/* Hanya merender list berita */}
+                                <CategorySection category={category} />
+                            </section>
+                        ))}
                     </div>
 
-                    <Sidebar
-                        trendingNews={trendingNews}
-                        latestNews={latestNews}
-                    />
+                    {/* RIGHT COLUMN (Sidebar) */}
+                    <div className="lg:col-span-4">
+                        <div className="sticky top-24">
+                            <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
+                        </div>
+                    </div>
                 </div>
             </main>
 

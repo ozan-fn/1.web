@@ -11,17 +11,24 @@ class TagController extends Controller
 {
     public function index(Request $request)
     {
-        return Inertia::render('dashboard/tags/index', [
-            'tags' => Tag::when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+        $tags = Tag::query()
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
             })
-                ->when($request->field && $request->direction, function ($query) use ($request) {
-                    $query->orderBy($request->field, $request->direction);
-                }, function ($query) {
-                    $query->orderBy('created_at', 'desc');
-                })
-                ->get(),
+            ->when($request->filled(['field', 'direction']), function ($query) use ($request) {
+                $direction = strtolower($request->direction) === 'desc' ? 'desc' : 'asc';
+                $query->orderBy($request->field, $direction);
+            }, function ($query) {
+                $query->orderBy('created_at', 'desc');
+            })
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('dashboard/tags/index', [
+            'tags'    => $tags,
             'filters' => $request->only(['search', 'field', 'direction'])
         ]);
     }
