@@ -16,26 +16,27 @@ class PostController extends Controller
 {
     /**
      * Helper untuk mengambil data publik secara konsisten (Global Props).
+     * Digunakan untuk Sidebar, Navbar, dan Footer.
      */
-     protected function getPublicData(): array
-     {
-         return [
-             'categories' => Category::where('is_nav', true)->orderBy('order')->get(),
-             'siteSettings' => SiteSetting::first(),
-             // JOS: Tambahkan with(['category', 'subCategory']) agar data slug tidak undefined
-             'trendingNews' => News::published()
-                 ->with(['category', 'subCategory'])
-                 ->recent()
-                 ->orderBy('views', 'desc')
-                 ->take(5)
-                 ->get(),
-             'latestNews' => News::published()
-                 ->with(['category', 'subCategory'])
-                 ->recent()
-                 ->take(3)
-                 ->get(),
-         ];
-     }
+    protected function getPublicData(): array
+    {
+        return [
+            'categories' => Category::where('is_nav', true)->orderBy('order')->get(),
+            'siteSettings' => SiteSetting::first(),
+            // JOS: Eager loading category agar slug tidak undefined di Sidebar
+            'trendingNews' => News::published()
+                ->with(['category', 'subCategory'])
+                ->recent()
+                ->orderBy('views', 'desc')
+                ->take(5)
+                ->get(),
+            'latestNews' => News::published()
+                ->with(['category', 'subCategory'])
+                ->recent()
+                ->take(3)
+                ->get(),
+        ];
+    }
 
     /**
      * Menampilkan daftar berita berdasarkan kategori.
@@ -59,7 +60,9 @@ class PostController extends Controller
         ], $publicData))->withViewData([
             'title' => 'Berita ' . $category->name,
             'meta' => $category->description ?? 'Portal berita terpercaya seputar ' . $category->name . '.',
-            'image' => $publicData['siteSettings']->logo ? asset('storage/' . $publicData['siteSettings']->logo) : asset('storage/settings/og-default.jpg'),
+            'image' => ($publicData['siteSettings'] && $publicData['siteSettings']->logo)
+                ? asset('storage/' . $publicData['siteSettings']->logo)
+                : asset('storage/settings/og-default.jpg'),
         ]);
     }
 
@@ -68,6 +71,7 @@ class PostController extends Controller
      */
     public function show($categorySlug, $subCategoryOrSlug, $postSlug = null): Response
     {
+        // Handling routing dinamis untuk subkategori
         if ($postSlug === null) {
             $postSlug = $subCategoryOrSlug;
             $subCategorySlug = null;
@@ -92,14 +96,15 @@ class PostController extends Controller
         $post = $query->firstOrFail();
         $post->increment('views');
 
+        // FIX: Tambahkan with(['category', 'subCategory']) untuk mencegah error 'slug' undefined di frontend
         $relatedPosts = News::published()
+            ->with(['category', 'subCategory'])
             ->where('category_id', $category->id)
             ->where('id', '!=', $post->id)
             ->recent()
             ->take(4)
             ->get();
 
-        // getPublicData sudah mengandung trendingNews & latestNews
         return Inertia::render('home/show', array_merge([
             'post' => $post,
             'relatedPosts' => $relatedPosts,
