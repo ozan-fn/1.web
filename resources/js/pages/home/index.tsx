@@ -32,7 +32,7 @@ interface Props {
 
 export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], latestNews = [], categories = [], homepageCategories = [], siteSettings }: Props) {
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
+        <div className="min-h-screen bg-background font-sans text-foreground">
             <Head>
                 <title>{siteSettings?.site_name || ''}</title>
                 <meta name="description" content={siteSettings?.description || 'Portal Berita Terpercaya'} />
@@ -40,38 +40,38 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
 
             <Navbar categories={categories} siteSettings={siteSettings} />
 
-            <main className="container mx-auto max-w-7xl px-4 py-6">
-                {/* HERO SECTION */}
-                {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
+            <main className="container mx-auto max-w-7xl px-4 py-8">
+                {/* HERO / FOCUS SECTION */}
+                <div className="mb-12">{heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}</div>
+
+                {/* BREAKING NEWS TICKER (SIMULATED or Minimal) */}
+                <div className="mb-12 flex h-10 items-center overflow-hidden rounded-md border border-blue-100 bg-blue-50/50">
+                    <div className="bg-blue-700 px-4 py-2 text-[11px] font-black text-white uppercase">Breaking</div>
+                    <div className="flex-1 px-4 text-xs font-bold text-blue-800">{latestNews[0]?.title || 'Selamat datang di portal berita terupdate.'}</div>
+                </div>
 
                 {/* GRID CONTENT LAYOUT */}
-                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
-                    {/* LEFT COLUMN (Daftar Kategori Berita) */}
-                    <div className="space-y-14 lg:col-span-8">
-                        {homepageCategories.map((category) => (
-                            <section key={category.id} className="scroll-mt-20">
-                                {/* HEADER KATEGORI - Dipusatkan di sini untuk menghindari duplikasi */}
-                                <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
-                                    <div className="relative">
-                                        <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
-                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-primary"></div>
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+                    {/* LEFT COLUMN: Main News Stream */}
+                    <div className="lg:col-span-8">
+                        <div className="space-y-16">
+                            {homepageCategories.map((category) => (
+                                <section key={category.id} className="scroll-mt-20">
+                                    <div className="mb-6 flex items-center justify-between border-b-2 border-blue-700 pb-2">
+                                        <h2 className="text-xl font-black text-foreground uppercase">{category.name}</h2>
+                                        <Link href={`/${category.slug}`} className="text-xs font-black text-blue-700 uppercase hover:underline">
+                                            Lihat Semua
+                                        </Link>
                                     </div>
-
-                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
-                                        Lihat Semua
-                                        <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
-                                    </Link>
-                                </div>
-
-                                {/* Hanya merender list berita */}
-                                <CategorySection category={category} />
-                            </section>
-                        ))}
+                                    <CategorySection category={category} />
+                                </section>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* RIGHT COLUMN (Sidebar) */}
+                    {/* RIGHT COLUMN: Sidebar */}
                     <div className="lg:col-span-4">
-                        <div className="sticky top-24">
+                        <div className="sticky top-28">
                             <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone, Twitter, Youtube } from 'lucide-react';
 import React from 'react';
 
 interface Category {
@@ -31,134 +31,101 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     const categories = propCategories || props.categories || [];
     const siteSettings = propSiteSettings || props.siteSettings;
 
-    // Split site name for styling
-    const siteNameParts = siteSettings?.site_name?.split(' ') || ['NEWS', 'PORTAL'];
-    const firstPart = siteNameParts[0];
-    const restParts = siteNameParts.slice(1).join(' ');
-
     const socials = [
         { key: 'facebook', icon: Facebook, url: siteSettings?.social_facebook },
-        {
-            key: 'instagram',
-            icon: Instagram,
-            url: siteSettings?.social_instagram,
-        },
+        { key: 'instagram', icon: Instagram, url: siteSettings?.social_instagram },
         { key: 'twitter', icon: Twitter, url: siteSettings?.social_twitter },
         { key: 'youtube', icon: Youtube, url: siteSettings?.social_youtube },
     ].filter((s) => s.url);
 
     return (
-        <footer className="mt-20 border-t-4 border-primary bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-primary/80">
+        <footer className="mt-20 border-t-4 border-blue-700 bg-slate-50 pt-16 pb-12 text-slate-600 transition-colors">
             <div className="container mx-auto max-w-7xl px-4">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+                <div className="mb-12 grid grid-cols-1 gap-12 lg:grid-cols-12">
                     {/* Brand Info */}
-                    <div className="col-span-1">
+                    <div className="lg:col-span-4">
                         <div className="mb-6">
                             <Link href="/">
-                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                    {firstPart}
-                                    <span className="text-gray-400"> {restParts}</span>
-                                </h2>
+                                <h2 className="text-3xl font-black tracking-tighter text-blue-700 uppercase">{siteSettings?.site_name || 'Harian Indonesia'}</h2>
                             </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
+                            <p className="mt-1 text-[12px] font-bold tracking-wider text-slate-400 uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
                         </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+                        <p className="mb-8 text-sm leading-relaxed text-slate-500">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Harian Indonesia'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
 
-                        <div className="mb-8 space-y-4">
-                            {siteSettings?.address && (
-                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
-                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.address}</span>
-                                </div>
-                            )}
-
-                            {siteSettings?.email && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.email}</span>
-                                </div>
-                            )}
-                            {siteSettings?.phone && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.phone}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {socials.length > 0 && (
-                            <div className="flex gap-3">
-                                {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
-                                        <social.icon className="h-4 w-4" />
-                                    </a>
-                                ))}
+                        <div className="flex flex-col gap-3">
+                            <span className="text-xs font-black tracking-widest text-slate-400 uppercase">Hubungi Kami:</span>
+                            <div className="space-y-3">
+                                {siteSettings?.email && (
+                                    <div className="flex items-center gap-3 text-sm font-medium text-slate-600">
+                                        <Mail className="h-4 w-4 shrink-0 text-blue-700" />
+                                        <span>{siteSettings.email}</span>
+                                    </div>
+                                )}
+                                {siteSettings?.phone && (
+                                    <div className="flex items-center gap-3 text-sm font-medium text-slate-600">
+                                        <Phone className="h-4 w-4 shrink-0 text-blue-700" />
+                                        <span>{siteSettings.phone}</span>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
-                        {categories.length > 0 ? (
-                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
-                                    <li key={cat.id}>
-                                        <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
-                                            {cat.name}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-xs text-gray-500 italic">Belum ada kategori.</p>
-                        )}
-                    </div>
-
-                    {/* Info Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
-                        <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
-                            {[
-                                { title: 'Tentang Kami', url: '#' },
-                                { title: 'Redaksi', url: '#' },
-                                { title: 'Pedoman Media Siber', url: '#' },
-                                { title: 'Disclaimer', url: '#' },
-                                { title: 'Kebijakan Privasi', url: '#' },
-                                { title: 'Kontak Kami', url: '#' },
-                            ].map((link) => (
-                                <li key={link.title}>
-                                    <Link href={link.url} className="transition-colors hover:text-primary">
-                                        {link.title}
-                                    </Link>
-                                </li>
+                    {/* Categories */}
+                    <div className="lg:col-span-5">
+                        <h4 className="mb-6 border-l-4 border-blue-700 pl-3 text-sm font-black tracking-widest text-slate-900 uppercase">Kategori Populer</h4>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+                            {categories.slice(0, 12).map((category) => (
+                                <Link key={category.id} href={`/category/${category.slug}`} className="text-sm font-medium text-slate-600 transition-colors hover:text-blue-700 hover:underline">
+                                    {category.name}
+                                </Link>
                             ))}
-                        </ul>
+                        </div>
                     </div>
 
-                    {/* Redaksi / Office */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
+                    {/* Socials & Apps */}
+                    <div className="lg:col-span-3">
+                        <h4 className="mb-6 border-l-4 border-blue-700 pl-3 text-sm font-black tracking-widest text-slate-900 uppercase">Ikuti Kami</h4>
+                        <div className="mb-8 flex flex-wrap gap-3">
+                            {socials.map((social) => (
+                                <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white transition-all hover:border-blue-700 hover:text-blue-700 hover:shadow-md">
+                                    <social.icon className="h-5 w-5" />
+                                </a>
+                            ))}
+                        </div>
+
                         <div className="space-y-3">
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
-                                Kirim Berita (WA)
-                            </Link>
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-primary hover:bg-primary">
-                                Media Kit & Iklan
-                            </Link>
+                            <span className="text-xs font-black tracking-widest text-slate-400 uppercase italic">Segera Hadir:</span>
+                            <div className="flex gap-2">
+                                <div className="flex h-10 w-32 items-center justify-center rounded-lg border border-slate-200 bg-white text-[10px] font-bold text-slate-400 uppercase shadow-sm">Google Play</div>
+                                <div className="flex h-10 w-32 items-center justify-center rounded-lg border border-slate-200 bg-white text-[10px] font-bold text-slate-400 uppercase shadow-sm">App Store</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
-                    <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
-                    </p>
-                    <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">
-                            Admin Login
-                        </Link>
+                <div className="mt-16 border-t border-slate-200 pt-8">
+                    <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+                        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-bold tracking-tighter text-slate-400 uppercase">
+                            <Link href="/about" className="hover:text-blue-700">
+                                Tentang Kami
+                            </Link>
+                            <Link href="/disclaimer" className="hover:text-blue-700">
+                                Disclaimer
+                            </Link>
+                            <Link href="/privacy" className="hover:text-blue-700">
+                                Kebijakan Privasi
+                            </Link>
+                            <Link href="/pedoman" className="hover:text-blue-700">
+                                Pedoman Media Siber
+                            </Link>
+                            <Link href="/contact" className="hover:text-blue-700">
+                                Kontak
+                            </Link>
+                        </div>
+                        <p className="text-xs font-bold text-slate-400">
+                            &copy; {new Date().getFullYear()} <span className="text-blue-700">{siteSettings?.site_name}</span>. All rights reserved.
+                        </p>
                     </div>
                 </div>
             </div>

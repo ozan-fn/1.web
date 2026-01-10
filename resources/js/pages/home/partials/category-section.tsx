@@ -9,11 +9,11 @@ interface Props {
 const CategorySection: React.FC<Props> = ({ category }) => {
     // JOS: Cek apakah ada berita, jika tidak ada jangan render apapun
     if (!category.news || category.news.length === 0) {
-        return <div className="py-4 text-sm text-muted-foreground italic">Belum ada berita terbaru di kategori ini.</div>;
+        return <div className="py-4 text-xs tracking-tighter text-muted-foreground uppercase italic">Belum ada berita terbaru di kategori ini.</div>;
     }
 
     return (
-        <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-6 md:grid-cols-1">
             {category.news.map((item) => (
                 <ListCard key={item.id} item={item} />
             ))}
