@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { ArrowUpRight, Cpu, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import React from 'react';
 
 interface Category {
@@ -31,135 +31,124 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     const categories = propCategories || props.categories || [];
     const siteSettings = propSiteSettings || props.siteSettings;
 
-    // Split site name for styling
-    const siteNameParts = siteSettings?.site_name?.split(' ') || ['NEWS', 'PORTAL'];
-    const firstPart = siteNameParts[0];
-    const restParts = siteNameParts.slice(1).join(' ');
-
-    const socials = [
-        { key: 'facebook', icon: Facebook, url: siteSettings?.social_facebook },
-        {
-            key: 'instagram',
-            icon: Instagram,
-            url: siteSettings?.social_instagram,
-        },
-        { key: 'twitter', icon: Twitter, url: siteSettings?.social_twitter },
-        { key: 'youtube', icon: Youtube, url: siteSettings?.social_youtube },
-    ].filter((s) => s.url);
+    const siteName = siteSettings?.site_name || 'INDUSTRIAL_SYSTEM';
 
     return (
-        <footer className="mt-20 border-t-4 border-primary bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-primary/80">
-            <div className="container mx-auto max-w-7xl px-4">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-                    {/* Brand Info */}
-                    <div className="col-span-1">
-                        <div className="mb-6">
-                            <Link href="/">
-                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                    {firstPart}
-                                    <span className="text-gray-400"> {restParts}</span>
-                                </h2>
-                            </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
+        <footer className="mt-40 border-t-[15px] border-foreground bg-background text-foreground transition-colors selection:bg-foreground selection:text-background">
+            {/* MASSIVE TITULAR FOOTER BLOCK */}
+            <div className="border-b-4 border-foreground px-8 py-20 lg:px-16 lg:py-40">
+                <div className="mx-auto max-w-[1700px]">
+                    <div className="grid grid-cols-1 gap-20 lg:grid-cols-12 lg:items-center">
+                        <div className="lg:col-span-8">
+                            <h2 className="text-[12vw] leading-[0.8] font-[900] tracking-[-0.05em] uppercase md:text-[10vw]">
+                                {siteName.split(' ')[0]} <br />
+                                <span className="text-primary italic">{siteName.split(' ').slice(1).join('_') || 'NETWORK'}</span>
+                            </h2>
                         </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
-
-                        <div className="mb-8 space-y-4">
-                            {siteSettings?.address && (
-                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
-                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.address}</span>
-                                </div>
-                            )}
-
-                            {siteSettings?.email && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.email}</span>
-                                </div>
-                            )}
-                            {siteSettings?.phone && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.phone}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {socials.length > 0 && (
-                            <div className="flex gap-3">
-                                {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
-                                        <social.icon className="h-4 w-4" />
-                                    </a>
+                        <div className="flex flex-col gap-8 lg:col-span-4 lg:items-end">
+                            <div className="text-right">
+                                <p className="text-xs font-black tracking-[0.3em] uppercase opacity-40">Operational_Status</p>
+                                <p className="text-2xl font-black text-primary uppercase italic">// ONLINE_ACTIVE //</p>
+                            </div>
+                            <div className="flex gap-4">
+                                {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                                    <button key={i} className="flex h-16 w-16 translate-y-0 items-center justify-center border-4 border-foreground transition-all hover:-translate-y-2 hover:bg-foreground hover:text-background">
+                                        <Icon className="h-6 w-6" />
+                                    </button>
                                 ))}
                             </div>
-                        )}
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* Quick Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
-                        {categories.length > 0 ? (
-                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
+            {/* DIRECTORY GRID */}
+            <div className="border-b-4 border-foreground px-8 py-20 lg:px-16">
+                <div className="mx-auto max-w-[1700px]">
+                    <div className="grid grid-cols-1 gap-16 md:grid-cols-2 lg:grid-cols-4">
+                        {/* Sector: Distribution */}
+                        <div className="flex flex-col gap-8">
+                            <h3 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] uppercase italic">
+                                <span className="h-4 w-4 bg-primary"></span>
+                                SECTOR_DISTRIBUTION
+                            </h3>
+                            <ul className="flex flex-col gap-4 text-3xl font-black tracking-tighter uppercase italic">
+                                {categories.slice(0, 5).map((cat: any) => (
                                     <li key={cat.id}>
-                                        <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
+                                        <Link href={`/${cat.slug}`} className="group flex items-center gap-2 transition-all hover:text-primary">
                                             {cat.name}
+                                            <ArrowUpRight className="h-6 w-6 opacity-0 group-hover:opacity-100" />
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
-                        ) : (
-                            <p className="text-xs text-gray-500 italic">Belum ada kategori.</p>
-                        )}
-                    </div>
+                        </div>
 
-                    {/* Info Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
-                        <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
-                            {[
-                                { title: 'Tentang Kami', url: '#' },
-                                { title: 'Redaksi', url: '#' },
-                                { title: 'Pedoman Media Siber', url: '#' },
-                                { title: 'Disclaimer', url: '#' },
-                                { title: 'Kebijakan Privasi', url: '#' },
-                                { title: 'Kontak Kami', url: '#' },
-                            ].map((link) => (
-                                <li key={link.title}>
-                                    <Link href={link.url} className="transition-colors hover:text-primary">
-                                        {link.title}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                        {/* Sector: Information */}
+                        <div className="flex flex-col gap-8">
+                            <h3 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] uppercase italic">
+                                <span className="h-4 w-4 bg-foreground/20"></span>
+                                SYSTEM_INFO
+                            </h3>
+                            <ul className="flex flex-col gap-6 text-[11px] font-black tracking-[0.2em] uppercase opacity-60">
+                                {['ABOUT_US', 'EDITORIAL_CODE', 'RED_DESK_PROTOCOL', 'PRIVACY_ENCRYPTION', 'DISCLAIMER_LOG'].map((link) => (
+                                    <li key={link}>
+                                        <Link href="#" className="hover:text-primary hover:opacity-100">
+                                            {link}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
 
-                    {/* Redaksi / Office */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
-                        <div className="space-y-3">
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
-                                Kirim Berita (WA)
-                            </Link>
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-primary hover:bg-primary">
-                                Media Kit & Iklan
-                            </Link>
+                        {/* Sector: Connection */}
+                        <div className="flex flex-col gap-8">
+                            <h3 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] uppercase italic">
+                                <span className="h-4 w-4 bg-foreground/20"></span>
+                                SOURCE_LINKS
+                            </h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="border-4 border-foreground p-6">
+                                    <span className="text-[10px] font-black uppercase opacity-40">BASE_ADDR</span>
+                                    <p className="mt-2 text-xs font-black uppercase">{siteSettings?.address || 'COORDINATES_NOT_SET'}</p>
+                                </div>
+                                <div className="border-4 border-foreground p-6">
+                                    <span className="text-[10px] font-black uppercase opacity-40">COMM_FREQ</span>
+                                    <p className="mt-2 text-xs font-black uppercase">{siteSettings?.email || 'NULL@NETWORK'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sector: Identity */}
+                        <div className="flex flex-col gap-8">
+                            <div className="bg-foreground p-10 text-background">
+                                <Cpu className="mb-6 h-12 w-12 text-primary" />
+                                <h4 className="text-2xl leading-none font-black tracking-tighter uppercase italic">
+                                    HARDWARE_SUPPORT <br /> READY_FOR_DEPL
+                                </h4>
+                                <Link href="#" className="mt-8 flex items-center justify-between border-b border-background/20 pb-2 text-[10px] font-black uppercase transition-colors hover:text-primary">
+                                    CONTACT_SYSTEM_ADM
+                                    <ArrowUpRight className="h-4 w-4" />
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
-                    <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
-                    </p>
-                    <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">
-                            Admin Login
-                        </Link>
+            {/* LOWER TERMINAL BAR */}
+            <div className="px-8 py-8 lg:px-16">
+                <div className="mx-auto flex max-w-[1700px] flex-col items-center justify-between gap-6 text-[9px] font-black tracking-[0.4em] uppercase opacity-30 md:flex-row">
+                    <span>
+                        (C) {new Date().getFullYear()} {siteName} // ALL_RECORDS_LOGGED
+                    </span>
+                    <div className="flex gap-8">
+                        <span>BUILD_V_2026.01.11</span>
+                        <span>ENC: AES_256_GCM</span>
                     </div>
+                    <Link href="/login" className="hover:text-primary hover:opacity-100">
+                        ACCESS_CONSOLE
+                    </Link>
                 </div>
             </div>
         </footer>

@@ -1,8 +1,8 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useAppearance } from '@/hooks/use-appearance'; // Pastikan path sesuai
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAppearance } from '@/hooks/use-appearance';
 import { Link, router, usePage } from '@inertiajs/react';
-import { ChevronRight, Menu, Monitor, Moon, Search, Sun } from 'lucide-react';
-import React, { useState } from 'react';
+import { ChevronRight, Menu, Moon, Search, Sun, Terminal } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface Category {
     id: number;
@@ -23,11 +23,20 @@ interface Props {
 
 const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: propSiteSettings }) => {
     const { url, props } = usePage<any>();
-    const { appearance, updateAppearance } = useAppearance(); // Menggunakan hook baru
+    const { appearance, updateAppearance } = useAppearance();
 
     const categories = propCategories || props.categories || [];
     const siteSettings = propSiteSettings || props.siteSettings;
     const [search, setSearch] = useState('');
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,112 +45,113 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
         }
     };
 
-    // Fungsi untuk rotasi tema: Light -> Dark -> System
     const toggleTheme = () => {
         if (appearance === 'light') updateAppearance('dark');
-        // else if (appearance === 'dark') updateAppearance('system');
         else updateAppearance('light');
     };
 
-    const siteNameParts = siteSettings?.site_name.split(' ') || ['NEWS', 'PORTAL'];
-    const firstPart = siteNameParts[0];
-    const restParts = siteNameParts.slice(1).join(' ');
+    const siteName = siteSettings?.site_name || 'INDUSTRIAL_NEWS';
 
     return (
-        <header className="sticky top-0 z-50 border-b border-border bg-background transition-colors">
-            {/* Top Bar */}
-            <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-                <div className="flex items-center gap-4">
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <button className="rounded-lg p-2 text-muted-foreground hover:bg-muted lg:hidden">
-                                <Menu className="h-6 w-6" />
-                            </button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="w-[300px] bg-background p-0">
-                            <SheetHeader className="border-b border-border p-6">
-                                <SheetTitle className="text-left">
-                                    <Link href="/" className="flex items-center gap-3">
-                                        <div className="flex flex-col leading-none">
-                                            <span className="text-xl font-black tracking-tighter text-primary uppercase italic">
-                                                {firstPart}
-                                                <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
-                                            </span>
-                                        </div>
-                                    </Link>
-                                </SheetTitle>
-                            </SheetHeader>
-                            <div className="flex flex-col py-4">
-                                <Link href="/" className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === '/' ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
-                                    Home
-                                    <ChevronRight className="h-4 w-4" />
-                                </Link>
-                                {categories.map((cat) => (
-                                    <Link key={cat.id} href={`/${cat.slug}`} className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === `/${cat.slug}` ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
-                                        {cat.name}
-                                        <ChevronRight className="h-4 w-4" />
-                                    </Link>
-                                ))}
-                            </div>
-                        </SheetContent>
-                    </Sheet>
-
-                    <Link href="/" className="flex items-center gap-3">
-                        {siteSettings?.logo && <img src={`/storage/${siteSettings.logo}`} alt={siteSettings.site_name} className="h-10 w-auto object-contain" />}
-                        <div className="flex flex-col leading-none">
-                            <span className="text-2xl font-black tracking-tighter text-primary uppercase italic">
-                                {firstPart}
-                                <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
-                            </span>
-                            <span className="text-[9px] font-bold tracking-[0.2em] text-muted-foreground uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</span>
+        <header className="sticky top-0 z-50 bg-background transition-all duration-500">
+            {/* MASSIVE BRAND HEADER - Neo-Brutalist Style */}
+            <div className={`border-foreground px-8 transition-all duration-500 lg:px-16 ${scrolled ? 'border-b-4 py-2' : 'border-b-[10px] py-10 lg:py-20'}`}>
+                <div className="mx-auto flex max-w-[1700px] flex-col items-center justify-between gap-12 lg:flex-row lg:items-end">
+                    <div className={`flex flex-col items-center transition-all duration-500 lg:items-start ${scrolled ? 'lg:flex-row lg:items-center lg:gap-8' : ''}`}>
+                        <div className={`flex items-center gap-4 transition-all duration-500 ${scrolled ? 'hidden lg:flex' : 'mb-4'}`}>
+                            <span className="animate-pulse bg-primary px-3 py-1 text-[10px] font-black tracking-[0.5em] text-background uppercase italic">SYSTEM_LIVE_V.4.0</span>
+                            {!scrolled && <div className="h-1 w-20 bg-foreground opacity-10"></div>}
                         </div>
-                    </Link>
-                </div>
+                        <Link href="/" className="group relative">
+                            <h1 className={`leading-none font-[900] tracking-[-0.08em] text-foreground uppercase transition-all duration-500 ${scrolled ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-7xl md:text-9xl lg:text-[180px]'}`}>
+                                {siteName.split(' ')[0]}
+                                <span className="text-primary italic">{siteName.split(' ').slice(1).join('_')}</span>
+                            </h1>
+                            {/* Decorative ghost text behind brand */}
+                            {!scrolled && <div className="pointer-events-none absolute -bottom-10 left-0 -z-10 text-[150px] leading-none font-black whitespace-nowrap italic opacity-[0.03] select-none lg:text-[250px]">CONNECTED_REALITY</div>}
+                        </Link>
+                        {!scrolled && (
+                            <div className="mt-6 flex flex-wrap items-center gap-6 text-[10px] font-black tracking-[0.2em] uppercase opacity-40 lg:text-xs">
+                                <span>PORTAL_ID: 88-X-99</span>
+                                <span className="h-1 w-1 rounded-full bg-foreground"></span>
+                                <span>{siteSettings?.tagline || 'NO_TAGLINE_LOGGED'}</span>
+                                <span className="h-1 w-1 rounded-full bg-foreground"></span>
+                                <span className="flex items-center gap-2">
+                                    <Terminal className="h-3 w-3" />
+                                    ROOT@USER_PROMPT:~$
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-border bg-background px-2 py-2 transition-colors focus-within:border-primary md:flex">
-                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita..." className="w-full bg-transparent text-sm font-medium text-foreground placeholder-muted-foreground outline-none" />
-                    <button type="submit" className="px-2 text-muted-foreground transition-colors hover:text-primary">
-                        <Search className="h-4 w-4" />
-                    </button>
-                </form>
+                    {/* Industrial Search & Actions Block */}
+                    <div className={`flex w-full flex-col gap-6 transition-all duration-500 lg:w-auto lg:items-end ${scrolled ? 'lg:flex-row lg:items-center' : ''}`}>
+                        <form onSubmit={handleSearch} className={`relative w-full transition-all duration-500 ${scrolled ? 'lg:w-[250px]' : 'lg:w-[400px]'}`}>
+                            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="EXECUTE_SEARCH_QUERY..." className={`w-full border-4 border-foreground bg-transparent font-black uppercase placeholder-foreground/30 transition-all outline-none focus:bg-foreground focus:text-background focus:placeholder-background/30 ${scrolled ? 'p-3 text-xs' : 'p-6 text-sm'}`} />
+                            <button type="submit" className="absolute top-1/2 right-4 -translate-y-1/2">
+                                <Search className={`${scrolled ? 'h-4 w-4' : 'h-6 w-6'}`} />
+                            </button>
+                        </form>
 
-                <div className="flex items-center gap-2">
-                    {/* Theme Toggle Button */}
-                    <button onClick={toggleTheme} className="flex items-center gap-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary" title={`Mode: ${appearance}`}>
-                        {appearance === 'light' && <Sun className="h-5 w-5" />}
-                        {appearance === 'dark' && <Moon className="h-5 w-5" />}
-                        {appearance === 'system' && <Monitor className="h-5 w-5" />}
+                        <div className="flex items-center gap-4">
+                            <button onClick={toggleTheme} className={`group relative border-4 border-foreground transition-all hover:bg-foreground hover:text-background ${scrolled ? 'p-2' : 'p-4'}`}>
+                                {appearance === 'light' ? <Sun className={`${scrolled ? 'h-5 w-5' : 'h-6 w-6'}`} /> : <Moon className={`${scrolled ? 'h-5 w-5' : 'h-6 w-6'}`} />}
+                            </button>
 
-                        {/* Indikator teks opsional (bisa dihapus jika ingin icon saja) */}
-                        <span className="hidden text-[10px] font-bold uppercase lg:block">{appearance}</span>
-                    </button>
-
-                    <button className="rounded-full p-2 text-muted-foreground hover:bg-muted md:hidden">
-                        <Search className="h-5 w-5" />
-                    </button>
+                            <Sheet>
+                                <SheetTrigger asChild>
+                                    <button className={`group flex items-center gap-4 border-4 border-foreground bg-foreground font-black text-background transition-all hover:bg-primary ${scrolled ? 'p-2' : 'p-4'}`}>
+                                        <Menu className={`${scrolled ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                                        {!scrolled && <span className="hidden text-sm uppercase lg:block">INDEX_CHANNELS</span>}
+                                    </button>
+                                </SheetTrigger>
+                                <SheetContent side="right" className="w-full border-l-[20px] border-foreground bg-background p-0 md:max-w-xl">
+                                    <div className="flex h-full flex-col p-12">
+                                        <div className="mb-20 flex items-center justify-between border-b-8 border-foreground pb-8">
+                                            <h2 className="text-5xl font-black tracking-tighter uppercase italic">DIRECTORY</h2>
+                                            <div className="h-4 w-4 bg-primary"></div>
+                                        </div>
+                                        <nav className="flex flex-col gap-4">
+                                            <Link href="/" className="group flex items-center justify-between border-b-2 border-foreground/10 py-6 text-4xl font-black uppercase italic transition-all hover:text-primary">
+                                                00_HOME
+                                                <ChevronRight className="h-8 w-8 translate-x-10 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                                            </Link>
+                                            {categories.map((cat: any, i: number) => (
+                                                <Link key={cat.id} href={`/${cat.slug}`} className="group flex items-center justify-between border-b-2 border-foreground/10 py-6 text-4xl font-black uppercase italic transition-all hover:text-primary">
+                                                    {String(i + 1).padStart(2, '0')}_{cat.name}
+                                                    <ChevronRight className="h-8 w-8 translate-x-10 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                                                </Link>
+                                            ))}
+                                        </nav>
+                                    </div>
+                                </SheetContent>
+                            </Sheet>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden border-t border-border bg-background lg:block">
-                <div className="no-scrollbar container mx-auto max-w-7xl overflow-x-auto px-4">
-                    <div className="flex gap-8 py-3 text-[13px] font-black tracking-tight whitespace-nowrap uppercase">
-                        <Link href="/" className={`border-b-2 py-1 transition-colors ${url === '/' ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
-                            Home
-                        </Link>
-                        {categories.map((cat) => {
-                            const href = `/${cat.slug}`;
-                            const isActive = url === href || url.startsWith(`${href}/`);
-                            return (
-                                <Link key={cat.id} href={href} className={`border-b-2 py-1 transition-colors ${isActive ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
-                                    {cat.name}
-                                </Link>
-                            );
-                        })}
+            {/* MINIMAL SUBNAVBAR */}
+            {!scrolled && (
+                <nav className="border-b-4 border-foreground bg-background py-4">
+                    <div className="no-scrollbar mx-auto max-w-[1700px] overflow-x-auto px-8">
+                        <div className="flex items-center gap-12 text-[11px] font-[900] tracking-[0.2em] whitespace-nowrap uppercase">
+                            <Link href="/" className={`transition-all hover:text-primary ${url === '/' ? 'text-primary underline decoration-4 underline-offset-8' : ''}`}>
+                                / ROOT
+                            </Link>
+                            {categories.map((cat: any) => {
+                                const href = `/${cat.slug}`;
+                                const isActive = url === href || url.startsWith(`${href}/`);
+                                return (
+                                    <Link key={cat.id} href={href} className={`transition-all hover:text-primary ${isActive ? 'text-primary underline decoration-4 underline-offset-8' : ''}`}>
+                                        / {cat.name}
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            )}
         </header>
     );
 };
