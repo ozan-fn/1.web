@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone, Twitter, Youtube } from 'lucide-react';
 import React from 'react';
 
 interface Category {

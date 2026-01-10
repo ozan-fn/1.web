@@ -65,14 +65,9 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                                     {/* Category Header - Magazine Style */}
                                     <header className="mb-8">
                                         <div className="flex items-baseline gap-4">
-                                            <h2 className="font-serif text-4xl font-bold text-foreground">
-                                                {category.name}
-                                            </h2>
+                                            <h2 className="font-serif text-4xl font-bold text-foreground">{category.name}</h2>
                                             <div className="h-px flex-1 bg-border"></div>
-                                            <Link 
-                                                href={`/${category.slug}`} 
-                                                className="shrink-0 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-                                            >
+                                            <Link href={`/${category.slug}`} className="shrink-0 text-sm font-medium text-primary transition-colors hover:text-primary/80">
                                                 Selengkapnya →
                                             </Link>
                                         </div>

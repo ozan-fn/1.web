@@ -1,7 +1,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppearance } from '@/hooks/use-appearance'; // Pastikan path sesuai
 import { Link, router, usePage } from '@inertiajs/react';
-import { ChevronRight, Menu, Monitor, Moon, Search, Sun } from 'lucide-react';
+import { Menu, Monitor, Moon, Search, Sun } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 interface Category {
@@ -96,19 +96,9 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                         {/* Center: Logo */}
                         <Link href="/" className="flex flex-col items-center transition-all duration-300">
-                            <h1 className={`font-serif font-bold leading-none text-foreground transition-all duration-300 ${scrolled ? 'text-2xl' : 'text-4xl'}`}>
-                                {firstPart}
-                            </h1>
-                            {restParts && (
-                                <span className={`font-serif font-normal text-foreground/70 transition-all duration-300 ${scrolled ? 'text-sm' : 'text-xl'}`}>
-                                    {restParts}
-                                </span>
-                            )}
-                            {!scrolled && (
-                                <p className="mt-1 text-xs tracking-widest text-muted-foreground transition-opacity duration-300">
-                                    {siteSettings?.tagline || 'Informasi Terpercaya'}
-                                </p>
-                            )}
+                            <h1 className={`font-serif leading-none font-bold text-foreground transition-all duration-300 ${scrolled ? 'text-2xl' : 'text-4xl'}`}>{firstPart}</h1>
+                            {restParts && <span className={`font-serif font-normal text-foreground/70 transition-all duration-300 ${scrolled ? 'text-sm' : 'text-xl'}`}>{restParts}</span>}
+                            {!scrolled && <p className="mt-1 text-xs tracking-widest text-muted-foreground transition-opacity duration-300">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>}
                         </Link>
 
                         {/* Right: Search & Theme (mobile) */}
@@ -131,13 +121,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                 <div className="container mx-auto max-w-[1400px] px-4">
                     <form onSubmit={handleSearch} className={`mx-auto flex items-center gap-2 rounded-full border border-border bg-background shadow-sm transition-all duration-300 focus-within:border-primary focus-within:shadow-md ${scrolled ? 'max-w-xl px-4 py-1.5' : 'max-w-2xl px-5 py-2.5'}`}>
                         <Search className={`text-muted-foreground transition-all duration-300 ${scrolled ? 'h-4 w-4' : 'h-5 w-5'}`} />
-                        <input 
-                            type="text" 
-                            value={search} 
-                            onChange={(e) => setSearch(e.target.value)} 
-                            placeholder="Cari berita, topik, atau kata kunci..." 
-                            className={`flex-1 bg-transparent text-foreground placeholder-muted-foreground outline-none transition-all duration-300 ${scrolled ? 'text-xs' : 'text-sm'}`}
-                        />
+                        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita, topik, atau kata kunci..." className={`flex-1 bg-transparent text-foreground placeholder-muted-foreground transition-all duration-300 outline-none ${scrolled ? 'text-xs' : 'text-sm'}`} />
                         <button type="submit" className={`rounded-full bg-primary font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 ${scrolled ? 'px-3 py-1 text-[10px]' : 'px-5 py-1.5 text-xs'}`}>
                             Cari
                         </button>
