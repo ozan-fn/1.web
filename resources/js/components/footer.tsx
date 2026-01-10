@@ -48,117 +48,144 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     ].filter((s) => s.url);
 
     return (
-        <footer className="mt-20 border-t-4 border-primary bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-primary/80">
-            <div className="container mx-auto max-w-7xl px-4">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-                    {/* Brand Info */}
-                    <div className="col-span-1">
-                        <div className="mb-6">
-                            <Link href="/">
-                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                    {firstPart}
-                                    <span className="text-gray-400"> {restParts}</span>
-                                </h2>
-                            </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
-                        </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+        <footer className="mt-20 border-t border-gray-100 bg-white transition-colors dark:border-gray-800 dark:bg-gray-950">
+            {/* 1. TOP SECTION: Branding & Socials */}
+            <div className="container mx-auto max-w-7xl px-4 pt-16 pb-12">
+                <div className="flex flex-col items-center justify-between border-b border-gray-100 pb-12 lg:flex-row dark:border-gray-800">
+                    <div className="mb-8 lg:mb-0">
+                        <Link href="/" className="flex flex-col items-center leading-none lg:items-start">
+                            <span className="text-4xl font-black uppercase tracking-tighter text-[#0455A4]">
+                                {firstPart}
+                                <span className="text-gray-900 dark:text-gray-100">{restParts ? ` ${restParts}` : ''}</span>
+                            </span>
+                            <span className="mt-1 text-[11px] font-bold uppercase tracking-[0.3em] text-gray-500">{siteSettings?.tagline || 'Informasi Terpercaya'}</span>
+                        </Link>
+                    </div>
 
-                        <div className="mb-8 space-y-4">
-                            {siteSettings?.address && (
-                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
-                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.address}</span>
-                                </div>
-                            )}
-
-                            {siteSettings?.email && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.email}</span>
-                                </div>
-                            )}
-                            {siteSettings?.phone && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.phone}</span>
-                                </div>
-                            )}
-                        </div>
-
+                    <div className="flex flex-col items-center gap-6 lg:items-end">
+                        <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Ikuti Kami Di Media Sosial</span>
                         {socials.length > 0 && (
-                            <div className="flex gap-3">
+                            <div className="flex gap-4">
                                 {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
-                                        <social.icon className="h-4 w-4" />
+                                    <a
+                                        key={social.key}
+                                        href={social.url!}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-gray-100 bg-white transition-all hover:border-[#0455A4] hover:bg-[#0455A4] dark:border-gray-800 dark:bg-gray-900"
+                                    >
+                                        <social.icon className="h-4 w-4 text-gray-400 group-hover:text-white" />
                                     </a>
                                 ))}
                             </div>
                         )}
                     </div>
+                </div>
 
-                    {/* Quick Links */}
+                {/* 2. GRID SECTION: Links & Info */}
+                <div className="grid grid-cols-2 gap-12 py-16 md:grid-cols-4 lg:grid-cols-5">
+                    {/* About Us Column */}
+                    <div className="col-span-2 lg:col-span-2">
+                        <h4 className="mb-6 text-[13px] font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">Tentang Kami</h4>
+                        <p className="max-w-md text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                            {siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri secara profesional dan independen.`}
+                        </p>
+
+                        <div className="mt-8 space-y-4">
+                            {siteSettings?.address && (
+                                <div className="flex items-start gap-4 text-xs text-gray-500">
+                                    <MapPin className="h-4 w-4 shrink-0 text-[#0455A4]" />
+                                    <span>{siteSettings.address}</span>
+                                </div>
+                            )}
+                            {siteSettings?.email && (
+                                <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
+                                    <Mail className="h-4 w-4 shrink-0 text-[#0455A4]" />
+                                    <span>{siteSettings.email}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Quick Navigation */}
                     <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
+                        <h4 className="mb-6 text-[13px] font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">Kanal Berita</h4>
                         {categories.length > 0 ? (
-                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
+                            <ul className="space-y-3">
+                                {categories.slice(0, 7).map((cat) => (
                                     <li key={cat.id}>
-                                        <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
+                                        <Link href={`/${cat.slug}`} className="text-sm text-gray-500 transition-colors hover:text-[#0455A4] dark:hover:text-[#0455A4]">
                                             {cat.name}
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-xs text-gray-500 italic">Belum ada kategori.</p>
+                            <p className="text-xs italic text-gray-400">Belum tersedia.</p>
                         )}
                     </div>
 
-                    {/* Info Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
-                        <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
-                            {[
-                                { title: 'Tentang Kami', url: '#' },
-                                { title: 'Redaksi', url: '#' },
-                                { title: 'Pedoman Media Siber', url: '#' },
-                                { title: 'Disclaimer', url: '#' },
-                                { title: 'Kebijakan Privasi', url: '#' },
-                                { title: 'Kontak Kami', url: '#' },
-                            ].map((link) => (
-                                <li key={link.title}>
-                                    <Link href={link.url} className="transition-colors hover:text-primary">
-                                        {link.title}
-                                    </Link>
-                                </li>
-                            ))}
+                    <div className="col-span-1 pt-11 lg:pt-[44px]">
+                        {categories.length > 7 ? (
+                            <ul className="space-y-3">
+                                {categories.slice(7, 14).map((cat) => (
+                                    <li key={cat.id}>
+                                        <Link href={`/${cat.slug}`} className="text-sm text-gray-500 transition-colors hover:text-[#0455A4] dark:hover:text-[#0455A4]">
+                                            {cat.name}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : null}
+                    </div>
+
+                    {/* Company Legal */}
+                    <div className="col-span-1 lg:col-span-1">
+                        <h4 className="mb-6 text-[13px] font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">Informasi</h4>
+                        <ul className="space-y-3 text-sm text-gray-500">
+                            <li>
+                                <Link href="/" className="hover:text-[#0455A4]">
+                                    Redaksi
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/" className="hover:text-[#0455A4]">
+                                    Pedoman Media Siber
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/" className="hover:text-[#0455A4]">
+                                    Disclaimer
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/" className="hover:text-[#0455A4]">
+                                    Privacy Policy
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/" className="hover:text-[#0455A4]">
+                                    Info Iklan
+                                </Link>
+                            </li>
                         </ul>
                     </div>
-
-                    {/* Redaksi / Office */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
-                        <div className="space-y-3">
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
-                                Kirim Berita (WA)
-                            </Link>
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-primary hover:bg-primary">
-                                Media Kit & Iklan
-                            </Link>
-                        </div>
-                    </div>
                 </div>
+            </div>
 
-                <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
-                    <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
-                    </p>
-                    <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">
-                            Admin Login
-                        </Link>
+            {/* 3. BOTTOM SECTION: Copyright */}
+            <div className="bg-gray-50 py-8 dark:bg-gray-900/50">
+                <div className="container mx-auto max-w-7xl px-4">
+                    <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                            © {new Date().getFullYear()} <span className="text-[#0455A4]">{siteSettings?.site_name || 'Lensa Publik'}</span>. All Rights Reserved.
+                        </p>
+                        <div className="flex items-center gap-6">
+                            <Link href="/login" className="text-[10px] font-bold uppercase tracking-wide text-gray-400 hover:text-[#0455A4]">
+                                Admin Login
+                            </Link>
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Terpercaya Sejak 2025</span>
+                        </div>
                     </div>
                 </div>
             </div>

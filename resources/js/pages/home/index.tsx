@@ -4,6 +4,8 @@ import Navbar from '../../components/navbar';
 import Sidebar from '../../components/sidebar';
 import CategorySection from './partials/category-section';
 import HeroSection from './partials/hero-section';
+import StoryCategories from './partials/story-categories';
+import VideoSection from './partials/video-section';
 import { Category, NewsItem } from './partials/types';
 
 export interface SiteSettings {
@@ -41,38 +43,76 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
             <Navbar categories={categories} siteSettings={siteSettings} />
 
             <main className="container mx-auto max-w-7xl px-4 py-6">
-                {/* HERO SECTION */}
+                {/* 1. TOP STORY BUBBLES */}
+                <StoryCategories categories={categories.map(c => c.name)} />
+
+                {/* 2. HERO SECTION (HEADLINES) */}
                 {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
 
-                {/* GRID CONTENT LAYOUT */}
-                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
-                    {/* LEFT COLUMN (Daftar Kategori Berita) */}
-                    <div className="space-y-14 lg:col-span-8">
-                        {homepageCategories.map((category) => (
-                            <section key={category.id} className="scroll-mt-20">
-                                {/* HEADER KATEGORI - Dipusatkan di sini untuk menghindari duplikasi */}
-                                <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
-                                    <div className="relative">
-                                        <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
-                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-primary"></div>
-                                    </div>
-
-                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
-                                        Lihat Semua
-                                        <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
-                                    </Link>
+                {/* 3. BREAKING/TRENDING SECTION (Grid Horizontal) */}
+                <section className="mb-16 border-y border-gray-100 py-10 dark:border-gray-800">
+                    <div className="mb-8 flex items-center justify-between">
+                        <h3 className="text-xl font-bold text-[#0455A4] uppercase tracking-tight">Tren Saat Ini</h3>
+                        <Link href="/" className="text-sm font-bold text-gray-400 hover:text-[#0455A4]">Eksplorasi Semua</Link>
+                    </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                        {trendingNews.slice(0, 4).map((item) => (
+                            <Link key={item.id} href={`/${item.category.slug}/${item.slug}`} className="group flex flex-col gap-3">
+                                <div className="aspect-video w-full overflow-hidden rounded-lg">
+                                    <img src={item.thumbnail_url || ''} className="h-full w-full object-cover transition-transform group-hover:scale-105" alt={item.title} />
                                 </div>
+                                <h4 className="line-clamp-2 text-sm font-bold text-gray-900 leading-tight transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h4>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
 
-                                {/* Hanya merender list berita */}
+                {/* 4. MAIN LAYOUT WITH SIDEBAR */}
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+                    {/* LEFT: Category Lists */}
+                    <div className="space-y-16 lg:col-span-8">
+                        {homepageCategories.slice(0, 2).map((category) => (
+                            <section key={category.id} className="scroll-mt-20">
+                                <div className="mb-8 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                                    <h2 className="text-2xl font-bold text-[#0455A4] uppercase">{category.name}</h2>
+                                    <Link href={`/${category.slug}`} className="text-xs font-bold text-[#0455A4] hover:underline">LIHAT SEMUA</Link>
+                                </div>
+                                <CategorySection category={category} />
+                            </section>
+                        ))}
+
+                        {/* VIDEO INTERMISSION - Full inside the column or breaking out */}
+                        {latestNews.length > 0 && (
+                            <div className="py-4">
+                                <VideoSection news={latestNews} />
+                            </div>
+                        )}
+
+                        {homepageCategories.slice(2).map((category) => (
+                            <section key={category.id} className="scroll-mt-20">
+                                <div className="mb-8 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                                    <h2 className="text-2xl font-bold text-[#0455A4] uppercase">{category.name}</h2>
+                                    <Link href={`/${category.slug}`} className="text-xs font-bold text-[#0455A4] hover:underline">LIHAT SEMUA</Link>
+                                </div>
                                 <CategorySection category={category} />
                             </section>
                         ))}
                     </div>
 
-                    {/* RIGHT COLUMN (Sidebar) */}
+                    {/* RIGHT: Sidebar */}
                     <div className="lg:col-span-4">
-                        <div className="sticky top-24">
+                        <div className="sticky top-24 space-y-12">
                             <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
+
+                            {/* Additional Sidebar Block: Newsletter or Promo */}
+                            <div className="rounded-2xl bg-blue-50 p-6 dark:bg-gray-900">
+                                <h4 className="text-lg font-bold text-[#0455A4]">Langganan Berita</h4>
+                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Dapatkan update berita terpopuler setiap pagi langsung di email Anda.</p>
+                                <div className="mt-4 flex flex-col gap-2">
+                                    <input type="email" placeholder="Email Anda" className="rounded-lg border border-gray-200 px-4 py-2 text-sm outline-none focus:border-[#0455A4] dark:border-gray-800 dark:bg-gray-800" />
+                                    <button className="rounded-lg bg-[#0455A4] py-2 text-sm font-bold text-white transition-opacity hover:opacity-90">Daftar Sekarang</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
