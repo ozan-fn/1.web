@@ -27,7 +27,7 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
     return (
         <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
             <Head>
-                <title>{siteSettings?.site_name || 'Lensa Publik'}</title>
+                <title>{siteSettings?.site_name || ''}</title>
                 <meta name="description" content={siteSettings?.description || 'Portal Berita Terpercaya'} />
             </Head>
 
