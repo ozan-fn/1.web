@@ -7,6 +7,9 @@ use Inertia\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SiteSettingController extends Controller
 {
@@ -30,6 +33,16 @@ class SiteSettingController extends Controller
             'address' => 'nullable|string',
             'logo' => 'nullable|image|max:2048',
             'favicon' => 'nullable|image|max:1024',
+
+            // Tambahkan Validasi Warna (HEX format)
+            'color_primary' => 'nullable|string|max:20',
+            'color_primary_foreground' => 'nullable|string|max:20',
+            'color_background' => 'nullable|string|max:20',
+            'color_foreground' => 'nullable|string|max:20',
+            'color_card' => 'nullable|string|max:20',
+            'color_border' => 'nullable|string|max:20',
+            'color_radius' => 'nullable|string|max:20',
+
             'social_facebook' => 'nullable|url',
             'social_instagram' => 'nullable|url',
             'social_twitter' => 'nullable|url',
@@ -38,36 +51,35 @@ class SiteSettingController extends Controller
 
         $settings = SiteSetting::first() ?? new SiteSetting();
 
-        // --- LOGIC KUNCI AGAR LOGO TIDAK HILANG ---
-        // Kita hapus logo & favicon dari array $validated bawaan validasi.
-        // Kita hanya akan mengisinya kembali JIKA ada file baru.
+        // Kunci agar path file lama tidak tertimpa NULL jika user tidak upload file baru
         unset($validated['logo'], $validated['favicon']);
 
+        // Handle Upload Logo
         if ($request->hasFile('logo')) {
-            // Hapus file lama jika ada
             if ($settings->logo) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($settings->logo);
+                Storage::disk('public')->delete($settings->logo);
             }
-            // Simpan file baru ke array $validated
             $validated['logo'] = $request->file('logo')->store('site', 'public');
         }
 
+        // Handle Upload Favicon
         if ($request->hasFile('favicon')) {
             if ($settings->favicon) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($settings->favicon);
+                Storage::disk('public')->delete($settings->favicon);
             }
             $validated['favicon'] = $request->file('favicon')->store('site', 'public');
         }
 
-        // Gunakan DB Transaction agar jika query error, file tidak terlanjur terhapus (Opsional tapi bagus)
-        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+        // Eksekusi Update
+        DB::transaction(function () use ($validated) {
             SiteSetting::updateOrCreate(
                 ['id' => 1],
                 $validated
             );
         });
 
-        \Illuminate\Support\Facades\Cache::forget('site_settings');
+        // Hapus cache agar perubahan warna/logo langsung terlihat di frontend
+        Cache::forget('site_settings');
 
         return back()->with('success', 'Pengaturan situs berhasil diperbarui.');
     }

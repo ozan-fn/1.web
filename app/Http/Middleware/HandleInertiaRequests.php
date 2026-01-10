@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SiteSetting;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -11,16 +13,12 @@ class HandleInertiaRequests extends Middleware
     /**
      * The root template that's loaded on the first page visit.
      *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
      * @var string
      */
     protected $rootView = 'app';
 
     /**
      * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
      */
     public function version(Request $request): ?string
     {
@@ -30,18 +28,34 @@ class HandleInertiaRequests extends Middleware
     /**
      * Define the props that are shared by default.
      *
-     * @see https://inertiajs.com/shared-data
-     *
      * @return array<string, mixed>
      */
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        // Ambil Site Settings dari Cache untuk performa maksimal
+        $settings = Cache::rememberForever('site_settings', function () {
+            return SiteSetting::first();
+        });
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
+
+            // Tambahkan data settings agar bisa diakses di semua halaman React
+            'settings' => $settings,
+            'seo' => [
+                'site_name' => $settings->site_name ?? config('app.name'),
+                'description' => $settings->description ?? 'Portal Berita Terpercaya',
+                'logo' => $settings->logo ? asset('storage/' . $settings->logo) : null,
+                'favicon' => $settings->favicon ? asset('storage/' . $settings->favicon) : asset('favicon.ico'),
+            ],
+
+            'quote' => [
+                'message' => trim($message),
+                'author' => trim($author)
+            ],
             'auth' => [
                 'user' => $request->user(),
             ],

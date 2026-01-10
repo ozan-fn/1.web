@@ -11,6 +11,13 @@ export interface SiteSettings {
     tagline: string | null;
     description: string | null;
     logo: string | null;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    social_facebook: string | null;
+    social_twitter: string | null;
+    social_instagram: string | null;
+    social_youtube: string | null;
 }
 
 interface Props {
