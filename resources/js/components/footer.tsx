@@ -48,48 +48,40 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     ].filter((s) => s.url);
 
     return (
-        <footer className="mt-20 border-t-4 border-primary bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-primary/80">
-            <div className="container mx-auto max-w-7xl px-4">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-                    {/* Brand Info */}
-                    <div className="col-span-1">
-                        <div className="mb-6">
-                            <Link href="/">
-                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                    {firstPart}
-                                    <span className="text-gray-400"> {restParts}</span>
-                                </h2>
-                            </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
-                        </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+        <footer className="mt-24 border-t border-border bg-muted/30 pt-16 pb-8 transition-colors">
+            <div className="container mx-auto max-w-[1400px] px-4">
+                {/* Main Footer Content */}
+                <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-12">
+                    {/* Brand Section - Larger on left */}
+                    <div className="lg:col-span-5">
+                        <Link href="/" className="mb-6 inline-block">
+                            <h2 className="font-serif text-4xl font-bold text-foreground">{firstPart}</h2>
+                            {restParts && <p className="font-serif text-xl text-foreground/70">{restParts}</p>}
+                        </Link>
+                        <p className="mb-1 text-sm font-medium tracking-wide text-primary">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
+                        <p className="mb-8 text-sm leading-relaxed text-muted-foreground">{siteSettings?.description || `Portal berita terpercaya yang menyajikan informasi tercepat dan akurat.`}</p>
 
-                        <div className="mb-8 space-y-4">
-                            {siteSettings?.address && (
-                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
-                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.address}</span>
-                                </div>
-                            )}
-
+                        {/* Contact Info - Compact */}
+                        <div className="mb-8 space-y-3">
                             {siteSettings?.email && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
+                                <a href={`mailto:${siteSettings.email}`} className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary">
+                                    <Mail className="h-4 w-4" />
                                     <span>{siteSettings.email}</span>
-                                </div>
+                                </a>
                             )}
                             {siteSettings?.phone && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
+                                <a href={`tel:${siteSettings.phone}`} className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary">
+                                    <Phone className="h-4 w-4" />
                                     <span>{siteSettings.phone}</span>
-                                </div>
+                                </a>
                             )}
                         </div>
 
+                        {/* Social Icons - Minimal */}
                         {socials.length > 0 && (
                             <div className="flex gap-3">
                                 {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
+                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary">
                                         <social.icon className="h-4 w-4" />
                                     </a>
                                 ))}
@@ -97,38 +89,36 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                         )}
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
+                    {/* Categories - Compact */}
+                    <div className="lg:col-span-3">
+                        <h3 className="mb-6 font-serif text-lg font-bold text-foreground">Kategori</h3>
                         {categories.length > 0 ? (
-                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
+                            <ul className="space-y-2">
+                                {categories.slice(0, 8).map((cat) => (
                                     <li key={cat.id}>
-                                        <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
+                                        <Link href={`/${cat.slug}`} className="text-sm text-muted-foreground transition-colors hover:text-primary">
                                             {cat.name}
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-xs text-gray-500 italic">Belum ada kategori.</p>
+                            <p className="text-sm text-muted-foreground italic">Belum ada kategori.</p>
                         )}
                     </div>
 
-                    {/* Info Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
-                        <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
+                    {/* Info Links - Compact */}
+                    <div className="lg:col-span-2">
+                        <h3 className="mb-6 font-serif text-lg font-bold text-foreground">Informasi</h3>
+                        <ul className="space-y-2">
                             {[
                                 { title: 'Tentang Kami', url: '#' },
                                 { title: 'Redaksi', url: '#' },
-                                { title: 'Pedoman Media Siber', url: '#' },
-                                { title: 'Disclaimer', url: '#' },
-                                { title: 'Kebijakan Privasi', url: '#' },
-                                { title: 'Kontak Kami', url: '#' },
+                                { title: 'Kontak', url: '#' },
+                                { title: 'Privasi', url: '#' },
                             ].map((link) => (
                                 <li key={link.title}>
-                                    <Link href={link.url} className="transition-colors hover:text-primary">
+                                    <Link href={link.url} className="text-sm text-muted-foreground transition-colors hover:text-primary">
                                         {link.title}
                                     </Link>
                                 </li>
@@ -136,30 +126,24 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                         </ul>
                     </div>
 
-                    {/* Redaksi / Office */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
-                        <div className="space-y-3">
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
-                                Kirim Berita (WA)
-                            </Link>
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-primary hover:bg-primary">
-                                Media Kit & Iklan
-                            </Link>
-                        </div>
+                    {/* Newsletter / CTA - Compact */}
+                    <div className="lg:col-span-2">
+                        <h3 className="mb-6 font-serif text-lg font-bold text-foreground">Hubungi</h3>
+                        <p className="mb-4 text-sm text-muted-foreground">Punya informasi atau ingin bekerjasama?</p>
+                        <Link href="#" className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                            Kirim Berita
+                        </Link>
                     </div>
                 </div>
 
-                <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
-                    <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
+                {/* Bottom Bar - Minimal */}
+                <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
+                    <p className="text-sm text-muted-foreground">
+                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Portal Berita'}. All rights reserved.
                     </p>
-                    <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">
-                            Admin Login
-                        </Link>
-                    </div>
+                    <Link href="/login" className="text-sm text-muted-foreground transition-colors hover:text-primary">
+                        Admin
+                    </Link>
                 </div>
             </div>
         </footer>

@@ -24,6 +24,7 @@ interface Post {
     thumbnail_url: string | null;
     published_at: string;
     views: number;
+    category_id: number;
     category: Category;
     sub_category: Category | null;
     user: { name: string };

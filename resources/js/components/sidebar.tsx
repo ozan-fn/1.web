@@ -9,59 +9,86 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-    trendingNews = [], // Berikan default value array kosong
+    trendingNews = [],
     latestNews = [],
 }) => {
     return (
-        <aside className="space-y-10 lg:col-span-4 lg:pl-4">
-            {/* Widget: Terpopuler (Numbered) */}
-            <div className="bg-background">
-                <div className="mb-6 flex items-center justify-between border-b-2 border-primary pb-2">
-                    <h3 className="text-lg font-black tracking-tighter text-foreground uppercase">Terpopuler</h3>
-                </div>
-                <div className="flex flex-col">
-                    {/* Optional chaining ?.map digunakan untuk keamanan ekstra */}
+        <aside className="space-y-12">
+            {/* Widget: Terpopuler */}
+            <section className="rounded-lg border border-border bg-card p-6 shadow-sm">
+                <header className="mb-6 border-b-2 border-primary pb-3">
+                    <h3 className="font-serif text-2xl font-bold text-foreground">Terpopuler</h3>
+                </header>
+                <div className="space-y-5">
                     {trendingNews?.map((item, i) => (
-                        <Link key={item.id} href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex cursor-pointer items-start gap-4 border-b border-border py-4 transition last:border-0 hover:bg-muted/50">
-                            {/* Nomor urut menggunakan muted-foreground agar sinkron di dark mode */}
-                            <div className="text-3xl leading-none font-black text-muted-foreground/30 italic transition-colors group-hover:text-primary">{i + 1}</div>
-                            <div className="flex flex-col gap-1">
-                                <h4 className="text-[14px] leading-snug font-black text-foreground transition-colors group-hover:text-primary">{item.title}</h4>
-                                <span className="text-[11px] font-black tracking-tight text-primary uppercase">{item.category?.name}</span>
+                        <Link 
+                            key={item.id} 
+                            href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} 
+                            className="group flex cursor-pointer items-start gap-4 border-b border-border/50 pb-5 transition-all last:border-0 last:pb-0 hover:bg-muted/30 hover:px-2 hover:-mx-2 rounded-md"
+                        >
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 font-serif text-xl font-bold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                                {i + 1}
                             </div>
-                        </Link>
-                    ))}
-                </div>
-            </div>
-
-            {/* Widget: Terbaru (Cards) */}
-            <div>
-                <div className="mb-6 flex items-center justify-between border-b-2 border-primary pb-2">
-                    <h3 className="text-lg font-black tracking-tighter text-foreground uppercase">Terbaru</h3>
-                </div>
-                <div className="flex flex-col gap-6">
-                    {latestNews?.map((item) => (
-                        <Link key={item.id} href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex cursor-pointer flex-col gap-3">
-                            <div className="relative aspect-video w-full overflow-hidden rounded-sm bg-muted">
-                                {item.thumbnail_url ? <img src={item.thumbnail_url} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" alt={item.title} /> : <div className="flex h-full w-full items-center justify-center bg-muted text-xs font-bold text-muted-foreground uppercase">No Image</div>}
-                                <span className="absolute bottom-2 left-2 bg-primary px-2 py-0.5 text-[10px] font-black tracking-widest text-primary-foreground uppercase">{item.category?.name}</span>
-                            </div>
-                            <h4 className="line-clamp-2 text-base leading-tight font-black text-foreground transition-colors group-hover:text-primary">{item.title}</h4>
-                            <div className="flex items-center gap-2 text-[11px] font-medium tracking-tighter text-muted-foreground uppercase">
-                                <span>{item.user?.name || 'Redaksi'}</span>
-                                <span className="h-1 w-1 rounded-full bg-border"></span>
-                                <span>
-                                    {new Date(item.published_at).toLocaleDateString('id-ID', {
-                                        day: '2-digit',
-                                        month: 'short',
-                                        year: 'numeric',
-                                    })}
+                            <div className="flex flex-col gap-1.5">
+                                <h4 className="font-serif text-sm font-bold leading-snug text-foreground transition-colors line-clamp-2 group-hover:text-primary">
+                                    {item.title}
+                                </h4>
+                                <span className="text-xs font-semibold tracking-wide text-primary uppercase">
+                                    {item.category?.name}
                                 </span>
                             </div>
                         </Link>
                     ))}
                 </div>
-            </div>
+            </section>
+
+            {/* Widget: Terbaru */}
+            <section className="rounded-lg border border-border bg-card p-6 shadow-sm">
+                <header className="mb-6 border-b-2 border-primary pb-3">
+                    <h3 className="font-serif text-2xl font-bold text-foreground">Terbaru</h3>
+                </header>
+                <div className="space-y-6">
+                    {latestNews?.map((item) => (
+                        <article key={item.id}>
+                            <Link 
+                                href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} 
+                                className="group flex flex-col gap-3"
+                            >
+                                <div className="relative aspect-video w-full overflow-hidden rounded-md bg-muted shadow-sm">
+                                    {item.thumbnail_url ? (
+                                        <img 
+                                            src={item.thumbnail_url} 
+                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                                            alt={item.title} 
+                                        />
+                                    ) : (
+                                        <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted-foreground">
+                                            No Image
+                                        </div>
+                                    )}
+                                    <span className="absolute bottom-2 left-2 rounded-sm bg-primary px-2 py-1 text-xs font-bold text-primary-foreground shadow-md">
+                                        {item.category?.name}
+                                    </span>
+                                </div>
+                                <h4 className="font-serif text-base font-bold leading-snug text-foreground transition-colors line-clamp-2 group-hover:text-primary">
+                                    {item.title}
+                                </h4>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <span className="font-medium">{item.user?.name || 'Redaksi'}</span>
+                                    <span className="text-border">•</span>
+                                    <time className="font-normal">
+                                        {new Date(item.published_at).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric',
+                                        })}
+                                    </time>
+                                </div>
+                            </Link>
+                        </article>
+                    ))}
+                </div>
+            </section>
         </aside>
     );
 };
