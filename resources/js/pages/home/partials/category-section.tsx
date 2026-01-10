@@ -13,7 +13,7 @@ const CategorySection: React.FC<Props> = ({ category }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {category.news.map((item) => (
                 <ListCard key={item.id} item={item} />
             ))}

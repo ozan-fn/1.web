@@ -6,20 +6,33 @@ interface Props {
     item: NewsItem;
 }
 
-const ListCard: React.FC<Props> = ({ item }) => (
-    <Link href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group mb-6 flex cursor-pointer items-start gap-4 border-b border-gray-100 pb-6 transition-colors last:border-0 last:pb-0 dark:border-gray-800">
-        <div className="relative aspect-[16/9] w-1/3 shrink-0 overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-900">
-            {item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" /> : <div className="flex h-full w-full items-center justify-center bg-gray-200 text-xs font-bold text-gray-400 uppercase dark:bg-gray-800">No Image</div>}
-        </div>
-        <div className="flex w-2/3 flex-col gap-1.5">
-            <span className="text-[11px] font-black tracking-wider text-primary uppercase">
-                {item.category?.name || 'Berita'}
-                {item.sub_category && <span className="ml-1 font-medium text-gray-400 dark:text-gray-500"> | {item.sub_category.name}</span>}
-            </span>
-            <h3 className="line-clamp-2 text-[15px] leading-tight font-extrabold text-gray-900 transition-colors group-hover:text-primary md:text-lg dark:text-gray-100 dark:group-hover:text-primary">{item.title}</h3>
-            <span className="text-[11px] font-medium tracking-tight text-gray-400 uppercase dark:text-gray-500">{new Date(item.published_at).toLocaleDateString('id-ID')}</span>
-        </div>
-    </Link>
-);
+const ListCard: React.FC<Props> = ({ item }) => {
+    const categorySlug = item.category?.slug || 'news';
+    const postSlug = item.slug || '#';
+    const subCategorySlug = item.sub_category?.slug;
 
+    const href = subCategorySlug ? `/${categorySlug}/${subCategorySlug}/${postSlug}` : `/${categorySlug}/${postSlug}`;
+
+    return (
+        <Link href={href} className="group relative flex flex-col overflow-hidden rounded-[32px] bg-card p-3 shadow-sm ring-1 ring-border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 hover:ring-primary/20">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[24px] bg-muted">
+                {item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" /> : <div className="flex h-full w-full items-center justify-center bg-muted text-[10px] font-black tracking-widest text-muted-foreground uppercase">No Image</div>}
+                <div className="absolute top-4 left-4">
+                    <span className="inline-block rounded-full bg-background/90 px-3 py-1.5 text-[9px] font-black tracking-widest text-primary uppercase shadow-sm backdrop-blur-md">{item.category?.name || 'News'}</span>
+                </div>
+            </div>
+
+            <div className="flex flex-1 flex-col justify-between p-4">
+                <div>
+                    <h3 className="line-clamp-2 text-base leading-tight font-black text-foreground transition-colors group-hover:text-primary md:text-lg">{item.title}</h3>
+                    {/* Optional description placeholder if needed */}
+                </div>
+                <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+                    <span className="text-[10px] font-bold tracking-tight text-muted-foreground uppercase">{new Date(item.published_at).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-black tracking-tighter text-primary uppercase italic">Read More →</span>
+                </div>
+            </div>
+        </Link>
+    );
+};
 export default ListCard;

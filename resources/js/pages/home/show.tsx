@@ -2,11 +2,12 @@ import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import Sidebar from '@/components/sidebar';
 import { Head, Link } from '@inertiajs/react';
-import { Eye, Share2 } from 'lucide-react';
+import { ChevronRight, Eye, Share2 } from 'lucide-react';
 
 interface Tag {
     id: number;
     name: string;
+    slug: string;
 }
 
 interface Category {
@@ -81,31 +82,33 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
 
             <Navbar />
 
-            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:ml-20 lg:px-8">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                     {/* Main Content */}
                     <div className="lg:col-span-8">
                         {/* Breadcrumbs */}
-                        <nav className="mb-4 flex items-center text-sm text-muted-foreground">
+                        <nav className="mb-8 flex items-center gap-2 text-[10px] font-black tracking-widest text-muted-foreground uppercase lg:text-xs">
                             <Link href="/" className="transition-colors hover:text-primary">
-                                Beranda
+                                Home
                             </Link>
-                            <span className="mx-2 opacity-50">/</span>
-                            <Link href={`/${post.category?.slug}`} className="transition-colors hover:text-primary">
-                                {post.category?.name}
+                            <ChevronRight className="h-3 w-3" />
+                            <Link href={`/${post.category?.slug || 'news'}`} className="transition-colors hover:text-primary">
+                                {post.category?.name || 'News'}
                             </Link>
                             {subCategory && (
                                 <>
-                                    <span className="mx-2 opacity-50">/</span>
-                                    <div className="transition-colors hover:text-primary">{subCategory.name}</div>
+                                    <ChevronRight className="h-3 w-3" />
+                                    <span className="text-primary/70">{subCategory.name}</span>
                                 </>
                             )}
+                            <ChevronRight className="h-3 w-3 text-primary" />
+                            <span className="max-w-[150px] truncate text-primary md:max-w-[300px]">{post.title}</span>
                         </nav>
 
-                        <article>
-                            <div className="mb-2 flex items-center gap-2">
-                                <Link href={`/${post.category?.slug}`} className="text-sm font-bold tracking-widest text-primary uppercase transition-colors hover:text-primary/90">
-                                    {post.category?.name}
+                        <article className="overflow-hidden rounded-[40px] bg-card p-6 shadow-2xl ring-1 shadow-black/5 ring-border md:p-12">
+                            <div className="mb-6 flex items-center gap-2">
+                                <Link href={`/${post.category?.slug || 'news'}`} className="rounded-full bg-primary/10 px-4 py-1.5 text-[10px] font-black tracking-widest text-primary uppercase transition-all hover:bg-primary hover:text-primary-foreground">
+                                    {post.category?.name || 'News'}
                                 </Link>
                                 {subCategory && (
                                     <>
@@ -171,7 +174,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                     <h4 className="mb-4 text-sm font-bold tracking-wider text-foreground uppercase">TAGS:</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {post.tags.map((tag) => (
-                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
+                                            <Link key={tag.id} href={`/tag/${tag.slug}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
                                                 {tag.name}
                                             </Link>
                                         ))}
@@ -189,22 +192,28 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                 <div className="ml-6 h-px flex-1 bg-border"></div>
                             </div>
                             <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:gap-12">
-                                {relatedPosts.map((related) => (
-                                    <Link key={related.id} href={related.sub_category ? `/${related.category.slug}/${related.sub_category.slug}/${related.slug}` : `/${related.category.slug}/${related.slug}`} className="group">
-                                        <div className="flex flex-col gap-4">
-                                            {related.thumbnail_url && (
-                                                <div className="aspect-[16/9] overflow-hidden rounded-md border border-border shadow-sm">
-                                                    <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                {relatedPosts.map((related) => {
+                                    const relatedCategorySlug = related.category?.slug || 'news';
+                                    const relatedSubCategory = (related as any).sub_category || (related as any).subCategory;
+                                    const href = relatedSubCategory ? `/${relatedCategorySlug}/${relatedSubCategory.slug}/${related.slug}` : `/${relatedCategorySlug}/${related.slug}`;
+
+                                    return (
+                                        <Link key={related.id} href={href} className="group">
+                                            <div className="flex flex-col gap-4">
+                                                {related.thumbnail_url && (
+                                                    <div className="aspect-[16/9] overflow-hidden rounded-md border border-border shadow-sm">
+                                                        <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                    </div>
+                                                )}
+                                                <div className="flex flex-col gap-2">
+                                                    <span className="text-[11px] font-bold tracking-wider text-primary uppercase">{related.category?.name || 'News'}</span>
+                                                    <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
+                                                    <span className="text-[12px] text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                                                 </div>
-                                            )}
-                                            <div className="flex flex-col gap-2">
-                                                <span className="text-[11px] font-bold tracking-wider text-primary uppercase">{related.category.name}</span>
-                                                <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
-                                                <span className="text-[12px] text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                                             </div>
-                                        </div>
-                                    </Link>
-                                ))}
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         </section>
                     </div>
@@ -212,13 +221,13 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                     {/* Sidebar */}
                     <div className="lg:col-span-4">
                         <div className="sticky top-24 space-y-8">
-                            <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
+                            <Sidebar trendingNews={trendingNews as any} latestNews={latestNews as any} />
                         </div>
                     </div>
                 </div>
             </main>
 
-            <Footer />
+            <Footer siteSettings={(post as any).siteSettings || (post as any).props?.siteSettings} />
         </div>
     );
 }
