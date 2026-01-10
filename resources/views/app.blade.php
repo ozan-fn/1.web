@@ -105,6 +105,19 @@
     @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
     @inertiaHead
 
+
+    <style>
+        :root {
+            --primary: #0418c7;
+        }
+
+        /* Jika ingin mengganti warna saat mode dark juga */
+        .dark {
+            --background: #0e25f1;
+        }
+    </style>
+
+
     <script type="text/javascript">
         (function (c, l, a, r, i, t, y) {
             c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };

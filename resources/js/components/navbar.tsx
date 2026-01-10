@@ -63,7 +63,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                 <SheetTitle className="text-left">
                                     <Link href="/" className="flex items-center gap-3">
                                         <div className="flex flex-col leading-none">
-                                            <span className="text-xl font-black tracking-tighter text-red-600 uppercase italic">
+                                            <span className="text-xl font-black tracking-tighter text-primary uppercase italic">
                                                 {firstPart}
                                                 <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
                                             </span>
@@ -72,12 +72,12 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                 </SheetTitle>
                             </SheetHeader>
                             <div className="flex flex-col py-4">
-                                <Link href="/" className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === '/' ? 'bg-red-50 text-red-600 dark:bg-red-950/20' : 'text-foreground/80 hover:bg-muted'}`}>
+                                <Link href="/" className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === '/' ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
                                     Home
                                     <ChevronRight className="h-4 w-4" />
                                 </Link>
                                 {categories.map((cat) => (
-                                    <Link key={cat.id} href={`/${cat.slug}`} className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === `/${cat.slug}` ? 'bg-red-50 text-red-600 dark:bg-red-950/20' : 'text-foreground/80 hover:bg-muted'}`}>
+                                    <Link key={cat.id} href={`/${cat.slug}`} className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === `/${cat.slug}` ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
                                         {cat.name}
                                         <ChevronRight className="h-4 w-4" />
                                     </Link>
@@ -89,7 +89,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                     <Link href="/" className="flex items-center gap-3">
                         {siteSettings?.logo && <img src={`/storage/${siteSettings.logo}`} alt={siteSettings.site_name} className="h-10 w-auto object-contain" />}
                         <div className="flex flex-col leading-none">
-                            <span className="text-2xl font-black tracking-tighter text-red-600 uppercase italic">
+                            <span className="text-2xl font-black tracking-tighter text-primary uppercase italic">
                                 {firstPart}
                                 <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
                             </span>
@@ -99,16 +99,16 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                 </div>
 
                 {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-border bg-background px-2 py-2 transition-colors focus-within:border-red-600 md:flex">
+                <form onSubmit={handleSearch} className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-border bg-background px-2 py-2 transition-colors focus-within:border-primary md:flex">
                     <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita..." className="w-full bg-transparent text-sm font-medium text-foreground placeholder-muted-foreground outline-none" />
-                    <button type="submit" className="px-2 text-muted-foreground transition-colors hover:text-red-600">
+                    <button type="submit" className="px-2 text-muted-foreground transition-colors hover:text-primary">
                         <Search className="h-4 w-4" />
                     </button>
                 </form>
 
                 <div className="flex items-center gap-2">
                     {/* Theme Toggle Button */}
-                    <button onClick={toggleTheme} className="flex items-center gap-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-red-600" title={`Mode: ${appearance}`}>
+                    <button onClick={toggleTheme} className="flex items-center gap-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary" title={`Mode: ${appearance}`}>
                         {appearance === 'light' && <Sun className="h-5 w-5" />}
                         {appearance === 'dark' && <Moon className="h-5 w-5" />}
                         {appearance === 'system' && <Monitor className="h-5 w-5" />}
@@ -127,14 +127,14 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
             <nav className="hidden border-t border-border bg-background lg:block">
                 <div className="no-scrollbar container mx-auto max-w-7xl overflow-x-auto px-4">
                     <div className="flex gap-8 py-3 text-[13px] font-black tracking-tight whitespace-nowrap uppercase">
-                        <Link href="/" className={`border-b-2 py-1 transition-colors ${url === '/' ? 'border-red-600 text-red-600' : 'border-transparent text-foreground hover:text-red-600'}`}>
+                        <Link href="/" className={`border-b-2 py-1 transition-colors ${url === '/' ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
                             Home
                         </Link>
                         {categories.map((cat) => {
                             const href = `/${cat.slug}`;
                             const isActive = url === href || url.startsWith(`${href}/`);
                             return (
-                                <Link key={cat.id} href={href} className={`border-b-2 py-1 transition-colors ${isActive ? 'border-red-600 text-red-600' : 'border-transparent text-foreground hover:text-red-600'}`}>
+                                <Link key={cat.id} href={href} className={`border-b-2 py-1 transition-colors ${isActive ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
                                     {cat.name}
                                 </Link>
                             );

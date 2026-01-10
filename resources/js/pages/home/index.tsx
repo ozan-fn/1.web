@@ -47,10 +47,10 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                                 <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
                                     <div className="relative">
                                         <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
-                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-red-600"></div>
+                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-primary"></div>
                                     </div>
 
-                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-red-600">
+                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
                                         Lihat Semua
                                         <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
                                     </Link>

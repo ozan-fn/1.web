@@ -87,17 +87,17 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                     <div className="lg:col-span-8">
                         {/* Breadcrumbs */}
                         <nav className="mb-4 flex items-center text-sm text-muted-foreground">
-                            <Link href="/" className="transition-colors hover:text-red-600">
+                            <Link href="/" className="transition-colors hover:text-primary">
                                 Beranda
                             </Link>
                             <span className="mx-2 opacity-50">/</span>
-                            <Link href={`/${post.category?.slug}`} className="transition-colors hover:text-red-600">
+                            <Link href={`/${post.category?.slug}`} className="transition-colors hover:text-primary">
                                 {post.category?.name}
                             </Link>
                             {subCategory && (
                                 <>
                                     <span className="mx-2 opacity-50">/</span>
-                                    <Link href={`/${post.category?.slug}/${subCategory.slug}`} className="transition-colors hover:text-red-600">
+                                    <Link href={`/${post.category?.slug}/${subCategory.slug}`} className="transition-colors hover:text-primary">
                                         {subCategory.name}
                                     </Link>
                                 </>
@@ -106,13 +106,13 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
 
                         <article>
                             <div className="mb-2 flex items-center gap-2">
-                                <Link href={`/${post.category?.slug}`} className="text-sm font-bold tracking-widest text-red-600 uppercase transition-colors hover:text-red-700">
+                                <Link href={`/${post.category?.slug}`} className="text-sm font-bold tracking-widest text-primary uppercase transition-colors hover:text-primary/90">
                                     {post.category?.name}
                                 </Link>
                                 {subCategory && (
                                     <>
                                         <span className="text-border">|</span>
-                                        <Link href={`/${post.category?.slug}/${subCategory.slug}`} className="text-sm font-medium text-muted-foreground transition-colors hover:text-red-600">
+                                        <Link href={`/${post.category?.slug}/${subCategory.slug}`} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                                             {subCategory.name}
                                         </Link>
                                     </>
@@ -123,7 +123,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
 
                             <div className="mb-6">
                                 <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                                    <span className="font-bold text-foreground underline decoration-red-600 decoration-2 underline-offset-4">{post.user?.name}</span>
+                                    <span className="font-bold text-foreground underline decoration-primary decoration-2 underline-offset-4">{post.user?.name}</span>
                                     <span className="text-border">|</span>
                                     <span className="font-medium tracking-tight uppercase">
                                         {formattedDate} | {new Date(post.published_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
@@ -168,14 +168,14 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                 </figure>
                             )}
 
-                            <div className="prose max-w-none text-[17px] leading-[1.8] text-foreground/90 prose-red dark:prose-invert prose-headings:font-black prose-p:mb-6 prose-a:text-red-600 dark:prose-a:text-red-500 prose-strong:text-foreground prose-img:rounded-xl" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            <div className="prose max-w-none text-[17px] leading-[1.8] text-foreground/90 prose-red dark:prose-invert prose-headings:font-black prose-p:mb-6 prose-a:text-primary prose-strong:text-foreground prose-img:rounded-xl" dangerouslySetInnerHTML={{ __html: post.content }} />
 
                             {post.tags.length > 0 && (
                                 <div className="mt-12 border-t border-border pt-8">
                                     <h4 className="mb-4 text-sm font-bold tracking-wider text-foreground uppercase">TAGS:</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {post.tags.map((tag) => (
-                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-red-600 hover:text-white">
+                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
                                                 {tag.name}
                                             </Link>
                                         ))}
@@ -188,7 +188,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                         <section className="mt-16 border-t border-border pt-10">
                             <div className="mb-8 flex items-center justify-between">
                                 <h3 className="text-xl font-black tracking-tight text-foreground uppercase">
-                                    Berita <span className="text-red-600">Terhubung</span>
+                                    Berita <span className="text-primary">Terhubung</span>
                                 </h3>
                                 <div className="ml-6 h-px flex-1 bg-border"></div>
                             </div>
@@ -202,8 +202,8 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-2">
-                                                <span className="text-[11px] font-bold tracking-wider text-red-600 uppercase">{related.category.name}</span>
-                                                <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-red-600">{related.title}</h4>
+                                                <span className="text-[11px] font-bold tracking-wider text-primary uppercase">{related.category.name}</span>
+                                                <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
                                                 <span className="text-[12px] text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                                             </div>
                                         </div>
