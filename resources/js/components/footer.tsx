@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import React from 'react';
 
 interface Category {
@@ -48,116 +48,72 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     ].filter((s) => s.url);
 
     return (
-        <footer className="mt-20 border-t-4 border-primary bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-primary/80">
-            <div className="container mx-auto max-w-7xl px-4">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <footer className="mt-40 overflow-hidden border-t border-foreground bg-background py-20 text-muted-foreground transition-colors">
+            <div className="container mx-auto px-6 lg:px-12">
+                <div className="grid grid-cols-1 gap-20 lg:grid-cols-4">
                     {/* Brand Info */}
-                    <div className="col-span-1">
-                        <div className="mb-6">
-                            <Link href="/">
-                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
+                    <div className="lg:col-span-2">
+                        <div className="mb-10">
+                            <Link href="/" className="group flex items-center gap-6">
+                                <div className="flex h-16 w-16 items-center justify-center border-2 border-foreground bg-foreground font-mono text-3xl font-bold text-background">{firstPart.charAt(0)}</div>
+                                <h2 className="text-4xl leading-[1.1] font-bold tracking-tighter text-foreground uppercase">
                                     {firstPart}
-                                    <span className="text-gray-400"> {restParts}</span>
+                                    <span className="block text-muted-foreground/30">{restParts}</span>
                                 </h2>
                             </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
                         </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+                        <p className="max-w-md font-mono text-[11px] leading-relaxed font-medium tracking-wide uppercase opacity-60">{siteSettings?.description || `Portal berita ${siteSettings?.site_name} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
 
-                        <div className="mb-8 space-y-4">
-                            {siteSettings?.address && (
-                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
-                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.address}</span>
-                                </div>
-                            )}
-
-                            {siteSettings?.email && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.email}</span>
-                                </div>
-                            )}
-                            {siteSettings?.phone && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.phone}</span>
-                                </div>
-                            )}
+                        <div className="mt-12 flex gap-2">
+                            {socials.map((social) => (
+                                <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-12 w-12 items-center justify-center border border-foreground/10 grayscale transition-all hover:bg-foreground hover:text-background hover:grayscale-0">
+                                    <social.icon className="h-4 w-4" />
+                                </a>
+                            ))}
                         </div>
-
-                        {socials.length > 0 && (
-                            <div className="flex gap-3">
-                                {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
-                                        <social.icon className="h-4 w-4" />
-                                    </a>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     {/* Quick Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
-                        {categories.length > 0 ? (
-                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
-                                    <li key={cat.id}>
-                                        <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
-                                            {cat.name}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-xs text-gray-500 italic">Belum ada kategori.</p>
-                        )}
-                    </div>
-
-                    {/* Info Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
-                        <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
-                            {[
-                                { title: 'Tentang Kami', url: '#' },
-                                { title: 'Redaksi', url: '#' },
-                                { title: 'Pedoman Media Siber', url: '#' },
-                                { title: 'Disclaimer', url: '#' },
-                                { title: 'Kebijakan Privasi', url: '#' },
-                                { title: 'Kontak Kami', url: '#' },
-                            ].map((link) => (
-                                <li key={link.title}>
-                                    <Link href={link.url} className="transition-colors hover:text-primary">
-                                        {link.title}
+                    <div>
+                        <h3 className="mb-10 font-mono text-[10px] font-bold tracking-[0.5em] text-muted-foreground uppercase">Archives</h3>
+                        <ul className="grid grid-cols-1 gap-4 font-mono text-[10px] font-bold tracking-[0.2em] text-foreground uppercase">
+                            {categories.slice(0, 8).map((cat) => (
+                                <li key={cat.id}>
+                                    <Link href={`/${cat.slug}`} className="transition-all hover:text-primary">
+                                        / {cat.name}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* Redaksi / Office */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
-                        <div className="space-y-3">
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
-                                Kirim Berita (WA)
-                            </Link>
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-primary hover:bg-primary">
-                                Media Kit & Iklan
-                            </Link>
-                        </div>
+                    {/* Info Links */}
+                    <div>
+                        <h3 className="mb-10 font-mono text-[10px] font-bold tracking-[0.5em] text-muted-foreground uppercase">Information</h3>
+                        <ul className="grid grid-cols-1 gap-4 font-mono text-[10px] font-bold tracking-[0.2em] text-foreground uppercase">
+                            {[
+                                { title: 'Terms', url: '#' },
+                                { title: 'Editorial', url: '#' },
+                                { title: 'Privacy', url: '#' },
+                                { title: 'Contact', url: '#' },
+                            ].map((link) => (
+                                <li key={link.title}>
+                                    <Link href={link.url} className="transition-all hover:ml-2 hover:text-primary">
+                                        {link.title}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
 
-                <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
-                    <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
+                <div className="mt-20 flex flex-col items-center justify-between border-t border-border/50 pt-10 lg:flex-row">
+                    <p className="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
+                        © {new Date().getFullYear()} {siteSettings?.site_name}. Built for the future.
                     </p>
-                    <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">
-                            Admin Login
+                    <div className="mt-6 flex gap-8 lg:mt-0">
+                        <Link href="/login" className="text-[10px] font-black tracking-widest text-muted-foreground uppercase transition-all hover:text-primary">
+                            Member Area
                         </Link>
                     </div>
                 </div>

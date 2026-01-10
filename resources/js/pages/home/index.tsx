@@ -1,7 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import Footer from '../../components/footer';
 import Navbar from '../../components/navbar';
-import Sidebar from '../../components/sidebar';
 import CategorySection from './partials/category-section';
 import HeroSection from './partials/hero-section';
 import { Category, NewsItem } from './partials/types';
@@ -32,7 +31,7 @@ interface Props {
 
 export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], latestNews = [], categories = [], homepageCategories = [], siteSettings }: Props) {
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
+        <div className="min-h-screen bg-background font-sans text-foreground transition-all duration-300">
             <Head>
                 <title>{siteSettings?.site_name || ''}</title>
                 <meta name="description" content={siteSettings?.description || 'Portal Berita Terpercaya'} />
@@ -40,39 +39,58 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
 
             <Navbar categories={categories} siteSettings={siteSettings} />
 
-            <main className="container mx-auto max-w-7xl px-4 py-6">
-                {/* HERO SECTION */}
-                {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
-
-                {/* GRID CONTENT LAYOUT */}
-                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
-                    {/* LEFT COLUMN (Daftar Kategori Berita) */}
-                    <div className="space-y-14 lg:col-span-8">
-                        {homepageCategories.map((category) => (
-                            <section key={category.id} className="scroll-mt-20">
-                                {/* HEADER KATEGORI - Dipusatkan di sini untuk menghindari duplikasi */}
-                                <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
-                                    <div className="relative">
-                                        <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
-                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-primary"></div>
-                                    </div>
-
-                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
-                                        Lihat Semua
-                                        <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
-                                    </Link>
-                                </div>
-
-                                {/* Hanya merender list berita */}
-                                <CategorySection category={category} />
-                            </section>
-                        ))}
+            <main className="container mx-auto px-4 py-16 lg:max-w-none lg:px-20">
+                <div className="mb-20 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-end">
+                    <div>
+                        <div className="mb-4 flex items-center gap-3">
+                            <span className="h-[1px] w-12 bg-primary" />
+                            <span className="font-mono text-[10px] font-bold tracking-[0.4em] text-primary uppercase">Edition 2026</span>
+                        </div>
+                        <h1 className="text-6xl leading-[0.9] font-bold tracking-tighter text-foreground md:text-8xl lg:text-[120px]">
+                            URBAN
+                            <br />
+                            <span className="text-muted-foreground/30">JOURNAL</span>
+                        </h1>
                     </div>
+                    <div className="flex flex-col gap-6 lg:pb-4">
+                        <p className="max-w-md font-mono text-sm leading-relaxed tracking-tight text-muted-foreground uppercase">A curated selection of stories exploring the intersection of culture, technology, and modern living in the digital age.</p>
+                        <div className="flex items-center gap-6">
+                            <div className="flex -space-x-3">
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="h-10 w-10 border border-background bg-muted" />
+                                ))}
+                            </div>
+                            <span className="font-mono text-[10px] font-bold text-foreground">500+ DAILY SUBSCRIBERS</span>
+                        </div>
+                    </div>
+                </div>
 
-                    {/* RIGHT COLUMN (Sidebar) */}
-                    <div className="lg:col-span-4">
-                        <div className="sticky top-24">
-                            <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
+                <div className="grid grid-cols-1 gap-20 lg:grid-cols-1">
+                    {/* MAIN FEED - FULL WIDTH */}
+                    <div className="lg:col-span-1">
+                        <div className="space-y-40">
+                            {/* FEATURED FIRST */}
+                            {heroNews && (
+                                <section>
+                                    <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />
+                                </section>
+                            )}
+
+                            {homepageCategories.map((category) => (
+                                <section key={category.id} className="scroll-mt-24">
+                                    <div className="mb-16 flex flex-col gap-6 border-l border-foreground pl-10">
+                                        <h2 className="text-5xl font-bold tracking-tighter text-foreground uppercase md:text-7xl">{category.name}</h2>
+                                        <div className="flex items-center gap-10">
+                                            <Link href={`/${category.slug}`} className="font-mono text-[11px] font-bold tracking-[0.4em] text-primary uppercase transition-all hover:translate-x-4">
+                                                EXPLORE_SECTION [→]
+                                            </Link>
+                                            <div className="h-[1px] flex-1 bg-foreground/10" />
+                                            <span className="font-mono text-[10px] text-muted-foreground/50">{category.news?.length || 0} TOTAL_RECORDS</span>
+                                        </div>
+                                    </div>
+                                    <CategorySection category={category} />
+                                </section>
+                            ))}
                         </div>
                     </div>
                 </div>

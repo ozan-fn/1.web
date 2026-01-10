@@ -1,6 +1,7 @@
+import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 import React from 'react';
 import OverlayCard from './overlay-card';
-import SectionHeader from './section-header';
 import { NewsItem } from './types';
 
 interface Props {
@@ -9,18 +10,23 @@ interface Props {
 }
 
 const HeroSection: React.FC<Props> = ({ heroNews, sideHeroNews }) => (
-    <section className="mb-12">
-        <SectionHeader title="FOKUS UTAMA" />
-        <div className="grid h-auto grid-cols-1 gap-6 lg:h-[500px] lg:grid-cols-12">
+    <section className="mb-24 flex flex-col gap-10">
+        <div className="grid grid-cols-1 border-y border-foreground/10 lg:grid-cols-12">
             {/* Main Feature (Kiri) */}
-            <div className="h-[400px] lg:col-span-8 lg:h-full">
-                <OverlayCard item={heroNews} height="h-full" />
+            <div className="border-foreground/10 lg:col-span-9 lg:border-r">
+                <OverlayCard item={heroNews} height="aspect-[16/9] lg:h-[650px] w-full" />
             </div>
 
             {/* Sub Features (Kanan) */}
-            <div className="flex h-full flex-col gap-6 lg:col-span-4">
-                {sideHeroNews.map((item) => (
-                    <OverlayCard key={item.id} item={item} height="h-full" />
+            <div className="flex flex-col lg:col-span-3">
+                {sideHeroNews.map((item, idx) => (
+                    <div key={item.id} className={cn('flex-1 border-b border-foreground/10 p-10 transition-colors hover:bg-muted', idx === sideHeroNews.length - 1 && 'border-b-0')}>
+                        <Link href={`/${item.category?.slug}/${item.slug}`} className="group flex flex-col gap-4">
+                            <span className="font-mono text-[9px] font-bold tracking-[0.4em] text-primary uppercase">{item.category?.name || 'FEATURED'}</span>
+                            <h3 className="line-clamp-3 text-lg leading-tight font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">{item.title}</h3>
+                            <div className="mt-2 h-[2px] w-8 bg-foreground/10 transition-all group-hover:w-full group-hover:bg-primary" />
+                        </Link>
+                    </div>
                 ))}
             </div>
         </div>
