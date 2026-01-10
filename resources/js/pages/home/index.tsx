@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import Footer from '../../components/footer';
 import Navbar from '../../components/navbar';
 import Sidebar from '../../components/sidebar';
@@ -6,18 +6,16 @@ import CategorySection from './partials/category-section';
 import HeroSection from './partials/hero-section';
 import { Category, NewsItem } from './partials/types';
 
-export interface SiteSettings {
-    site_name: string;
-    tagline: string | null;
-    description: string | null;
-    logo: string | null;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-    social_facebook: string | null;
-    social_twitter: string | null;
-    social_instagram: string | null;
-    social_youtube: string | null;
+// Interface untuk data global (sesuai middleware HandleInertiaRequests)
+interface SharedProps {
+    settings: {
+        site_name: string;
+        tagline: string | null;
+        description: string | null;
+        logo: string | null;
+        // ... field lain jika perlu
+    } | null;
+    [key: string]: any;
 }
 
 interface Props {
@@ -25,60 +23,74 @@ interface Props {
     sideHeroNews: NewsItem[];
     trendingNews: NewsItem[];
     latestNews: NewsItem[];
-    categories: Category[];
-    homepageCategories: Category[];
-    siteSettings: SiteSettings | null;
+    // categories: Category[]; // Tidak lagi dibutuhkan di sini karena Navbar mengambilnya sendiri
+    homepageCategories: Category[]; // Kategori khusus untuk layout body homepage
 }
 
-export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], latestNews = [], categories = [], homepageCategories = [], siteSettings }: Props) {
+export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], latestNews = [], homepageCategories = [] }: Props) {
+    // Mengambil settings dari Global Props (Middleware) untuk keperluan SEO/Head
+    const { settings } = usePage<SharedProps>().props;
+
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
+        <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300">
+            {/* SEO & Meta Tags */}
             <Head>
-                <title>{siteSettings?.site_name || ''}</title>
-                <meta name="description" content={siteSettings?.description || 'Portal Berita Terpercaya'} />
+                <title>{settings?.site_name || 'Beranda'}</title>
+                <meta name="description" content={settings?.description || 'Portal Berita Terpercaya dan Aktual'} />
             </Head>
 
-            <Navbar categories={categories} siteSettings={siteSettings} />
+            {/* Navbar: Tidak perlu oper props lagi, dia ambil sendiri dari global state */}
+            <Navbar />
 
-            <main className="container mx-auto max-w-7xl px-4 py-6">
+            <main className="container mx-auto max-w-7xl px-4 py-8 lg:px-8">
                 {/* HERO SECTION */}
-                {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
+                {heroNews && (
+                    <div className="animate-in duration-700 fade-in slide-in-from-bottom-4">
+                        <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />
+                    </div>
+                )}
 
-                {/* GRID CONTENT LAYOUT */}
-                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
-                    {/* LEFT COLUMN (Daftar Kategori Berita) */}
-                    <div className="space-y-14 lg:col-span-8">
-                        {homepageCategories.map((category) => (
-                            <section key={category.id} className="scroll-mt-20">
-                                {/* HEADER KATEGORI - Dipusatkan di sini untuk menghindari duplikasi */}
-                                <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
+                {/* MAIN CONTENT LAYOUT */}
+                <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-12">
+                    {/* LEFT COLUMN: Kategori Berita */}
+                    <div className="space-y-16 lg:col-span-8">
+                        {homepageCategories.map((category, index) => (
+                            <section
+                                key={category.id}
+                                className="scroll-mt-24"
+                                // Sedikit delay animasi untuk setiap kategori agar tidak muncul bersamaan
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                                {/* Header Kategori */}
+                                <div className="mb-8 flex items-end justify-between border-b border-border/60 pb-3">
                                     <div className="relative">
-                                        <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
-                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-primary"></div>
+                                        <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase italic">{category.name}</h2>
+                                        <div className="absolute -bottom-[13px] left-0 h-[3px] w-16 bg-primary"></div>
                                     </div>
 
-                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
+                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
                                         Lihat Semua
-                                        <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
+                                        <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-x-1">›</span>
                                     </Link>
                                 </div>
 
-                                {/* Hanya merender list berita */}
+                                {/* List Berita per Kategori */}
                                 <CategorySection category={category} />
                             </section>
                         ))}
                     </div>
 
-                    {/* RIGHT COLUMN (Sidebar) */}
-                    <div className="lg:col-span-4">
-                        <div className="sticky top-24">
+                    {/* RIGHT COLUMN: Sidebar (Sticky) */}
+                    <aside className="lg:col-span-4">
+                        <div className="sticky top-24 space-y-10">
                             <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </main>
 
-            <Footer categories={categories} siteSettings={siteSettings} />
+            {/* Footer: Tidak perlu oper props lagi */}
+            <Footer />
         </div>
     );
 }

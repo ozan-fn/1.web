@@ -1,9 +1,10 @@
 import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import Sidebar from '@/components/sidebar';
-import { Head, Link } from '@inertiajs/react';
-import { Eye, Share2 } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Bookmark, Calendar, ChevronRight, Copy, Facebook, Hash, MessageCircle, Share2, Twitter } from 'lucide-react';
 
+// --- Interfaces & Types ---
 interface Tag {
     id: number;
     name: string;
@@ -26,7 +27,7 @@ interface Post {
     views: number;
     category: Category;
     sub_category: Category | null;
-    user: { name: string };
+    user: { name: string; avatar?: string; bio?: string }; // Ditambah optional props simulasi
     tags: Tag[];
 }
 
@@ -37,17 +38,20 @@ interface ShowProps {
     latestNews: Post[];
 }
 
-export default function PostShow({ post, relatedPosts, trendingNews, latestNews }: ShowProps) {
-    const formattedDate = new Date(post.published_at).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
+// --- Helper Components ---
 
-    const subCategory = post.sub_category || (post as any).subCategory;
+const ShareButton = ({ icon: Icon, onClick, className }: { icon: any; onClick: () => void; className?: string }) => (
+    <button onClick={onClick} className={`flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-all hover:-translate-y-1 hover:shadow-md ${className}`}>
+        <Icon className="h-4 w-4" />
+    </button>
+);
+
+export default function PostShow({ post, relatedPosts, trendingNews, latestNews }: ShowProps) {
+    // Mengambil data global site settings
+    const { settings } = usePage<any>().props;
 
     const handleShare = (platform: 'facebook' | 'twitter' | 'whatsapp' | 'copy') => {
-        const url = window.location.href;
+        const url = typeof window !== 'undefined' ? window.location.href : '';
         const title = post.title;
         const text = `${title}\n\nBaca selengkapnya di: ${url}`;
 
@@ -62,160 +66,207 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
                 break;
             case 'copy':
-                if (navigator.share) {
-                    navigator.share({ title, text: title, url }).catch(() => {
-                        navigator.clipboard.writeText(url);
-                    });
-                } else {
-                    navigator.clipboard.writeText(url);
-                    alert('Link berhasil disalin!');
-                }
+                navigator.clipboard.writeText(url);
+                alert('Tautan artikel berhasil disalin!');
                 break;
         }
     };
 
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
-            {/* Meta Tags dihandle app.blade.php */}
-            <Head title={post.title} />
+        <div className="min-h-screen bg-background font-sans text-foreground">
+            <Head>
+                <title>{`${post.title} - ${settings?.site_name || 'News'}`}</title>
+                <meta name="description" content={post.content.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
+                <meta property="og:image" content={post.thumbnail_url || ''} />
+            </Head>
 
             <Navbar />
 
-            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                    {/* Main Content */}
-                    <div className="lg:col-span-8">
-                        {/* Breadcrumbs */}
-                        <nav className="mb-4 flex items-center text-sm text-muted-foreground">
-                            <Link href="/" className="transition-colors hover:text-primary">
-                                Beranda
-                            </Link>
-                            <span className="mx-2 opacity-50">/</span>
-                            <Link href={`/${post.category?.slug}`} className="transition-colors hover:text-primary">
+            <main className="pb-20">
+                {/* --- HEADER SECTION (Centered & Dramatic) --- */}
+                <header className="relative w-full border-b border-border/40 bg-muted/10 pt-12 pb-12 lg:pt-20">
+                    <div className="container mx-auto max-w-4xl px-4 text-center">
+                        {/* Breadcrumb Minimalis */}
+                        <div className="mb-6 flex items-center justify-center gap-2 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+                            <Link href={`/${post.category?.slug}`} className="text-primary hover:underline">
                                 {post.category?.name}
                             </Link>
-                            {subCategory && (
+                            {post.sub_category && (
                                 <>
-                                    <span className="mx-2 opacity-50">/</span>
-                                    <div className="transition-colors hover:text-primary">{subCategory.name}</div>
+                                    <ChevronRight className="h-3 w-3" />
+                                    <Link href={`/${post.category?.slug}/${post.sub_category.slug}`} className="hover:text-foreground">
+                                        {post.sub_category.name}
+                                    </Link>
                                 </>
                             )}
-                        </nav>
+                        </div>
 
-                        <article>
-                            <div className="mb-2 flex items-center gap-2">
-                                <Link href={`/${post.category?.slug}`} className="text-sm font-bold tracking-widest text-primary uppercase transition-colors hover:text-primary/90">
-                                    {post.category?.name}
-                                </Link>
-                                {subCategory && (
-                                    <>
-                                        <span className="text-border">|</span>
-                                        <div className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">{subCategory.name}</div>
-                                    </>
-                                )}
-                            </div>
+                        {/* Judul Besar */}
+                        <h1 className="mb-6 text-3xl leading-tight font-black tracking-tighter text-foreground sm:text-4xl md:text-5xl lg:text-6xl">{post.title}</h1>
 
-                            <h1 className="mb-4 text-3xl leading-[1.15] font-black text-foreground sm:text-4xl md:text-5xl lg:text-[42px]">{post.title}</h1>
-
-                            <div className="mb-6">
-                                <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                                    <span className="font-bold text-foreground underline decoration-primary decoration-2 underline-offset-4">{post.user?.name}</span>
-                                    <span className="text-border">|</span>
-                                    <span className="font-medium tracking-tight uppercase">
-                                        {formattedDate} | {new Date(post.published_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
-                                    </span>
+                        {/* Author & Meta Data */}
+                        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 overflow-hidden rounded-full border border-border bg-muted">
+                                    {/* Placeholder Avatar - Gunakan inisial jika tidak ada gambar */}
+                                    <div className="flex h-full w-full items-center justify-center bg-primary/10 text-sm font-bold text-primary">{post.user.name.charAt(0)}</div>
                                 </div>
-
-                                <div className="mt-6 flex items-center gap-4 border-y border-border py-4">
-                                    <span className="text-[11px] font-black tracking-widest text-muted-foreground uppercase">BAGIKAN:</span>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => handleShare('facebook')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1877F2] text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                            </svg>
-                                        </button>
-                                        <button onClick={() => handleShare('twitter')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-black text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
-                                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                            </svg>
-                                        </button>
-                                        <button onClick={() => handleShare('whatsapp')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#25D366] text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.27 9.27 0 01-4.487-1.159l-.323-.192-3.33.873.888-3.245-.211-.336a9.28 9.28 0 01-1.424-4.916c0-5.11 4.156-9.265 9.268-9.265a9.245 9.245 0 016.551 2.716 9.22 9.22 0 012.718 6.556c0 5.11-4.156 9.265-9.268 9.265M12 2.182a10.3 10.3 0 00-10.324 10.311 10.27 10.27 0 001.603 5.53L2 22l4.285-1.124a10.25 10.25 0 005.711 1.698l.004-.001c5.696 0 10.327-4.631 10.327-10.323 0-2.744-1.069-5.323-3.012-7.266A10.23 10.23 0 0012 2.182z" />
-                                            </svg>
-                                        </button>
-                                        <button onClick={() => handleShare('copy')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-secondary text-secondary-foreground transition-colors hover:bg-muted">
-                                            <Share2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                    <div className="ml-auto flex items-center gap-1.5 text-[12px] font-bold text-muted-foreground">
-                                        <Eye className="h-4 w-4" />
-                                        <span>{post.views}</span>
-                                    </div>
+                                <div className="text-left">
+                                    <p className="text-sm font-bold text-foreground">{post.user.name}</p>
+                                    <p className="text-xs text-muted-foreground">Redaksi</p>
                                 </div>
                             </div>
+                            <div className="hidden h-8 w-px bg-border sm:block"></div>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-1.5">
+                                    <Calendar className="h-4 w-4" />
+                                    {new Date(post.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="font-medium text-foreground">{post.views}</span> Dibaca
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
 
+                {/* --- CONTENT WRAPPER --- */}
+                <div className="container mx-auto max-w-7xl px-4 lg:px-8">
+                    <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
+                        {/* LEFT: Floating Share (Sticky) - Hidden on Mobile */}
+                        <div className="hidden lg:col-span-1 lg:block">
+                            <div className="sticky top-32 flex flex-col items-center gap-4">
+                                <span className="mb-2 rotate-180 text-[10px] font-black tracking-widest text-muted-foreground/50 uppercase" style={{ writingMode: 'vertical-rl' }}>
+                                    Bagikan
+                                </span>
+                                <ShareButton icon={Facebook} onClick={() => handleShare('facebook')} className="hover:border-blue-600 hover:text-blue-600" />
+                                <ShareButton icon={Twitter} onClick={() => handleShare('twitter')} className="hover:border-sky-500 hover:text-sky-500" />
+                                <ShareButton icon={MessageCircle} onClick={() => handleShare('whatsapp')} className="hover:border-green-500 hover:text-green-500" />
+                                <div className="my-2 h-px w-6 bg-border"></div>
+                                <ShareButton icon={Copy} onClick={() => handleShare('copy')} />
+                                <ShareButton icon={Bookmark} onClick={() => alert('Fitur Bookmark segera hadir')} />
+                            </div>
+                        </div>
+
+                        {/* CENTER: Main Article */}
+                        <article className="lg:col-span-8">
+                            {/* Featured Image - Negative Margin Top to overlap header slightly */}
                             {post.thumbnail_url && (
-                                <figure className="mb-8">
-                                    <div className="overflow-hidden rounded-lg border border-border shadow-sm">
-                                        <img src={post.thumbnail_url} alt={post.title} className="h-auto w-full object-cover" />
-                                    </div>
-                                    <figcaption className="mt-3 text-[13px] text-muted-foreground italic">Ilustrasi {post.title}. (Foto: Istimewa)</figcaption>
+                                <figure className="relative -mt-8 mb-12 overflow-hidden rounded-xl shadow-xl lg:-mt-12">
+                                    <img src={post.thumbnail_url} alt={post.title} className="w-full object-cover transition-transform duration-700 hover:scale-105" style={{ maxHeight: '500px' }} />
+                                    <figcaption className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-xs text-white/80">Ilustrasi gambar utama artikel.</figcaption>
                                 </figure>
                             )}
 
-                            <div className="prose max-w-none text-[17px] leading-[1.8] text-foreground/90 prose-red dark:prose-invert prose-headings:font-black prose-p:mb-6 prose-a:text-primary prose-strong:text-foreground prose-img:rounded-xl" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            {/* The Content */}
+                            <div className="prose prose-lg max-w-none text-foreground dark:prose-invert prose-headings:font-black prose-headings:tracking-tight prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl">
+                                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                            </div>
 
+                            {/* Tags */}
                             {post.tags.length > 0 && (
-                                <div className="mt-12 border-t border-border pt-8">
-                                    <h4 className="mb-4 text-sm font-bold tracking-wider text-foreground uppercase">TAGS:</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {post.tags.map((tag) => (
-                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
-                                                {tag.name}
+                                <div className="mt-12 flex flex-wrap items-center gap-2 border-y border-border py-6">
+                                    <div className="mr-2 flex items-center gap-1 text-primary">
+                                        <Hash className="h-4 w-4" />
+                                        <span className="text-sm font-bold uppercase">Topik:</span>
+                                    </div>
+                                    {post.tags.map((tag) => (
+                                        <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-full bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
+                                            {tag.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Author Bio Box */}
+                            <div className="mt-10 rounded-xl bg-muted/30 p-8 text-center sm:text-left">
+                                <div className="flex flex-col items-center gap-6 sm:flex-row">
+                                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-background shadow-md">
+                                        <div className="flex h-full w-full items-center justify-center bg-primary text-2xl font-bold text-white">{post.user.name.charAt(0)}</div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className="text-lg font-bold text-foreground">Tentang Penulis: {post.user.name}</h3>
+                                        <p className="text-sm leading-relaxed text-muted-foreground">Jurnalis dan editor konten di {settings?.site_name || 'Portal Berita'}. Berdedikasi untuk menyajikan informasi faktual dan mendalam seputar topik terkini.</p>
+                                        <Link href="#" className="inline-block text-xs font-bold text-primary hover:underline">
+                                            Lihat semua artikel penulis &rarr;
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Mobile Share Bar (Fixed Bottom) */}
+                            <div className="fixed right-0 bottom-0 left-0 z-40 border-t border-border bg-background/80 p-3 backdrop-blur-md lg:hidden">
+                                <div className="flex justify-evenly">
+                                    <button onClick={() => handleShare('whatsapp')} className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary">
+                                        <MessageCircle className="h-5 w-5" /> WA
+                                    </button>
+                                    <button onClick={() => handleShare('facebook')} className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary">
+                                        <Facebook className="h-5 w-5" /> FB
+                                    </button>
+                                    <button onClick={() => handleShare('twitter')} className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary">
+                                        <Twitter className="h-5 w-5" /> X
+                                    </button>
+                                    <button onClick={() => handleShare('copy')} className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary">
+                                        <Share2 className="h-5 w-5" /> Share
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+
+                        {/* RIGHT: Sidebar (Sticky) */}
+                        <aside className="lg:col-span-3">
+                            <div className="sticky top-32 space-y-8">
+                                {/* Baca Juga Card */}
+                                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                                    <div className="mb-4 flex items-center gap-2 border-b border-border pb-2">
+                                        <div className="h-2 w-2 animate-pulse rounded-full bg-primary"></div>
+                                        <h3 className="text-sm font-black tracking-widest uppercase">Wajib Baca</h3>
+                                    </div>
+                                    <div className="flex flex-col gap-6">
+                                        {trendingNews.slice(0, 4).map((item, idx) => (
+                                            <Link key={item.id} href={`/${item.category.slug}/${item.slug}`} className="group flex gap-3">
+                                                <span className="text-2xl font-black text-muted-foreground/20 transition-colors group-hover:text-primary/50">{idx + 1}</span>
+                                                <div>
+                                                    <h4 className="line-clamp-3 text-sm leading-tight font-bold transition-colors group-hover:text-primary">{item.title}</h4>
+                                                </div>
                                             </Link>
                                         ))}
                                     </div>
                                 </div>
-                            )}
-                        </article>
 
-                        {/* Related News - DISINI PERBAIKAN WARNA BERITA TERHUBUNG */}
-                        <section className="mt-16 border-t border-border pt-10">
-                            <div className="mb-8 flex items-center justify-between">
-                                <h3 className="text-xl font-black tracking-tight text-foreground uppercase">
-                                    Berita <span className="text-primary">Terhubung</span>
-                                </h3>
-                                <div className="ml-6 h-px flex-1 bg-border"></div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:gap-12">
-                                {relatedPosts.map((related) => (
-                                    <Link key={related.id} href={related.sub_category ? `/${related.category.slug}/${related.sub_category.slug}/${related.slug}` : `/${related.category.slug}/${related.slug}`} className="group">
-                                        <div className="flex flex-col gap-4">
-                                            {related.thumbnail_url && (
-                                                <div className="aspect-[16/9] overflow-hidden rounded-md border border-border shadow-sm">
-                                                    <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                                </div>
-                                            )}
-                                            <div className="flex flex-col gap-2">
-                                                <span className="text-[11px] font-bold tracking-wider text-primary uppercase">{related.category.name}</span>
-                                                <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
-                                                <span className="text-[12px] text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </section>
-                    </div>
+                                {/* Iklan / Banner Space */}
+                                <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-muted/50 text-xs font-medium text-muted-foreground">Space Iklan</div>
 
-                    {/* Sidebar */}
-                    <div className="lg:col-span-4">
-                        <div className="sticky top-24 space-y-8">
-                            <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
-                        </div>
+                                <Sidebar trendingNews={[]} latestNews={latestNews} />
+                            </div>
+                        </aside>
                     </div>
                 </div>
+
+                {/* --- RELATED POSTS SECTION (Full Width Darker BG) --- */}
+                <section className="mt-20 border-t border-border bg-muted/30 py-16">
+                    <div className="container mx-auto max-w-7xl px-4 lg:px-8">
+                        <div className="mb-10 flex items-center justify-between">
+                            <h2 className="text-2xl font-black tracking-tight uppercase sm:text-3xl">Berita Terkait</h2>
+                            <Link href="/" className="text-sm font-bold text-primary hover:underline">
+                                Lihat Index &rarr;
+                            </Link>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            {relatedPosts.map((related) => (
+                                <Link key={related.id} href={`/${related.category.slug}/${related.slug}`} className="group flex flex-col overflow-hidden rounded-lg bg-background shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+                                    <div className="aspect-[3/2] overflow-hidden">{related.thumbnail_url ? <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" /> : <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">NO IMAGE</div>}</div>
+                                    <div className="flex flex-1 flex-col p-4">
+                                        <span className="mb-2 text-[10px] font-black tracking-widest text-primary uppercase">{related.category.name}</span>
+                                        <h3 className="mb-2 line-clamp-3 text-base leading-snug font-bold group-hover:text-primary">{related.title}</h3>
+                                        <div className="mt-auto pt-4 text-xs text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })}</div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
             </main>
 
             <Footer />
