@@ -9,20 +9,20 @@ interface Props {
 }
 
 const HeroSection: React.FC<Props> = ({ heroNews, sideHeroNews }) => (
-    <section className="mb-12">
-        <SectionHeader title="FOKUS UTAMA" />
-        <div className="grid h-auto grid-cols-1 gap-6 lg:h-[500px] lg:grid-cols-12">
-            {/* Main Feature (Kiri) */}
-            <div className="h-[400px] lg:col-span-8 lg:h-full">
+    <section className="mb-20">
+        <SectionHeader title="DIBERITAKAN" />
+        <div className="grid grid-cols-1 gap-6 lg:h-[650px] lg:grid-cols-12 lg:grid-rows-2">
+            {/* Main Feature - Spans 8 columns and 2 rows */}
+            <div className="h-[450px] lg:col-span-8 lg:row-span-2 lg:h-full">
                 <OverlayCard item={heroNews} height="h-full" />
             </div>
 
-            {/* Sub Features (Kanan) */}
-            <div className="flex h-full flex-col gap-6 lg:col-span-4">
-                {sideHeroNews.map((item) => (
-                    <OverlayCard key={item.id} item={item} height="h-full" />
-                ))}
-            </div>
+            {/* Sub Features - Stacked on the right */}
+            {sideHeroNews.slice(0, 2).map((item, index) => (
+                <div key={item.id} className="h-[250px] lg:col-span-4 lg:row-span-1 lg:h-full">
+                    <OverlayCard item={item} height="h-full" />
+                </div>
+            ))}
         </div>
     </section>
 );

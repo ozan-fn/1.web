@@ -2,7 +2,7 @@ import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import Sidebar from '@/components/sidebar';
 import { Head, Link } from '@inertiajs/react';
-import { Eye, Share2 } from 'lucide-react';
+import { ChevronRight, Share2 } from 'lucide-react';
 
 interface Tag {
     id: number;
@@ -75,132 +75,126 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
     };
 
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground transition-colors">
-            {/* Meta Tags dihandle app.blade.php */}
+        <div className="min-h-screen bg-background font-sans text-foreground transition-all duration-500">
             <Head title={post.title} />
 
             <Navbar />
 
-            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* PROGRESS BAR READ */}
+            <div className="sticky top-[80px] z-40 h-1 w-full bg-muted/30">
+                <div className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-all duration-300" style={{ width: '30%' }}></div>
+            </div>
+
+            <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
                     {/* Main Content */}
                     <div className="lg:col-span-8">
-                        {/* Breadcrumbs */}
-                        <nav className="mb-4 flex items-center text-sm text-muted-foreground">
-                            <Link href="/" className="transition-colors hover:text-primary">
-                                Beranda
-                            </Link>
-                            <span className="mx-2 opacity-50">/</span>
-                            <Link href={`/${post.category?.slug}`} className="transition-colors hover:text-primary">
-                                {post.category?.name}
-                            </Link>
-                            {subCategory && (
-                                <>
-                                    <span className="mx-2 opacity-50">/</span>
-                                    <div className="transition-colors hover:text-primary">{subCategory.name}</div>
-                                </>
-                            )}
-                        </nav>
-
-                        <article>
-                            <div className="mb-2 flex items-center gap-2">
-                                <Link href={`/${post.category?.slug}`} className="text-sm font-bold tracking-widest text-primary uppercase transition-colors hover:text-primary/90">
+                        {/* REFINED HEADER */}
+                        <header className="mb-12">
+                            <nav className="mb-8 flex items-center gap-3 text-[10px] font-black tracking-[0.3em] text-muted-foreground uppercase">
+                                <Link href="/" className="transition-all hover:text-primary">
+                                    Home
+                                </Link>
+                                <span className="h-1 w-1 rounded-full bg-border"></span>
+                                <Link href={`/${post.category?.slug}`} className="text-primary transition-all hover:text-primary">
                                     {post.category?.name}
                                 </Link>
                                 {subCategory && (
                                     <>
-                                        <span className="text-border">|</span>
-                                        <div className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">{subCategory.name}</div>
+                                        <span className="h-1 w-1 rounded-full bg-border"></span>
+                                        <span className="opacity-60">{subCategory.name}</span>
                                     </>
                                 )}
-                            </div>
+                            </nav>
 
-                            <h1 className="mb-4 text-3xl leading-[1.15] font-black text-foreground sm:text-4xl md:text-5xl lg:text-[42px]">{post.title}</h1>
+                            <h1 className="mb-8 text-4xl leading-[1.1] font-black tracking-tighter text-foreground italic sm:text-5xl md:text-6xl lg:text-7xl">{post.title}</h1>
 
-                            <div className="mb-6">
-                                <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                                    <span className="font-bold text-foreground underline decoration-primary decoration-2 underline-offset-4">{post.user?.name}</span>
-                                    <span className="text-border">|</span>
-                                    <span className="font-medium tracking-tight uppercase">
-                                        {formattedDate} | {new Date(post.published_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
-                                    </span>
+                            <div className="flex flex-wrap items-center justify-between gap-6 border-y border-border py-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-14 w-14 overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 p-1">
+                                        <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary text-xl font-black text-primary-foreground italic">{post.user?.name.charAt(0)}</div>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-black tracking-tighter text-foreground uppercase">{post.user?.name}</span>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Redaksi Insight</span>
+                                    </div>
                                 </div>
 
-                                <div className="mt-6 flex items-center gap-4 border-y border-border py-4">
-                                    <span className="text-[11px] font-black tracking-widest text-muted-foreground uppercase">BAGIKAN:</span>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => handleShare('facebook')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1877F2] text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                            </svg>
-                                        </button>
-                                        <button onClick={() => handleShare('twitter')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-black text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
-                                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                            </svg>
-                                        </button>
-                                        <button onClick={() => handleShare('whatsapp')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#25D366] text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.27 9.27 0 01-4.487-1.159l-.323-.192-3.33.873.888-3.245-.211-.336a9.28 9.28 0 01-1.424-4.916c0-5.11 4.156-9.265 9.268-9.265a9.245 9.245 0 016.551 2.716 9.22 9.22 0 012.718 6.556c0 5.11-4.156 9.265-9.268 9.265M12 2.182a10.3 10.3 0 00-10.324 10.311 10.27 10.27 0 001.603 5.53L2 22l4.285-1.124a10.25 10.25 0 005.711 1.698l.004-.001c5.696 0 10.327-4.631 10.327-10.323 0-2.744-1.069-5.323-3.012-7.266A10.23 10.23 0 0012 2.182z" />
-                                            </svg>
-                                        </button>
-                                        <button onClick={() => handleShare('copy')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-secondary text-secondary-foreground transition-colors hover:bg-muted">
-                                            <Share2 className="h-4 w-4" />
-                                        </button>
+                                <div className="flex items-center gap-8">
+                                    <div className="flex flex-col items-end">
+                                        <span className="mb-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">Published</span>
+                                        <span className="text-xs font-bold">{formattedDate}</span>
                                     </div>
-                                    <div className="ml-auto flex items-center gap-1.5 text-[12px] font-bold text-muted-foreground">
-                                        <Eye className="h-4 w-4" />
-                                        <span>{post.views}</span>
+                                    <div className="h-8 w-px bg-border"></div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="mb-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">Reading Time</span>
+                                        <span className="text-xs font-bold">5 Mins Read</span>
                                     </div>
                                 </div>
                             </div>
+                        </header>
 
+                        <article>
                             {post.thumbnail_url && (
-                                <figure className="mb-8">
-                                    <div className="overflow-hidden rounded-lg border border-border shadow-sm">
-                                        <img src={post.thumbnail_url} alt={post.title} className="h-auto w-full object-cover" />
-                                    </div>
-                                    <figcaption className="mt-3 text-[13px] text-muted-foreground italic">Ilustrasi {post.title}. (Foto: Istimewa)</figcaption>
+                                <figure className="group relative mb-16 overflow-hidden rounded-[2.5rem] shadow-2xl">
+                                    <img src={post.thumbnail_url} alt={post.title} className="h-auto w-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
+                                    <figcaption className="absolute bottom-6 left-8 translate-y-4 text-[11px] font-medium text-white/80 italic opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">Source: SWARA Library Archive</figcaption>
                                 </figure>
                             )}
 
-                            <div className="prose max-w-none text-[17px] leading-[1.8] text-foreground/90 prose-red dark:prose-invert prose-headings:font-black prose-p:mb-6 prose-a:text-primary prose-strong:text-foreground prose-img:rounded-xl" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            {/* SHARE BAR FLOATING CONCEPT (Side) */}
+                            <div className="relative">
+                                <div
+                                    className="prose prose-lg max-w-none prose-zinc dark:prose-invert prose-headings:font-black prose-headings:tracking-tighter prose-headings:italic prose-p:text-lg prose-p:leading-[1.9] prose-p:text-foreground/80 prose-blockquote:rounded-r-2xl prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2 prose-strong:font-black prose-strong:text-foreground prose-img:rounded-[2rem] prose-img:shadow-xl"
+                                    dangerouslySetInnerHTML={{ __html: post.content }}
+                                />
 
-                            {post.tags.length > 0 && (
-                                <div className="mt-12 border-t border-border pt-8">
-                                    <h4 className="mb-4 text-sm font-bold tracking-wider text-foreground uppercase">TAGS:</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {post.tags.map((tag) => (
-                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
-                                                {tag.name}
-                                            </Link>
-                                        ))}
+                                <div className="mt-20 flex flex-col gap-10 border-t border-border pt-12">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            {post.tags.map((tag) => (
+                                                <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-xl bg-muted px-4 py-2 text-[11px] font-black tracking-widest text-foreground uppercase transition-all hover:bg-primary hover:text-primary-foreground">
+                                                    #{tag.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                            <button onClick={() => handleShare('copy')} className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-foreground transition-all hover:bg-primary hover:text-primary-foreground">
+                                                <Share2 className="h-5 w-5" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            )}
+                            </div>
                         </article>
 
                         {/* Related News - DISINI PERBAIKAN WARNA BERITA TERHUBUNG */}
-                        <section className="mt-16 border-t border-border pt-10">
-                            <div className="mb-8 flex items-center justify-between">
-                                <h3 className="text-xl font-black tracking-tight text-foreground uppercase">
-                                    Berita <span className="text-primary">Terhubung</span>
+                        <section className="mt-32">
+                            <div className="mb-12 flex items-center justify-between">
+                                <h3 className="text-3xl font-black tracking-tighter text-foreground uppercase italic">
+                                    Deep <span className="mr-2 text-primary">Dive</span> Insight
                                 </h3>
-                                <div className="ml-6 h-px flex-1 bg-border"></div>
+                                <div className="ml-10 h-px flex-1 bg-border"></div>
                             </div>
-                            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:gap-12">
+                            <div className="grid grid-cols-1 gap-12 sm:grid-cols-2">
                                 {relatedPosts.map((related) => (
-                                    <Link key={related.id} href={related.sub_category ? `/${related.category.slug}/${related.sub_category.slug}/${related.slug}` : `/${related.category.slug}/${related.slug}`} className="group">
-                                        <div className="flex flex-col gap-4">
+                                    <Link key={related.id} href={related.sub_category ? `/${related.category.slug}/${related.sub_category.slug}/${related.slug}` : `/${related.category.slug}/${related.slug}`} className="group relative">
+                                        <div className="flex flex-col gap-6">
                                             {related.thumbnail_url && (
-                                                <div className="aspect-[16/9] overflow-hidden rounded-md border border-border shadow-sm">
-                                                    <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                <div className="aspect-[16/10] overflow-hidden rounded-[2rem] border border-border bg-muted shadow-sm transition-all group-hover:shadow-2xl">
+                                                    <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                                                 </div>
                                             )}
-                                            <div className="flex flex-col gap-2">
-                                                <span className="text-[11px] font-bold tracking-wider text-primary uppercase">{related.category.name}</span>
-                                                <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
-                                                <span className="text-[12px] text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                                            <div className="flex flex-col gap-3 px-2">
+                                                <span className="text-[10px] font-black tracking-widest text-primary uppercase">{related.category?.name}</span>
+                                                <h4 className="line-clamp-2 text-xl leading-tight font-black text-foreground italic transition-colors group-hover:text-primary">{related.title}</h4>
+                                                <div className="mt-2 flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase">
+                                                    <span>{new Date(related.published_at).toLocaleDateString('id-ID')}</span>
+                                                    <span className="h-1 w-1 rounded-full bg-border"></span>
+                                                    <span>5 Min Read</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </Link>
@@ -209,10 +203,20 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                         </section>
                     </div>
 
-                    {/* Sidebar */}
+                    {/* RIGHT SIDEBAR AREA */}
                     <div className="lg:col-span-4">
-                        <div className="sticky top-24 space-y-8">
-                            <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
+                        <div className="sticky top-32 flex flex-col gap-12">
+                            <Sidebar trendingNews={trendingNews as any} latestNews={latestNews as any} />
+
+                            {/* Newsletter Specific to Show Page */}
+                            <div className="rounded-[2.5rem] bg-primary p-10 text-primary-foreground shadow-2xl">
+                                <h4 className="text-2xl font-black tracking-tighter italic">Stay Inspired.</h4>
+                                <p className="mt-4 text-sm leading-relaxed font-medium opacity-80">Jangan lewatkan analisis mendalam selanjutnya. Daftar untuk update mingguan.</p>
+                                <button className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-black py-4 text-[11px] font-black tracking-widest text-white uppercase transition-transform hover:scale-105">
+                                    Notify Me
+                                    <ChevronRight className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
