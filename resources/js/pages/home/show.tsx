@@ -97,9 +97,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                             {subCategory && (
                                 <>
                                     <span className="mx-2 opacity-50">/</span>
-                                    <Link href={`/${post.category?.slug}/${subCategory.slug}`} className="transition-colors hover:text-primary">
-                                        {subCategory.name}
-                                    </Link>
+                                    <div className="transition-colors hover:text-primary">{subCategory.name}</div>
                                 </>
                             )}
                         </nav>
@@ -112,9 +110,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                 {subCategory && (
                                     <>
                                         <span className="text-border">|</span>
-                                        <Link href={`/${post.category?.slug}/${subCategory.slug}`} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                                            {subCategory.name}
-                                        </Link>
+                                        <div className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">{subCategory.name}</div>
                                     </>
                                 )}
                             </div>
