@@ -90,9 +90,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                     </div>
 
                     <div className="hidden items-center gap-4 lg:flex lg:w-1/3">
-                        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-none">
-                            {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                        </span>
+                        <span className="text-[11px] leading-none font-bold tracking-widest text-gray-400 uppercase">{new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
 
                     {/* Center: Logo */}
@@ -102,7 +100,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                 <img src={`/storage/${siteSettings.logo}`} alt={siteSettings.site_name} className="h-12 w-auto object-contain" />
                             ) : (
                                 <div className="flex flex-col leading-none">
-                                    <span className="text-3xl font-black text-[#0455A4] uppercase tracking-tighter sm:text-4xl">
+                                    <span className="text-3xl font-black tracking-tighter text-[#0455A4] uppercase sm:text-4xl">
                                         {firstPart}
                                         <span className="text-gray-900 dark:text-gray-100">{restParts ? ` ${restParts}` : ''}</span>
                                     </span>
@@ -119,9 +117,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                             {appearance === 'dark' && <Moon className="h-5 w-5" />}
                             {appearance === 'system' && <Monitor className="h-5 w-5" />}
                         </button>
-                        <button className="rounded-full bg-[#0455A4] px-4 py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90">
-                            LOGIN
-                        </button>
+                        <button className="rounded-full bg-[#0455A4] px-4 py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90">LOGIN</button>
                     </div>
                 </div>
             </div>
@@ -130,7 +126,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
             <nav className="bg-white px-4 shadow-sm dark:bg-gray-950">
                 <div className="container mx-auto flex max-w-7xl items-center justify-between border-t border-gray-50 dark:border-gray-900">
                     <div className="no-scrollbar flex flex-grow items-center overflow-x-auto overflow-y-hidden">
-                        <div className="flex gap-1 py-1 text-[13px] font-bold uppercase tracking-tight">
+                        <div className="flex gap-1 py-1 text-[13px] font-bold tracking-tight uppercase">
                             <Link href="/" className={`px-4 py-3 transition-colors ${url === '/' ? 'text-[#0455A4] shadow-[inset_0_-2px_0_0_#0455A4]' : 'text-gray-600 hover:text-[#0455A4] dark:text-gray-400'}`}>
                                 Home
                             </Link>
@@ -149,13 +145,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                     {/* Search Bar Right */}
                     <div className="ml-4 flex items-center border-l border-gray-100 pl-4 dark:border-gray-800">
                         <form onSubmit={handleSearch} className="group flex items-center gap-2 rounded-full bg-gray-50 px-3 py-1.5 transition-all focus-within:ring-1 focus-within:ring-[#0455A4] dark:bg-gray-900">
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Cari..."
-                                className="w-24 bg-transparent text-xs font-medium outline-none transition-all focus:w-40"
-                            />
+                            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari..." className="w-24 bg-transparent text-xs font-medium transition-all outline-none focus:w-40" />
                             <button type="submit" className="text-gray-400 hover:text-[#0455A4]">
                                 <Search className="h-3.5 w-3.5" />
                             </button>

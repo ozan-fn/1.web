@@ -24,7 +24,7 @@ const VideoSection: React.FC<Props> = ({ news }) => {
                             <>
                                 <img src={mainVideo.thumbnail_url || ''} className="aspect-video w-full object-cover opacity-70 transition-opacity duration-700 group-hover:opacity-90" alt={mainVideo.title} />
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:bg-[#0455A4]">
+                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 text-white shadow-2xl backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:bg-[#0455A4]">
                                         <svg className="h-8 w-8 fill-current" viewBox="0 0 24 24">
                                             <path d="M7 6v12l10-6z" />
                                         </svg>
@@ -32,7 +32,7 @@ const VideoSection: React.FC<Props> = ({ news }) => {
                                 </div>
                                 <div className="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/60 to-transparent p-8">
                                     <span className="mb-3 inline-block rounded bg-[#0455A4] px-2 py-0.5 text-[11px] font-bold text-white uppercase">{mainVideo.category?.name || 'Video'}</span>
-                                    <h3 className="text-xl font-bold sm:text-2xl md:text-3xl leading-tight text-white group-hover:text-gray-200 transition-colors">{mainVideo.title}</h3>
+                                    <h3 className="text-xl leading-tight font-bold text-white transition-colors group-hover:text-gray-200 sm:text-2xl md:text-3xl">{mainVideo.title}</h3>
                                 </div>
                             </>
                         ) : (
@@ -53,7 +53,7 @@ const VideoSection: React.FC<Props> = ({ news }) => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <h4 className="line-clamp-2 text-[15px] font-bold text-gray-200 group-hover:text-[#0455A4] transition-colors leading-snug">{item.title}</h4>
+                                    <h4 className="line-clamp-2 text-[15px] leading-snug font-bold text-gray-200 transition-colors group-hover:text-[#0455A4]">{item.title}</h4>
                                     <span className="text-[10px] font-medium text-gray-500 uppercase">{item.category?.name}</span>
                                 </div>
                             </div>

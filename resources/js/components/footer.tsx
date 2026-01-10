@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Mail, MapPin, Twitter, Youtube } from 'lucide-react';
 import React from 'react';
 
 interface Category {
@@ -54,26 +54,20 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                 <div className="flex flex-col items-center justify-between border-b border-gray-100 pb-12 lg:flex-row dark:border-gray-800">
                     <div className="mb-8 lg:mb-0">
                         <Link href="/" className="flex flex-col items-center leading-none lg:items-start">
-                            <span className="text-4xl font-black uppercase tracking-tighter text-[#0455A4]">
+                            <span className="text-4xl font-black tracking-tighter text-[#0455A4] uppercase">
                                 {firstPart}
                                 <span className="text-gray-900 dark:text-gray-100">{restParts ? ` ${restParts}` : ''}</span>
                             </span>
-                            <span className="mt-1 text-[11px] font-bold uppercase tracking-[0.3em] text-gray-500">{siteSettings?.tagline || 'Informasi Terpercaya'}</span>
+                            <span className="mt-1 text-[11px] font-bold tracking-[0.3em] text-gray-500 uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</span>
                         </Link>
                     </div>
 
                     <div className="flex flex-col items-center gap-6 lg:items-end">
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Ikuti Kami Di Media Sosial</span>
+                        <span className="text-xs font-bold tracking-widest text-gray-400 uppercase">Ikuti Kami Di Media Sosial</span>
                         {socials.length > 0 && (
                             <div className="flex gap-4">
                                 {socials.map((social) => (
-                                    <a
-                                        key={social.key}
-                                        href={social.url!}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-gray-100 bg-white transition-all hover:border-[#0455A4] hover:bg-[#0455A4] dark:border-gray-800 dark:bg-gray-900"
-                                    >
+                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-gray-100 bg-white transition-all hover:border-[#0455A4] hover:bg-[#0455A4] dark:border-gray-800 dark:bg-gray-900">
                                         <social.icon className="h-4 w-4 text-gray-400 group-hover:text-white" />
                                     </a>
                                 ))}
@@ -86,10 +80,8 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                 <div className="grid grid-cols-2 gap-12 py-16 md:grid-cols-4 lg:grid-cols-5">
                     {/* About Us Column */}
                     <div className="col-span-2 lg:col-span-2">
-                        <h4 className="mb-6 text-[13px] font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">Tentang Kami</h4>
-                        <p className="max-w-md text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                            {siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri secara profesional dan independen.`}
-                        </p>
+                        <h4 className="mb-6 text-[13px] font-bold tracking-wider text-gray-900 uppercase dark:text-gray-100">Tentang Kami</h4>
+                        <p className="max-w-md text-sm leading-relaxed text-gray-500 dark:text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri secara profesional dan independen.`}</p>
 
                         <div className="mt-8 space-y-4">
                             {siteSettings?.address && (
@@ -109,7 +101,7 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                     {/* Quick Navigation */}
                     <div className="col-span-1">
-                        <h4 className="mb-6 text-[13px] font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">Kanal Berita</h4>
+                        <h4 className="mb-6 text-[13px] font-bold tracking-wider text-gray-900 uppercase dark:text-gray-100">Kanal Berita</h4>
                         {categories.length > 0 ? (
                             <ul className="space-y-3">
                                 {categories.slice(0, 7).map((cat) => (
@@ -121,7 +113,7 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-xs italic text-gray-400">Belum tersedia.</p>
+                            <p className="text-xs text-gray-400 italic">Belum tersedia.</p>
                         )}
                     </div>
 
@@ -141,7 +133,7 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                     {/* Company Legal */}
                     <div className="col-span-1 lg:col-span-1">
-                        <h4 className="mb-6 text-[13px] font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">Informasi</h4>
+                        <h4 className="mb-6 text-[13px] font-bold tracking-wider text-gray-900 uppercase dark:text-gray-100">Informasi</h4>
                         <ul className="space-y-3 text-sm text-gray-500">
                             <li>
                                 <Link href="/" className="hover:text-[#0455A4]">
@@ -177,14 +169,14 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
             <div className="bg-gray-50 py-8 dark:bg-gray-900/50">
                 <div className="container mx-auto max-w-7xl px-4">
                     <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                        <p className="text-xs font-bold tracking-widest text-gray-400 uppercase">
                             © {new Date().getFullYear()} <span className="text-[#0455A4]">{siteSettings?.site_name || 'Lensa Publik'}</span>. All Rights Reserved.
                         </p>
                         <div className="flex items-center gap-6">
-                            <Link href="/login" className="text-[10px] font-bold uppercase tracking-wide text-gray-400 hover:text-[#0455A4]">
+                            <Link href="/login" className="text-[10px] font-bold tracking-wide text-gray-400 uppercase hover:text-[#0455A4]">
                                 Admin Login
                             </Link>
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Terpercaya Sejak 2025</span>
+                            <span className="text-[10px] font-bold tracking-wide text-gray-400 uppercase">Terpercaya Sejak 2025</span>
                         </div>
                     </div>
                 </div>

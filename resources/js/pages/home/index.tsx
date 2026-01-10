@@ -5,8 +5,8 @@ import Sidebar from '../../components/sidebar';
 import CategorySection from './partials/category-section';
 import HeroSection from './partials/hero-section';
 import StoryCategories from './partials/story-categories';
-import VideoSection from './partials/video-section';
 import { Category, NewsItem } from './partials/types';
+import VideoSection from './partials/video-section';
 
 export interface SiteSettings {
     site_name: string;
@@ -44,7 +44,7 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
 
             <main className="container mx-auto max-w-7xl px-4 py-6">
                 {/* 1. TOP STORY BUBBLES */}
-                <StoryCategories categories={categories.map(c => c.name)} />
+                <StoryCategories categories={categories.map((c) => c.name)} />
 
                 {/* 2. HERO SECTION (HEADLINES) */}
                 {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
@@ -52,8 +52,10 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                 {/* 3. BREAKING/TRENDING SECTION (Grid Horizontal) */}
                 <section className="mb-16 border-y border-gray-100 py-10 dark:border-gray-800">
                     <div className="mb-8 flex items-center justify-between">
-                        <h3 className="text-xl font-bold text-[#0455A4] uppercase tracking-tight">Tren Saat Ini</h3>
-                        <Link href="/" className="text-sm font-bold text-gray-400 hover:text-[#0455A4]">Eksplorasi Semua</Link>
+                        <h3 className="text-xl font-bold tracking-tight text-[#0455A4] uppercase">Tren Saat Ini</h3>
+                        <Link href="/" className="text-sm font-bold text-gray-400 hover:text-[#0455A4]">
+                            Eksplorasi Semua
+                        </Link>
                     </div>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                         {trendingNews.slice(0, 4).map((item) => (
@@ -61,7 +63,7 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                                 <div className="aspect-video w-full overflow-hidden rounded-lg">
                                     <img src={item.thumbnail_url || ''} className="h-full w-full object-cover transition-transform group-hover:scale-105" alt={item.title} />
                                 </div>
-                                <h4 className="line-clamp-2 text-sm font-bold text-gray-900 leading-tight transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h4>
+                                <h4 className="line-clamp-2 text-sm leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h4>
                             </Link>
                         ))}
                     </div>
@@ -75,7 +77,9 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                             <section key={category.id} className="scroll-mt-20">
                                 <div className="mb-8 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                                     <h2 className="text-2xl font-bold text-[#0455A4] uppercase">{category.name}</h2>
-                                    <Link href={`/${category.slug}`} className="text-xs font-bold text-[#0455A4] hover:underline">LIHAT SEMUA</Link>
+                                    <Link href={`/${category.slug}`} className="text-xs font-bold text-[#0455A4] hover:underline">
+                                        LIHAT SEMUA
+                                    </Link>
                                 </div>
                                 <CategorySection category={category} />
                             </section>
@@ -92,7 +96,9 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                             <section key={category.id} className="scroll-mt-20">
                                 <div className="mb-8 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                                     <h2 className="text-2xl font-bold text-[#0455A4] uppercase">{category.name}</h2>
-                                    <Link href={`/${category.slug}`} className="text-xs font-bold text-[#0455A4] hover:underline">LIHAT SEMUA</Link>
+                                    <Link href={`/${category.slug}`} className="text-xs font-bold text-[#0455A4] hover:underline">
+                                        LIHAT SEMUA
+                                    </Link>
                                 </div>
                                 <CategorySection category={category} />
                             </section>

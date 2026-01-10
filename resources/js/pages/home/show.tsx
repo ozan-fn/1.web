@@ -115,11 +115,11 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                 )}
                             </div>
 
-                            <h1 className="mb-6 text-3xl font-black text-gray-900 leading-[1.2] sm:text-4xl md:text-5xl lg:text-[42px] dark:text-gray-100 tracking-tight">{post.title}</h1>
+                            <h1 className="mb-6 text-3xl leading-[1.2] font-black tracking-tight text-gray-900 sm:text-4xl md:text-5xl lg:text-[42px] dark:text-gray-100">{post.title}</h1>
 
                             <div className="mb-8">
                                 <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="font-bold text-[#0455A4] uppercase tracking-wide">{post.user?.name}</span>
+                                    <span className="font-bold tracking-wide text-[#0455A4] uppercase">{post.user?.name}</span>
                                     <span className="h-4 w-px bg-gray-200 dark:bg-gray-800"></span>
                                     <span className="font-medium">
                                         {formattedDate} | {new Date(post.published_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
@@ -128,7 +128,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
 
                                 <div className="mt-8 flex items-center justify-between border-y border-gray-100 py-4 dark:border-gray-800">
                                     <div className="flex items-center gap-4">
-                                        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Bagikan:</span>
+                                        <span className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">Bagikan:</span>
                                         <div className="flex gap-2">
                                             <button onClick={() => handleShare('facebook')} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1877F2] text-white transition-opacity hover:opacity-90">
                                                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -159,23 +159,24 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
 
                             {post.thumbnail_url && (
                                 <figure className="mb-10 lg:relative lg:-mx-8">
-                                    <div className="overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                                    <div className="overflow-hidden rounded-xl border border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
                                         <img src={post.thumbnail_url} alt={post.title} className="h-auto w-full object-cover" />
                                     </div>
-                                    <figcaption className="mt-4 px-8 text-[13px] text-gray-500 italic border-l-2 border-[#0455A4]">
-                                        {post.title}. (Foto: Istimewa)
-                                    </figcaption>
+                                    <figcaption className="mt-4 border-l-2 border-[#0455A4] px-8 text-[13px] text-gray-500 italic">{post.title}. (Foto: Istimewa)</figcaption>
                                 </figure>
                             )}
 
-                            <div className="prose prose-blue max-w-none text-[18px] leading-[1.85] text-gray-800 dark:text-gray-300 transition-colors prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:mb-6 prose-strong:text-gray-900 dark:prose-strong:text-white prose-a:text-[#0455A4] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            <div
+                                className="prose max-w-none text-[18px] leading-[1.85] text-gray-800 transition-colors prose-blue dark:text-gray-300 prose-headings:font-black prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:mb-6 prose-a:text-[#0455A4] prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white prose-img:rounded-xl"
+                                dangerouslySetInnerHTML={{ __html: post.content }}
+                            />
 
                             {post.tags.length > 0 && (
                                 <div className="mt-12 border-t border-gray-100 pt-8 dark:border-gray-800">
-                                    <h4 className="mb-4 text-sm font-bold text-gray-900 dark:text-gray-100 uppercase">Tags:</h4>
+                                    <h4 className="mb-4 text-sm font-bold text-gray-900 uppercase dark:text-gray-100">Tags:</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {post.tags.map((tag) => (
-                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded px-3 py-1.5 text-sm font-medium bg-gray-100 text-gray-800 transition-colors hover:bg-[#0455A4] hover:text-white dark:bg-gray-800 dark:text-gray-200">
+                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-800 transition-colors hover:bg-[#0455A4] hover:text-white dark:bg-gray-800 dark:text-gray-200">
                                                 {tag.name}
                                             </Link>
                                         ))}
@@ -187,9 +188,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                         {/* Related News */}
                         <section className="mt-16 border-t border-gray-100 pt-10 dark:border-gray-800">
                             <div className="mb-8 flex items-center justify-between">
-                                <h3 className="text-xl font-bold text-[#0455A4] uppercase">
-                                    Berita Terkait
-                                </h3>
+                                <h3 className="text-xl font-bold text-[#0455A4] uppercase">Berita Terkait</h3>
                                 <div className="ml-6 h-px flex-1 bg-gray-100 dark:bg-gray-800"></div>
                             </div>
                             <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
@@ -197,7 +196,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                     <Link key={related.id} href={related.sub_category ? `/${related.category.slug}/${related.sub_category.slug}/${related.slug}` : `/${related.category.slug}/${related.slug}`} className="group">
                                         <div className="flex flex-col gap-4">
                                             {related.thumbnail_url && (
-                                                <div className="aspect-[16/9] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                                                <div className="aspect-[16/9] overflow-hidden rounded-lg border border-gray-100 bg-gray-100 dark:border-gray-800 dark:bg-gray-900">
                                                     <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                                 </div>
                                             )}

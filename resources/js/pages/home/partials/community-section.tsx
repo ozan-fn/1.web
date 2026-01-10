@@ -12,11 +12,11 @@ const CommunitySection: React.FC<Props> = ({ news }) => (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
             {news.map((item) => (
                 <div key={item.id} className="group cursor-pointer transition-colors">
-                    <div className="relative mb-4 aspect-video overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-800">
+                    <div className="relative mb-4 aspect-video overflow-hidden rounded-lg border border-gray-100 bg-gray-100 dark:border-gray-800 dark:bg-gray-800">
                         <img src={item.thumbnail_url || ''} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt={item.title} />
                         <span className="absolute top-3 left-3 bg-[#0455A4] px-2 py-0.5 text-[10px] font-bold text-white uppercase">{item.category.name}</span>
                     </div>
-                    <h3 className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-[#0455A4] dark:text-gray-100 leading-tight">{item.title}</h3>
+                    <h3 className="line-clamp-2 text-lg leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h3>
                     <div className="mt-2 flex items-center gap-2 text-[11px] text-gray-500 uppercase">
                         <span>Redaksi</span>
                         <span className="h-1 w-1 rounded-full bg-gray-300"></span>

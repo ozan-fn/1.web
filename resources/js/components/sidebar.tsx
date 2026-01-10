@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         <Link key={item.id} href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex cursor-pointer items-start gap-4 border-b border-border py-4 transition last:border-0 hover:bg-muted/30">
                             <div className="text-2xl font-bold text-gray-300 transition-colors group-hover:text-[#0455A4]">{i + 1}</div>
                             <div className="flex flex-col gap-1">
-                                <h4 className="text-sm font-bold text-gray-900 leading-snug transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h4>
+                                <h4 className="text-sm leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h4>
                             </div>
                         </Link>
                     ))}
@@ -40,12 +40,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {latestNews?.map((item) => (
                         <Link key={item.id} href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex flex-col gap-1 border-b border-border pb-4 last:border-0">
                             <span className="text-[10px] font-bold text-[#0455A4] uppercase">{item.category?.name}</span>
-                            <h4 className="line-clamp-2 text-sm font-bold text-gray-900 transition-colors group-hover:text-[#0455A4] dark:text-gray-100 leading-snug">{item.title}</h4>
-                            <span className="text-[10px] text-gray-500 uppercase">{new Date(item.published_at).toLocaleDateString('id-ID', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric',
-                            })}</span>
+                            <h4 className="line-clamp-2 text-sm leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#0455A4] dark:text-gray-100">{item.title}</h4>
+                            <span className="text-[10px] text-gray-500 uppercase">
+                                {new Date(item.published_at).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                })}
+                            </span>
                         </Link>
                     ))}
                 </div>
