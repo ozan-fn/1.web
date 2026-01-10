@@ -1,4 +1,6 @@
+import { Link } from '@inertiajs/react';
 import React from 'react';
+import ListCard from './list-card';
 import SectionHeader from './section-header';
 import { NewsItem } from './types';
 
@@ -7,31 +9,20 @@ interface Props {
 }
 
 const CommunitySection: React.FC<Props> = ({ news }) => (
-    <div>
+    <div className="my-16">
         <SectionHeader title="Pengabdian Masyarakat" />
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {news.map((item) => (
-                <div key={item.id} className="group cursor-pointer border-r border-gray-100 pr-6 transition-colors last:border-0 last:pr-0 hover:bg-gray-50/50">
-                    <div className="relative mb-4 aspect-video overflow-hidden rounded-sm bg-gray-100">
-                        <img src={item.thumbnail_url || ''} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt={item.title} />
-                        <span className="absolute top-3 left-3 bg-primary px-2 py-1 text-[10px] font-black tracking-widest text-primary-foreground uppercase sm:text-[11px]">{item.category.name}</span>
-                    </div>
-                    <h3 className="line-clamp-2 text-lg leading-tight font-black text-gray-900 transition-colors group-hover:text-primary">{item.title}</h3>
-                    <div className="mt-3 flex items-center gap-2 text-[11px] font-medium tracking-tight text-gray-400 uppercase">
-                        <span>News Portal</span>
-                        <span className="h-1 w-1 rounded-full bg-gray-200"></span>
-                        <span>{item.timestamp}</span>
-                    </div>
-                </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {news.slice(0, 6).map((item) => (
+                <ListCard key={item.id} item={item} />
             ))}
         </div>
 
-        {/* Pagination */}
-        <div className="mt-12 flex items-center justify-center gap-2">
-            <button className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary text-[13px] font-black text-primary-foreground transition-colors hover:bg-primary/90">1</button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-sm border border-gray-200 bg-white text-[13px] font-black text-gray-800 transition-colors hover:border-primary hover:text-primary">2</button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-sm border border-gray-200 bg-white text-[13px] font-black text-gray-800 transition-colors hover:border-primary hover:text-primary">3</button>
-            <span className="text-gray-400">...</span>
+        {/* Action Button */}
+        <div className="mt-12 flex items-center justify-center">
+            <Link href="/kategori/pengabdian-masyarakat" className="group relative flex h-14 w-full max-w-xs items-center justify-center overflow-hidden border-2 border-primary bg-transparent text-sm font-black tracking-widest uppercase transition-all hover:text-white md:w-64">
+                <div className="absolute inset-0 z-0 h-full w-0 bg-primary transition-all duration-300 group-hover:w-full"></div>
+                <span className="relative z-10">Lihat Arsip Lengkap</span>
+            </Link>
         </div>
     </div>
 );

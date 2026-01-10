@@ -1,7 +1,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppearance } from '@/hooks/use-appearance'; // Pastikan path sesuai
 import { Link, router, usePage } from '@inertiajs/react';
-import { ChevronRight, Menu, Monitor, Moon, Search, Sun } from 'lucide-react';
+import { ChevronRight, Menu, Moon, Search, Sun } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface Category {
@@ -48,93 +48,90 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     const restParts = siteNameParts.slice(1).join(' ');
 
     return (
-        <header className="sticky top-0 z-50 border-b border-border bg-background transition-colors">
-            {/* Top Bar */}
-            <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-                <div className="flex items-center gap-4">
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <button className="rounded-lg p-2 text-muted-foreground hover:bg-muted lg:hidden">
-                                <Menu className="h-6 w-6" />
-                            </button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="w-[300px] bg-background p-0">
-                            <SheetHeader className="border-b border-border p-6">
-                                <SheetTitle className="text-left">
-                                    <Link href="/" className="flex items-center gap-3">
-                                        <div className="flex flex-col leading-none">
-                                            <span className="text-xl font-black tracking-tighter text-primary uppercase italic">
-                                                {firstPart}
-                                                <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
-                                            </span>
-                                        </div>
-                                    </Link>
-                                </SheetTitle>
-                            </SheetHeader>
-                            <div className="flex flex-col py-4">
-                                <Link href="/" className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === '/' ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
-                                    Home
-                                    <ChevronRight className="h-4 w-4" />
-                                </Link>
-                                {categories.map((cat) => (
-                                    <Link key={cat.id} href={`/${cat.slug}`} className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === `/${cat.slug}` ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
-                                        {cat.name}
-                                        <ChevronRight className="h-4 w-4" />
-                                    </Link>
-                                ))}
-                            </div>
-                        </SheetContent>
-                    </Sheet>
-
-                    <Link href="/" className="flex items-center gap-3">
-                        {siteSettings?.logo && <img src={`/storage/${siteSettings.logo}`} alt={siteSettings.site_name} className="h-10 w-auto object-contain" />}
-                        <div className="flex flex-col leading-none">
-                            <span className="text-2xl font-black tracking-tighter text-primary uppercase italic">
-                                {firstPart}
-                                <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
-                            </span>
-                            <span className="text-[9px] font-bold tracking-[0.2em] text-muted-foreground uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</span>
-                        </div>
-                    </Link>
-                </div>
-
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-border bg-background px-2 py-2 transition-colors focus-within:border-primary md:flex">
-                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita..." className="w-full bg-transparent text-sm font-medium text-foreground placeholder-muted-foreground outline-none" />
-                    <button type="submit" className="px-2 text-muted-foreground transition-colors hover:text-primary">
-                        <Search className="h-4 w-4" />
-                    </button>
-                </form>
-
-                <div className="flex items-center gap-2">
-                    {/* Theme Toggle Button */}
-                    <button onClick={toggleTheme} className="flex items-center gap-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary" title={`Mode: ${appearance}`}>
-                        {appearance === 'light' && <Sun className="h-5 w-5" />}
-                        {appearance === 'dark' && <Moon className="h-5 w-5" />}
-                        {appearance === 'system' && <Monitor className="h-5 w-5" />}
-
-                        {/* Indikator teks opsional (bisa dihapus jika ingin icon saja) */}
-                        <span className="hidden text-[10px] font-bold uppercase lg:block">{appearance}</span>
-                    </button>
-
-                    <button className="rounded-full p-2 text-muted-foreground hover:bg-muted md:hidden">
-                        <Search className="h-5 w-5" />
-                    </button>
+        <header className="z-50 bg-background transition-colors">
+            {/* Top Minimal Info Bar */}
+            <div className="border-b border-border bg-foreground text-background">
+                <div className="container mx-auto flex h-8 max-w-7xl items-center justify-between px-4 text-[9px] font-black tracking-[0.3em] uppercase">
+                    <div className="flex gap-6">
+                        <span>{new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        <span className="hidden sm:inline">Edisi Digital #001</span>
+                    </div>
+                    <div className="flex gap-4">
+                        <Link href="/about" className="transition-colors hover:text-primary">
+                            Redaksi
+                        </Link>
+                        <Link href="/contact" className="transition-colors hover:text-primary">
+                            Kontak
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden border-t border-border bg-background lg:block">
-                <div className="no-scrollbar container mx-auto max-w-7xl overflow-x-auto px-4">
-                    <div className="flex gap-8 py-3 text-[13px] font-black tracking-tight whitespace-nowrap uppercase">
-                        <Link href="/" className={`border-b-2 py-1 transition-colors ${url === '/' ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
-                            Home
+            {/* Main Brand Section - Massive Typography */}
+            <div className="border-b-4 border-foreground py-8">
+                <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-4 md:flex-row">
+                    <div className="flex items-center gap-6">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <button className="group relative flex h-14 w-14 items-center justify-center border-2 border-foreground bg-background transition-all hover:bg-foreground hover:text-background">
+                                    <Menu className="h-6 w-6" />
+                                    <div className="absolute -right-1 -bottom-1 h-3 w-3 bg-primary"></div>
+                                </button>
+                            </SheetTrigger>
+                            <SheetContent side="left" className="w-full border-r-8 border-foreground bg-background p-0 sm:w-[400px]">
+                                <SheetHeader className="border-b-4 border-foreground p-10">
+                                    <SheetTitle className="text-left text-4xl font-black tracking-tighter uppercase italic">Exploration</SheetTitle>
+                                </SheetHeader>
+                                <div className="flex flex-col space-y-2 p-6">
+                                    <Link href="/" className={`group flex items-center justify-between p-4 text-2xl font-black uppercase italic transition-all hover:translate-x-4 ${url === '/' ? 'text-primary' : ''}`}>
+                                        Dashboard
+                                        <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100" />
+                                    </Link>
+                                    {categories.map((cat: any) => (
+                                        <Link key={cat.id} href={`/${cat.slug}`} className="group flex items-center justify-between p-4 text-2xl font-black uppercase italic transition-all hover:translate-x-4">
+                                            {cat.name}
+                                            <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100" />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+
+                        <Link href="/" className="group flex flex-col items-start leading-none">
+                            <span className="text-5xl font-black tracking-[-0.08em] text-foreground uppercase italic md:text-7xl lg:text-8xl">
+                                {firstPart}
+                                <span className="text-primary">{restParts ? `${restParts}` : ''}</span>
+                            </span>
                         </Link>
-                        {categories.map((cat) => {
+                    </div>
+
+                    <div className="flex w-full items-center gap-4 md:w-auto">
+                        <form onSubmit={handleSearch} className="relative flex-1 md:w-64">
+                            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="CARI INFORMASI..." className="w-full border-b-2 border-foreground bg-transparent py-2 text-xs font-black placeholder-foreground/30 outline-none" />
+                            <button type="submit" className="absolute top-1/2 right-0 -translate-y-1/2">
+                                <Search className="h-4 w-4" />
+                            </button>
+                        </form>
+
+                        <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center border-2 border-foreground transition-all hover:bg-foreground hover:text-background">
+                            {appearance === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Sticky Navigation - Minimalist Sidebar-like items */}
+            <nav className="sticky top-0 z-40 border-b-2 border-foreground bg-background/80 backdrop-blur-md">
+                <div className="container mx-auto max-w-7xl px-4">
+                    <div className="no-scrollbar flex items-center justify-center gap-10 overflow-x-auto py-4">
+                        <Link href="/" className={`text-[11px] font-black tracking-[0.2em] uppercase transition-all hover:text-primary ${url === '/' ? 'text-primary' : ''}`}>
+                            Beranda
+                        </Link>
+                        {categories.map((cat: any) => {
                             const href = `/${cat.slug}`;
                             const isActive = url === href || url.startsWith(`${href}/`);
                             return (
-                                <Link key={cat.id} href={href} className={`border-b-2 py-1 transition-colors ${isActive ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
+                                <Link key={cat.id} href={href} className={`text-[11px] font-black tracking-[0.2em] uppercase transition-all hover:text-primary ${isActive ? 'text-primary' : ''}`}>
                                     {cat.name}
                                 </Link>
                             );

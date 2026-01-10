@@ -1,5 +1,5 @@
+import { Link } from '@inertiajs/react';
 import React from 'react';
-import ListCard from './list-card';
 import OverlayCard from './overlay-card';
 import SectionHeader from './section-header';
 import { NewsItem } from './types';
@@ -12,18 +12,23 @@ const InnovationSection: React.FC<Props> = ({ news }) => {
     if (news.length === 0) return null;
 
     const featured = news[0];
-    const others = news.slice(1, 4);
+    const others = news.slice(1, 5);
 
     return (
-        <div>
+        <div className="my-20">
             <SectionHeader title="Prestasi & Inovasi" />
-            <div className="flex flex-col gap-6 md:flex-row">
-                <div className="h-80 md:h-auto md:w-2/3">
+            <div className="flex flex-col gap-10 lg:flex-row">
+                <div className="h-[400px] lg:h-auto lg:w-3/5">
                     <OverlayCard item={featured} height="h-full" />
                 </div>
-                <div className="flex flex-col gap-2 md:w-1/3">
+                <div className="grid grid-cols-1 gap-6 lg:w-2/5">
                     {others.map((item) => (
-                        <ListCard key={item.id} item={item} />
+                        <div key={item.id} className="border-l-4 border-primary bg-card p-4 transition-all hover:translate-x-2">
+                            <Link href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group">
+                                <span className="mb-2 block text-[10px] font-black tracking-[0.2em] text-primary uppercase">{item.category.name}</span>
+                                <h4 className="line-clamp-2 text-lg leading-tight font-black transition-colors group-hover:text-primary">{item.title}</h4>
+                            </Link>
+                        </div>
                     ))}
                 </div>
             </div>

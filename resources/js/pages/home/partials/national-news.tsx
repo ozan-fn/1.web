@@ -8,9 +8,9 @@ interface Props {
 }
 
 const NationalNews: React.FC<Props> = ({ news }) => (
-    <div>
-        <SectionHeader title="Kabar Kampus & Nasional" />
-        <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
+    <div className="my-16">
+        <SectionHeader title="Warta Nasional" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {news.map((item) => (
                 <ListCard key={item.id} item={item} />
             ))}

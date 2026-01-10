@@ -2,7 +2,9 @@ import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import Sidebar from '@/components/sidebar';
 import { Head, Link } from '@inertiajs/react';
-import { Eye, Share2 } from 'lucide-react';
+import { Eye, Facebook, Share2, Twitter } from 'lucide-react';
+import ListCard from './partials/list-card';
+import SectionHeader from './partials/section-header';
 
 interface Tag {
     id: number;
@@ -81,129 +83,95 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
 
             <Navbar />
 
-            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
                     {/* Main Content */}
                     <div className="lg:col-span-8">
-                        {/* Breadcrumbs */}
-                        <nav className="mb-4 flex items-center text-sm text-muted-foreground">
-                            <Link href="/" className="transition-colors hover:text-primary">
-                                Beranda
-                            </Link>
-                            <span className="mx-2 opacity-50">/</span>
-                            <Link href={`/${post.category?.slug}`} className="transition-colors hover:text-primary">
-                                {post.category?.name}
-                            </Link>
-                            {subCategory && (
-                                <>
-                                    <span className="mx-2 opacity-50">/</span>
-                                    <div className="transition-colors hover:text-primary">{subCategory.name}</div>
-                                </>
-                            )}
-                        </nav>
-
                         <article>
-                            <div className="mb-2 flex items-center gap-2">
-                                <Link href={`/${post.category?.slug}`} className="text-sm font-bold tracking-widest text-primary uppercase transition-colors hover:text-primary/90">
+                            <div className="mb-6 flex flex-wrap items-center gap-3">
+                                <Link href={`/${post.category?.slug}`} className="bg-primary px-4 py-1.5 text-[10px] font-black tracking-[0.2em] text-primary-foreground uppercase shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                                     {post.category?.name}
                                 </Link>
-                                {subCategory && (
-                                    <>
-                                        <span className="text-border">|</span>
-                                        <div className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">{subCategory.name}</div>
-                                    </>
-                                )}
+                                {subCategory && <span className="border border-border px-3 py-1.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">{subCategory.name}</span>}
                             </div>
 
-                            <h1 className="mb-4 text-3xl leading-[1.15] font-black text-foreground sm:text-4xl md:text-5xl lg:text-[42px]">{post.title}</h1>
+                            <h1 className="mb-8 text-4xl leading-[1.1] font-black tracking-[-0.03em] text-foreground md:text-5xl lg:text-7xl">{post.title}</h1>
 
-                            <div className="mb-6">
-                                <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                                    <span className="font-bold text-foreground underline decoration-primary decoration-2 underline-offset-4">{post.user?.name}</span>
-                                    <span className="text-border">|</span>
-                                    <span className="font-medium tracking-tight uppercase">
-                                        {formattedDate} | {new Date(post.published_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
-                                    </span>
+                            <div className="flex flex-col gap-6 border-y border-border py-8 md:flex-row md:items-center md:justify-between">
+                                <div className="flex items-center gap-6">
+                                    <div className="h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/20">
+                                        <div className="flex h-full w-full items-center justify-center bg-muted text-xl font-black text-muted-foreground uppercase italic">{post.user.name.substring(0, 1)}</div>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Penulis</span>
+                                        <span className="text-lg font-black italic">{post.user.name}</span>
+                                    </div>
                                 </div>
+                                <div className="flex flex-col md:text-right">
+                                    <span className="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Dirilis Pada</span>
+                                    <span className="text-lg font-black italic">{formattedDate}</span>
+                                </div>
+                            </div>
 
-                                <div className="mt-6 flex items-center gap-4 border-y border-border py-4">
-                                    <span className="text-[11px] font-black tracking-widest text-muted-foreground uppercase">BAGIKAN:</span>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => handleShare('facebook')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#1877F2] text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                            </svg>
+                            {/* Featured Image Case */}
+                            <div className="group relative my-12 overflow-hidden bg-muted">
+                                {post.thumbnail_url ? <img src={post.thumbnail_url} alt={post.title} className="w-full object-cover shadow-2xl contrast-110 transition-all duration-700 group-hover:scale-105" /> : <div className="flex aspect-video w-full items-center justify-center text-4xl font-black text-muted-foreground uppercase">No Image</div>}
+                                {/* Decorative Frame */}
+                                <div className="pointer-events-none absolute inset-4 border border-white/20 transition-all group-hover:inset-6"></div>
+                            </div>
+
+                            {/* Content Area */}
+                            <div className="prose prose-lg max-w-none md:prose-xl dark:prose-invert prose-headings:font-black prose-headings:tracking-tighter prose-p:leading-relaxed prose-img:shadow-2xl">
+                                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                            </div>
+
+                            {/* Share & Stats */}
+                            <div className="mt-16 flex flex-col gap-8 border-t border-border pt-12 md:flex-row md:items-center md:justify-between">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] font-black tracking-[0.3em] text-muted-foreground uppercase">Bagikan</span>
+                                    <div className="flex gap-3">
+                                        <button onClick={() => handleShare('facebook')} className="flex h-10 w-10 items-center justify-center border border-border transition-all hover:rotate-12 hover:bg-primary hover:text-primary-foreground">
+                                            <Facebook className="h-4 w-4" />
                                         </button>
-                                        <button onClick={() => handleShare('twitter')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-black text-white transition-opacity hover:opacity-90">
-                                            <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
-                                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                            </svg>
+                                        <button onClick={() => handleShare('twitter')} className="flex h-10 w-10 items-center justify-center border border-border transition-all hover:rotate-12 hover:bg-primary hover:text-primary-foreground">
+                                            <Twitter className="h-4 w-4" />
                                         </button>
-                                        <button onClick={() => handleShare('whatsapp')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#25D366] text-white transition-opacity hover:opacity-90">
+                                        <button onClick={() => handleShare('whatsapp')} className="flex h-10 w-10 items-center justify-center border border-border transition-all hover:rotate-12 hover:bg-primary hover:text-primary-foreground">
                                             <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
                                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.27 9.27 0 01-4.487-1.159l-.323-.192-3.33.873.888-3.245-.211-.336a9.28 9.28 0 01-1.424-4.916c0-5.11 4.156-9.265 9.268-9.265a9.245 9.245 0 016.551 2.716 9.22 9.22 0 012.718 6.556c0 5.11-4.156 9.265-9.268 9.265M12 2.182a10.3 10.3 0 00-10.324 10.311 10.27 10.27 0 001.603 5.53L2 22l4.285-1.124a10.25 10.25 0 005.711 1.698l.004-.001c5.696 0 10.327-4.631 10.327-10.323 0-2.744-1.069-5.323-3.012-7.266A10.23 10.23 0 0012 2.182z" />
                                             </svg>
                                         </button>
-                                        <button onClick={() => handleShare('copy')} className="flex h-8 w-8 items-center justify-center rounded-sm bg-secondary text-secondary-foreground transition-colors hover:bg-muted">
+                                        <button onClick={() => handleShare('copy')} className="flex h-10 w-10 items-center justify-center border border-border transition-all hover:rotate-12 hover:bg-primary hover:text-primary-foreground">
                                             <Share2 className="h-4 w-4" />
                                         </button>
                                     </div>
-                                    <div className="ml-auto flex items-center gap-1.5 text-[12px] font-bold text-muted-foreground">
+                                </div>
+                                <div className="flex items-center gap-6 text-muted-foreground">
+                                    <div className="flex items-center gap-2">
                                         <Eye className="h-4 w-4" />
-                                        <span>{post.views}</span>
+                                        <span className="text-sm font-black italic">{post.views.toLocaleString()}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            {post.thumbnail_url && (
-                                <figure className="mb-8">
-                                    <div className="overflow-hidden rounded-lg border border-border shadow-sm">
-                                        <img src={post.thumbnail_url} alt={post.title} className="h-auto w-full object-cover" />
-                                    </div>
-                                    <figcaption className="mt-3 text-[13px] text-muted-foreground italic">Ilustrasi {post.title}. (Foto: Istimewa)</figcaption>
-                                </figure>
-                            )}
-
-                            <div className="prose max-w-none text-[17px] leading-[1.8] text-foreground/90 prose-red dark:prose-invert prose-headings:font-black prose-p:mb-6 prose-a:text-primary prose-strong:text-foreground prose-img:rounded-xl" dangerouslySetInnerHTML={{ __html: post.content }} />
-
+                            {/* Tags Section */}
                             {post.tags.length > 0 && (
-                                <div className="mt-12 border-t border-border pt-8">
-                                    <h4 className="mb-4 text-sm font-bold tracking-wider text-foreground uppercase">TAGS:</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {post.tags.map((tag) => (
-                                            <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="rounded-sm bg-secondary px-3 py-1.5 text-[13px] font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground">
-                                                {tag.name}
-                                            </Link>
-                                        ))}
-                                    </div>
+                                <div className="mt-12 flex flex-wrap gap-2">
+                                    {post.tags.map((tag) => (
+                                        <Link key={tag.id} href={`/tag/${tag.name.toLowerCase()}`} className="border border-border px-3 py-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase transition-all hover:border-primary hover:text-primary">
+                                            #{tag.name}
+                                        </Link>
+                                    ))}
                                 </div>
                             )}
                         </article>
 
-                        {/* Related News - DISINI PERBAIKAN WARNA BERITA TERHUBUNG */}
-                        <section className="mt-16 border-t border-border pt-10">
-                            <div className="mb-8 flex items-center justify-between">
-                                <h3 className="text-xl font-black tracking-tight text-foreground uppercase">
-                                    Berita <span className="text-primary">Terhubung</span>
-                                </h3>
-                                <div className="ml-6 h-px flex-1 bg-border"></div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:gap-12">
-                                {relatedPosts.map((related) => (
-                                    <Link key={related.id} href={related.sub_category ? `/${related.category.slug}/${related.sub_category.slug}/${related.slug}` : `/${related.category.slug}/${related.slug}`} className="group">
-                                        <div className="flex flex-col gap-4">
-                                            {related.thumbnail_url && (
-                                                <div className="aspect-[16/9] overflow-hidden rounded-md border border-border shadow-sm">
-                                                    <img src={related.thumbnail_url} alt={related.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                                </div>
-                                            )}
-                                            <div className="flex flex-col gap-2">
-                                                <span className="text-[11px] font-bold tracking-wider text-primary uppercase">{related.category.name}</span>
-                                                <h4 className="line-clamp-2 text-lg leading-snug font-extrabold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
-                                                <span className="text-[12px] text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                                            </div>
-                                        </div>
-                                    </Link>
+                        {/* Related News */}
+                        <section className="mt-24">
+                            <SectionHeader title="Berita Terhubung" />
+                            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                                {relatedPosts.slice(0, 4).map((related) => (
+                                    <ListCard key={related.id} item={related as any} />
                                 ))}
                             </div>
                         </section>
@@ -212,7 +180,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                     {/* Sidebar */}
                     <div className="lg:col-span-4">
                         <div className="sticky top-24 space-y-8">
-                            <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
+                            <Sidebar trendingNews={trendingNews as any} latestNews={latestNews as any} />
                         </div>
                     </div>
                 </div>

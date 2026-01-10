@@ -6,13 +6,15 @@ interface Props {
     textColor?: string;
 }
 
-const SectionHeader: React.FC<Props> = ({ title, color = 'bg-primary', textColor = 'text-gray-900 dark:text-white' }) => (
-    <div className={`mb-6 flex items-center justify-between border-b-2 border-primary pb-2`}>
-        <div className="flex items-center">
-            <h2 className={`text-xl font-black tracking-tighter uppercase ${textColor} md:text-2xl`}>{title}</h2>
+const SectionHeader: React.FC<Props> = ({ title, color = 'bg-primary' }) => (
+    <div className="relative mb-8 flex items-end justify-between overflow-hidden">
+        <div className="flex items-center gap-4">
+            <div className={`h-8 w-2 ${color}`}></div>
+            <h2 className="text-2xl font-black tracking-[-0.02em] uppercase italic md:text-3xl">{title}</h2>
         </div>
-        <a href="#" className={`text-[12px] font-bold tracking-wider text-primary uppercase transition-colors hover:text-black dark:hover:text-white`}>
-            Lihat Semua <span className="ml-1">›</span>
+        <div className="mx-6 h-[1px] flex-1 bg-border opacity-50"></div>
+        <a href="#" className="text-[10px] font-black tracking-widest whitespace-nowrap text-muted-foreground uppercase transition-all hover:text-primary">
+            Lihat Index <span className="ml-1 text-primary">→</span>
         </a>
     </div>
 );

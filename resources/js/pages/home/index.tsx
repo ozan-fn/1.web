@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { ChevronRight } from 'lucide-react';
 import Footer from '../../components/footer';
 import Navbar from '../../components/navbar';
 import Sidebar from '../../components/sidebar';
@@ -40,38 +41,51 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
 
             <Navbar categories={categories} siteSettings={siteSettings} />
 
-            <main className="container mx-auto max-w-7xl px-4 py-6">
+            <main className="container mx-auto max-w-7xl px-4 py-20">
                 {/* HERO SECTION */}
                 {heroNews && <HeroSection heroNews={heroNews} sideHeroNews={sideHeroNews} />}
 
+                {/* DECORATIVE SEPARATOR - Extreme Industrial */}
+                <div className="my-32 flex flex-col items-center justify-center text-center">
+                    <div className="mb-8 h-24 w-[2px] bg-foreground"></div>
+                    <h2 className="text-[8vw] leading-[0.8] font-black tracking-tighter uppercase italic md:text-[6vw]">
+                        EXPLORE <span className="text-primary">THE_CHANNELS</span>
+                    </h2>
+                    <div className="mt-10 flex h-1 w-64 bg-foreground/10">
+                        <div className="h-full w-1/3 bg-primary"></div>
+                    </div>
+                </div>
+
                 {/* GRID CONTENT LAYOUT */}
-                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
+                <div className="grid grid-cols-1 gap-24 lg:grid-cols-12">
                     {/* LEFT COLUMN (Daftar Kategori Berita) */}
-                    <div className="space-y-14 lg:col-span-8">
+                    <div className="space-y-40 lg:col-span-8">
                         {homepageCategories.map((category) => (
                             <section key={category.id} className="scroll-mt-20">
-                                {/* HEADER KATEGORI - Dipusatkan di sini untuk menghindari duplikasi */}
-                                <div className="mb-6 flex items-end justify-between border-b border-border pb-3">
-                                    <div className="relative">
-                                        <h2 className="text-2xl font-black tracking-tighter uppercase italic">{category.name}</h2>
-                                        <div className="absolute -bottom-[3px] left-0 h-[3px] w-12 bg-primary"></div>
+                                {/* HEADER KATEGORI - Heavy Brutalist */}
+                                <div className="group mb-16">
+                                    <div className="flex items-end justify-between border-b-8 border-foreground pb-4">
+                                        <div className="flex items-baseline gap-4">
+                                            <span className="text-6xl font-black text-primary/20 italic">#</span>
+                                            <h2 className="text-5xl font-black tracking-tighter uppercase md:text-7xl">{category.name}</h2>
+                                        </div>
+                                        <Link href={`/${category.slug}`} className="group/link flex h-14 w-14 items-center justify-center border-4 border-foreground transition-all hover:bg-foreground hover:text-background">
+                                            <ChevronRight className="h-8 w-8 transition-transform group-hover/link:translate-x-1" />
+                                        </Link>
                                     </div>
-
-                                    <Link href={`/${category.slug}`} className="group flex items-center gap-1 text-[11px] font-black tracking-widest text-muted-foreground uppercase transition-colors hover:text-primary">
-                                        Lihat Semua
-                                        <span className="text-lg leading-none transition-transform group-hover:translate-x-1">›</span>
-                                    </Link>
+                                    <div className="mt-2 text-[10px] font-black tracking-[1em] uppercase opacity-30">INDUSTRIAL_FEED_ACCESS</div>
                                 </div>
 
-                                {/* Hanya merender list berita */}
-                                <CategorySection category={category} />
+                                <div className="relative">
+                                    <CategorySection category={category} />
+                                </div>
                             </section>
                         ))}
                     </div>
 
                     {/* RIGHT COLUMN (Sidebar) */}
                     <div className="lg:col-span-4">
-                        <div className="sticky top-24">
+                        <div className="sticky top-32">
                             <Sidebar trendingNews={trendingNews} latestNews={latestNews} />
                         </div>
                     </div>

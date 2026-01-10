@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Mail, MapPin, Twitter, Youtube } from 'lucide-react';
 import React from 'react';
 
 interface Category {
@@ -48,117 +48,99 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     ].filter((s) => s.url);
 
     return (
-        <footer className="mt-20 border-t-4 border-primary bg-black pt-16 pb-12 text-gray-500 transition-colors dark:border-primary/80">
-            <div className="container mx-auto max-w-7xl px-4">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-                    {/* Brand Info */}
-                    <div className="col-span-1">
-                        <div className="mb-6">
-                            <Link href="/">
-                                <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">
-                                    {firstPart}
-                                    <span className="text-gray-400"> {restParts}</span>
-                                </h2>
-                            </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
-                        </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+        <footer className="mt-40 bg-foreground text-background">
+            {/* Massive Industry Header */}
+            <div className="border-b border-background/10 py-20">
+                <div className="container mx-auto px-4 text-center">
+                    <h2 className="text-[12vw] leading-none font-black tracking-tighter uppercase italic md:text-[15vw]">
+                        {firstPart}
+                        <span className="text-primary opacity-80">{restParts ? ` ${restParts}` : ''}</span>
+                    </h2>
+                    <div className="mt-10 flex flex-wrap justify-center gap-10 text-[10px] font-black tracking-[0.5em] uppercase md:gap-20">
+                        <span>Reliable</span>
+                        <span className="text-primary">●</span>
+                        <span>Accurate</span>
+                        <span className="text-primary">●</span>
+                        <span>Deep Impact</span>
+                    </div>
+                </div>
+            </div>
 
-                        <div className="mb-8 space-y-4">
+            <div className="container mx-auto max-w-7xl px-4 py-20">
+                <div className="grid grid-cols-1 gap-16 md:grid-cols-2 lg:grid-cols-4">
+                    {/* About Column */}
+                    <div>
+                        <div className="mb-10 text-xs font-black tracking-[0.3em] text-primary uppercase">About Platform</div>
+                        <p className="text-lg leading-tight font-bold tracking-tight uppercase">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+                        <div className="mt-10 space-y-2 text-[10px] font-black tracking-widest uppercase opacity-60">
                             {siteSettings?.address && (
-                                <div className="flex gap-3 text-xs leading-normal text-gray-400">
-                                    <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.address}</span>
+                                <div className="flex gap-2">
+                                    <MapPin className="h-3 w-3" /> {siteSettings.address}
                                 </div>
                             )}
-
                             {siteSettings?.email && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.email}</span>
-                                </div>
-                            )}
-                            {siteSettings?.phone && (
-                                <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
-                                    <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
-                                    <span>{siteSettings.phone}</span>
+                                <div className="flex items-center gap-2">
+                                    <Mail className="h-3 w-3" /> {siteSettings.email}
                                 </div>
                             )}
                         </div>
-
-                        {socials.length > 0 && (
-                            <div className="flex gap-3">
-                                {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
-                                        <social.icon className="h-4 w-4" />
-                                    </a>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
-                        {categories.length > 0 ? (
-                            <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
-                                    <li key={cat.id}>
-                                        <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
-                                            {cat.name}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-xs text-gray-500 italic">Belum ada kategori.</p>
-                        )}
-                    </div>
-
-                    {/* Info Links */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
-                        <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
-                            {[
-                                { title: 'Tentang Kami', url: '#' },
-                                { title: 'Redaksi', url: '#' },
-                                { title: 'Pedoman Media Siber', url: '#' },
-                                { title: 'Disclaimer', url: '#' },
-                                { title: 'Kebijakan Privasi', url: '#' },
-                                { title: 'Kontak Kami', url: '#' },
-                            ].map((link) => (
-                                <li key={link.title}>
-                                    <Link href={link.url} className="transition-colors hover:text-primary">
-                                        {link.title}
+                    {/* Navigation Column */}
+                    <div>
+                        <div className="mb-10 text-xs font-black tracking-[0.3em] text-primary uppercase">Navigation</div>
+                        <ul className="grid grid-cols-1 gap-4 text-xl font-black uppercase italic">
+                            {categories.slice(0, 6).map((cat: any) => (
+                                <li key={cat.id}>
+                                    <Link href={`/${cat.slug}`} className="inline-block transition-all hover:translate-x-2 hover:text-primary">
+                                        {cat.name}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* Redaksi / Office */}
-                    <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
-                        <div className="space-y-3">
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
-                                Kirim Berita (WA)
-                            </Link>
-                            <Link href="#" className="flex w-full items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3 text-xs font-black tracking-widest text-white uppercase transition hover:border-primary hover:bg-primary">
-                                Media Kit & Iklan
-                            </Link>
+                    {/* Info Column */}
+                    <div>
+                        <div className="mb-10 text-xs font-black tracking-[0.3em] text-primary uppercase">Information</div>
+                        <ul className="flex flex-col gap-4 text-sm font-black tracking-widest uppercase">
+                            {['Tentang Kami', 'Redaksi', 'Pedoman Media Siber', 'Disclaimer', 'Kebijakan Privasi', 'Kontak Kami'].map((item) => (
+                                <li key={item}>
+                                    <Link href="#" className="italic opacity-60 transition-all hover:text-primary hover:opacity-100">
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Industrial Contact */}
+                    <div className="group relative overflow-hidden border-4 border-primary p-8 transition-all hover:bg-primary hover:text-primary-foreground">
+                        <div className="relative z-10">
+                            <div className="mb-6 text-xs font-black tracking-[0.3em] uppercase">Be Part of Us</div>
+                            <h4 className="text-3xl leading-tight font-black uppercase italic">SEND YOUR NEWS TO OUR DESK</h4>
+                            <div className="mt-10 flex gap-4">
+                                {socials.map((social) => (
+                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-12 w-12 items-center justify-center border-2 border-current transition-all hover:bg-background hover:text-foreground">
+                                        <social.icon className="h-5 w-5" />
+                                    </a>
+                                ))}
+                            </div>
                         </div>
+                        <div className="pointer-events-none absolute -right-4 -bottom-4 text-8xl font-black italic opacity-10 transition-all group-hover:opacity-20">SOS</div>
                     </div>
                 </div>
 
-                <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
-                    <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
+                <div className="mt-32 flex flex-col items-center justify-between border-t border-background/10 pt-10 md:flex-row">
+                    <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50">
+                        © {new Date().getFullYear()} {siteSettings?.site_name}. ALL RIGHTS RESERVED.
                     </p>
-                    <div className="mt-4 flex justify-center gap-6 md:mt-0">
-                        <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">
-                            Admin Login
+                    <div className="mt-4 flex gap-8 text-[10px] font-black tracking-[0.3em] uppercase md:mt-0">
+                        <span className="cursor-help transition-colors hover:text-primary">SYSTEM v4.0.2</span>
+                        <Link href="/login" className="transition-colors hover:text-primary">
+                            ADMIN LOGIN
                         </Link>
+                        <span className="cursor-help transition-colors hover:text-primary">DESIGN BY AGENT</span>
                     </div>
                 </div>
             </div>
