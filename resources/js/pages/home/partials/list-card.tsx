@@ -7,15 +7,18 @@ interface Props {
 }
 
 const ListCard: React.FC<Props> = ({ item }) => (
-    <Link href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex cursor-pointer items-start gap-5 border-b border-border/60 py-6 transition-all last:border-0 hover:bg-muted/30">
-        <div className="relative aspect-[4/3] w-40 shrink-0 overflow-hidden rounded-md bg-muted shadow-sm">{item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="flex h-full w-full items-center justify-center bg-muted text-xs font-semibold text-muted-foreground">No Image</div>}</div>
+    <Link href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex cursor-pointer items-start gap-4 rounded-xl p-4 transition-all hover:bg-muted/50">
+        <div className="relative aspect-square w-24 shrink-0 overflow-hidden rounded-xl bg-muted shadow-md">{item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" /> : <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 text-xs font-semibold text-primary">No Image</div>}</div>
         <div className="flex flex-1 flex-col gap-2">
-            <span className="text-xs font-bold tracking-wide text-primary uppercase">
+            <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
                 {item.category?.name || 'Berita'}
-                {item.sub_category && <span className="ml-2 font-normal text-muted-foreground">• {item.sub_category.name}</span>}
             </span>
-            <h3 className="line-clamp-3 font-serif text-lg leading-snug font-bold text-foreground transition-colors group-hover:text-primary">{item.title}</h3>
-            <time className="text-xs font-medium text-muted-foreground">{new Date(item.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
+            <h3 className="line-clamp-2 font-serif text-base font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{item.title}</h3>
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <time>{new Date(item.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</time>
+                <span>•</span>
+                <span>{item.views} views</span>
+            </div>
         </div>
     </Link>
 );

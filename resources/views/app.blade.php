@@ -28,7 +28,12 @@
         })();
     </script>
 
-    {{-- 2. SEO & Favicon --}}
+    {{-- 2. Google Fonts: Poppins + Lora --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    {{-- Meta SEO --}}    {{-- 2. SEO & Favicon --}}
     <meta name="description" content="{{ $page['props']['meta'] ?? $seo['description'] }}">
     <link rel="icon" href="{{ $seo['favicon'] }}">
     <link rel="apple-touch-icon" href="{{ $seo['favicon'] }}">

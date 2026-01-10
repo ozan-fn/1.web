@@ -57,16 +57,16 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
     const restParts = siteNameParts.slice(1).join(' ');
 
     return (
-        <header className="sticky top-0 z-50 bg-background shadow-sm transition-all duration-300">
-            {/* Top Bar - Logo Center */}
+        <header className="sticky top-0 z-50 bg-background shadow-md transition-all duration-300">
+            {/* Main Bar - Horizontal Layout Compact */}
             <div className="border-b border-border/50 transition-all duration-300">
-                <div className={`container mx-auto max-w-[1400px] px-4 transition-all duration-300 ${scrolled ? 'py-2' : 'py-6'}`}>
-                    <div className="flex items-center justify-between">
-                        {/* Left: Theme Toggle & Mobile Menu */}
+                <div className={`container mx-auto max-w-[1400px] px-4 transition-all duration-300 ${scrolled ? 'py-2' : 'py-3'}`}>
+                    <div className="flex items-center justify-between gap-4">
+                        {/* Left: Logo + Mobile Menu */}
                         <div className="flex items-center gap-3">
                             <Sheet>
                                 <SheetTrigger asChild>
-                                    <button className="rounded-md p-2 text-foreground hover:bg-muted lg:hidden">
+                                    <button className="rounded-full p-2 text-foreground transition-colors hover:bg-primary/10 hover:text-primary lg:hidden">
                                         <Menu className="h-5 w-5" />
                                     </button>
                                 </SheetTrigger>
@@ -87,60 +87,69 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                 </SheetContent>
                             </Sheet>
 
-                            <button onClick={toggleTheme} className="hidden rounded-md p-2 text-foreground hover:bg-muted lg:block" title={`Mode: ${appearance}`}>
-                                {appearance === 'light' && <Sun className="h-5 w-5" />}
-                                {appearance === 'dark' && <Moon className="h-5 w-5" />}
-                                {appearance === 'system' && <Monitor className="h-5 w-5" />}
-                            </button>
+                            {/* Logo - Left Side Compact */}
+                            <Link href="/" className="transition-all duration-300">
+                                <div className={`flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary/80 shadow-md transition-all duration-300 ${scrolled ? 'px-3 py-1' : 'px-4 py-1.5'}`}>
+                                    <h1 className={`font-sans font-black uppercase tracking-[0.15em] text-primary-foreground transition-all duration-300 ${scrolled ? 'text-xs' : 'text-sm'}`}>
+                                        {firstPart}
+                                    </h1>
+                                    {restParts && (
+                                        <>
+                                            <div className={`bg-primary-foreground/30 transition-all duration-300 ${scrolled ? 'h-3 w-px' : 'h-4 w-px'}`}></div>
+                                            <span className={`font-sans font-bold uppercase tracking-wider text-primary-foreground/90 transition-all duration-300 ${scrolled ? 'text-[10px]' : 'text-xs'}`}>{restParts}</span>
+                                        </>
+                                    )}
+                                </div>
+                            </Link>
                         </div>
 
-                        {/* Center: Logo */}
-                        <Link href="/" className="flex flex-col items-center transition-all duration-300">
-                            <h1 className={`font-serif leading-none font-bold text-foreground transition-all duration-300 ${scrolled ? 'text-2xl' : 'text-4xl'}`}>{firstPart}</h1>
-                            {restParts && <span className={`font-serif font-normal text-foreground/70 transition-all duration-300 ${scrolled ? 'text-sm' : 'text-xl'}`}>{restParts}</span>}
-                            {!scrolled && <p className="mt-1 text-xs tracking-widest text-muted-foreground transition-opacity duration-300">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>}
-                        </Link>
+                        {/* Center: Search - Inline Horizontal */}
+                        <form onSubmit={handleSearch} className={`hidden flex-1 transition-all duration-300 md:block ${scrolled ? 'max-w-md' : 'max-w-lg'}`}>
+                            <div className={`flex items-stretch overflow-hidden rounded-lg border border-border bg-muted/30 shadow-sm transition-all duration-300 focus-within:border-primary focus-within:bg-background focus-within:shadow-md ${scrolled ? '' : ''}`}>
+                                <input 
+                                    type="text" 
+                                    value={search} 
+                                    onChange={(e) => setSearch(e.target.value)} 
+                                    placeholder="Cari berita..." 
+                                    className={`flex-1 bg-transparent px-4 font-medium text-foreground placeholder-muted-foreground/60 outline-none transition-all duration-300 ${scrolled ? 'py-1.5 text-xs' : 'py-2 text-sm'}`} 
+                                />
+                                <button 
+                                    type="submit" 
+                                    className={`flex items-center gap-1.5 bg-primary px-4 font-bold uppercase tracking-wide text-primary-foreground transition-all duration-300 hover:bg-primary/90 ${scrolled ? 'text-[10px]' : 'text-xs'}`}
+                                >
+                                    <span>Cari</span>
+                                    <Search className={`transition-all duration-300 ${scrolled ? 'h-3 w-3' : 'h-3.5 w-3.5'}`} />
+                                </button>
+                            </div>
+                        </form>
 
-                        {/* Right: Search & Theme (mobile) */}
-                        <div className="flex items-center gap-3">
-                            <button className="rounded-md p-2 text-foreground hover:bg-muted md:hidden">
-                                <Search className="h-5 w-5" />
+                        {/* Right: Theme Toggle */}
+                        <div className="flex items-center gap-2">
+                            <button className="rounded-full p-2 text-foreground transition-colors hover:bg-primary/10 hover:text-primary md:hidden">
+                                <Search className="h-4 w-4" />
                             </button>
-                            <button onClick={toggleTheme} className="rounded-md p-2 text-foreground hover:bg-muted lg:hidden">
-                                {appearance === 'light' && <Sun className="h-5 w-5" />}
-                                {appearance === 'dark' && <Moon className="h-5 w-5" />}
-                                {appearance === 'system' && <Monitor className="h-5 w-5" />}
+                            <button onClick={toggleTheme} className="rounded-full p-1.5 text-foreground transition-colors hover:bg-primary/10 hover:text-primary" title={`Mode: ${appearance}`}>
+                                {appearance === 'light' && <Sun className="h-4 w-4" />}
+                                {appearance === 'dark' && <Moon className="h-4 w-4" />}
+                                {appearance === 'system' && <Monitor className="h-4 w-4" />}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Search Bar - Prominent */}
-            <div className={`border-b border-border/50 bg-muted/30 transition-all duration-300 ${scrolled ? 'py-2' : 'py-3'}`}>
+            {/* Desktop Navigation - Modern Pills */}
+            <nav className={`hidden border-b border-border/50 transition-all duration-300 lg:block ${scrolled ? 'py-1.5' : 'py-2'}`}>
                 <div className="container mx-auto max-w-[1400px] px-4">
-                    <form onSubmit={handleSearch} className={`mx-auto flex items-center gap-2 rounded-full border border-border bg-background shadow-sm transition-all duration-300 focus-within:border-primary focus-within:shadow-md ${scrolled ? 'max-w-xl px-4 py-1.5' : 'max-w-2xl px-5 py-2.5'}`}>
-                        <Search className={`text-muted-foreground transition-all duration-300 ${scrolled ? 'h-4 w-4' : 'h-5 w-5'}`} />
-                        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita, topik, atau kata kunci..." className={`flex-1 bg-transparent text-foreground placeholder-muted-foreground transition-all duration-300 outline-none ${scrolled ? 'text-xs' : 'text-sm'}`} />
-                        <button type="submit" className={`rounded-full bg-primary font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 ${scrolled ? 'px-3 py-1 text-[10px]' : 'px-5 py-1.5 text-xs'}`}>
-                            Cari
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {/* Desktop Navigation - Centered */}
-            <nav className={`hidden border-b border-border/50 transition-all duration-300 lg:block ${scrolled ? 'py-2' : 'py-4'}`}>
-                <div className="container mx-auto max-w-[1400px] px-4">
-                    <div className={`flex justify-center transition-all duration-300 ${scrolled ? 'gap-6' : 'gap-8'}`}>
-                        <Link href="/" className={`font-medium transition-colors ${scrolled ? 'text-xs' : 'text-sm'} ${url === '/' ? 'text-primary' : 'text-foreground hover:text-primary'}`}>
+                    <div className={`flex justify-center transition-all duration-300 ${scrolled ? 'gap-2' : 'gap-3'}`}>
+                        <Link href="/" className={`rounded-full font-semibold transition-all ${scrolled ? 'px-4 py-1.5 text-xs' : 'px-5 py-2 text-sm'} ${url === '/' ? 'bg-primary text-primary-foreground shadow-md' : 'text-foreground hover:bg-primary/10 hover:text-primary'}`}>
                             Beranda
                         </Link>
                         {categories.map((cat) => {
                             const href = `/${cat.slug}`;
                             const isActive = url === href || url.startsWith(`${href}/`);
                             return (
-                                <Link key={cat.id} href={href} className={`font-medium transition-colors ${scrolled ? 'text-xs' : 'text-sm'} ${isActive ? 'text-primary' : 'text-foreground hover:text-primary'}`}>
+                                <Link key={cat.id} href={href} className={`rounded-full font-semibold transition-all ${scrolled ? 'px-4 py-1.5 text-xs' : 'px-5 py-2 text-sm'} ${isActive ? 'bg-primary text-primary-foreground shadow-md' : 'text-foreground hover:bg-primary/10 hover:text-primary'}`}>
                                     {cat.name}
                                 </Link>
                             );
