@@ -3,7 +3,6 @@ import Footer from '../../components/footer';
 import Navbar from '../../components/navbar';
 import Sidebar from '../../components/sidebar';
 import CategorySection from './partials/category-section';
-import HeroSection from './partials/hero-section';
 import { Category, NewsItem } from './partials/types';
 
 export interface SiteSettings {

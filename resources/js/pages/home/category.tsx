@@ -54,7 +54,7 @@ export default function CategoryPage({ category, news, trendingNews, latestNews 
                                             {item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 text-sm font-bold text-primary">No Image</div>}
                                         </div>
                                         <div className="flex flex-col gap-3 p-5">
-                                            <h2 className="line-clamp-2 font-serif text-xl font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{item.title}</h2>
+                                            <h2 className="line-clamp-2 font-serif text-xl leading-snug font-bold text-foreground transition-colors group-hover:text-primary">{item.title}</h2>
                                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                 <div className="flex items-center gap-1">
                                                     <Clock className="h-3.5 w-3.5" />

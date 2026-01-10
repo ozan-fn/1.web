@@ -109,13 +109,11 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                 <Link href={`/${post.category?.slug}`} className="inline-flex items-center rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/90">
                                     {post.category?.name}
                                 </Link>
-                                {subCategory && (
-                                    <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{subCategory.name}</span>
-                                )}
+                                {subCategory && <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{subCategory.name}</span>}
                             </div>
 
                             {/* Title - Modern Clean */}
-                            <h1 className="mb-6 font-serif text-4xl font-bold leading-tight text-foreground sm:text-5xl md:text-5xl lg:text-6xl">{post.title}</h1>
+                            <h1 className="mb-6 font-serif text-4xl leading-tight font-bold text-foreground sm:text-5xl md:text-5xl lg:text-6xl">{post.title}</h1>
 
                             {/* Meta Info - Clean */}
                             <div className="mb-8">
@@ -204,7 +202,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                                         )}
                                         <div className="flex flex-col gap-3 p-5">
                                             <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{related.category.name}</span>
-                                            <h4 className="line-clamp-2 font-serif text-lg font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
+                                            <h4 className="line-clamp-2 font-serif text-lg leading-snug font-bold text-foreground transition-colors group-hover:text-primary">{related.title}</h4>
                                             <span className="text-xs text-muted-foreground">{new Date(related.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                         </div>
                                     </Link>

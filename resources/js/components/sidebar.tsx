@@ -22,8 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingNews = [], latestNews = [] })
                         <Link key={item.id} href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group flex cursor-pointer items-start gap-3 rounded-xl p-3 transition-all hover:bg-background/80">
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary font-sans text-sm font-bold text-primary-foreground shadow-md transition-transform group-hover:scale-110">{i + 1}</div>
                             <div className="flex flex-col gap-1">
-                                <h4 className="line-clamp-2 font-serif text-sm font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{item.title}</h4>
-                                <span className="inline-flex w-fit items-center rounded-full bg-background px-2 py-0.5 text-[10px] font-bold uppercase text-primary">{item.category?.name}</span>
+                                <h4 className="line-clamp-2 font-serif text-sm leading-snug font-bold text-foreground transition-colors group-hover:text-primary">{item.title}</h4>
+                                <span className="inline-flex w-fit items-center rounded-full bg-background px-2 py-0.5 text-[10px] font-bold text-primary uppercase">{item.category?.name}</span>
                             </div>
                         </Link>
                     ))}
@@ -44,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingNews = [], latestNews = [] })
                                     {item.thumbnail_url ? <img src={item.thumbnail_url} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" alt={item.title} /> : <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 text-xs font-semibold text-primary">No Image</div>}
                                     <span className="absolute bottom-2 left-2 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground shadow-lg">{item.category?.name}</span>
                                 </div>
-                                <h4 className="line-clamp-2 font-serif text-base font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{item.title}</h4>
+                                <h4 className="line-clamp-2 font-serif text-base leading-snug font-bold text-foreground transition-colors group-hover:text-primary">{item.title}</h4>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <span className="font-medium">{item.user?.name || 'Redaksi'}</span>
                                     <span>•</span>

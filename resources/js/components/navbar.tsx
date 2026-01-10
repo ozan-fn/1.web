@@ -90,13 +90,11 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                             {/* Logo - Left Side Compact */}
                             <Link href="/" className="transition-all duration-300">
                                 <div className={`flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary/80 shadow-md transition-all duration-300 ${scrolled ? 'px-3 py-1' : 'px-4 py-1.5'}`}>
-                                    <h1 className={`font-sans font-black uppercase tracking-[0.15em] text-primary-foreground transition-all duration-300 ${scrolled ? 'text-xs' : 'text-sm'}`}>
-                                        {firstPart}
-                                    </h1>
+                                    <h1 className={`font-sans font-black tracking-[0.15em] text-primary-foreground uppercase transition-all duration-300 ${scrolled ? 'text-xs' : 'text-sm'}`}>{firstPart}</h1>
                                     {restParts && (
                                         <>
                                             <div className={`bg-primary-foreground/30 transition-all duration-300 ${scrolled ? 'h-3 w-px' : 'h-4 w-px'}`}></div>
-                                            <span className={`font-sans font-bold uppercase tracking-wider text-primary-foreground/90 transition-all duration-300 ${scrolled ? 'text-[10px]' : 'text-xs'}`}>{restParts}</span>
+                                            <span className={`font-sans font-bold tracking-wider text-primary-foreground/90 uppercase transition-all duration-300 ${scrolled ? 'text-[10px]' : 'text-xs'}`}>{restParts}</span>
                                         </>
                                     )}
                                 </div>
@@ -106,17 +104,8 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                         {/* Center: Search - Inline Horizontal */}
                         <form onSubmit={handleSearch} className={`hidden flex-1 transition-all duration-300 md:block ${scrolled ? 'max-w-md' : 'max-w-lg'}`}>
                             <div className={`flex items-stretch overflow-hidden rounded-lg border border-border bg-muted/30 shadow-sm transition-all duration-300 focus-within:border-primary focus-within:bg-background focus-within:shadow-md ${scrolled ? '' : ''}`}>
-                                <input 
-                                    type="text" 
-                                    value={search} 
-                                    onChange={(e) => setSearch(e.target.value)} 
-                                    placeholder="Cari berita..." 
-                                    className={`flex-1 bg-transparent px-4 font-medium text-foreground placeholder-muted-foreground/60 outline-none transition-all duration-300 ${scrolled ? 'py-1.5 text-xs' : 'py-2 text-sm'}`} 
-                                />
-                                <button 
-                                    type="submit" 
-                                    className={`flex items-center gap-1.5 bg-primary px-4 font-bold uppercase tracking-wide text-primary-foreground transition-all duration-300 hover:bg-primary/90 ${scrolled ? 'text-[10px]' : 'text-xs'}`}
-                                >
+                                <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita..." className={`flex-1 bg-transparent px-4 font-medium text-foreground placeholder-muted-foreground/60 transition-all duration-300 outline-none ${scrolled ? 'py-1.5 text-xs' : 'py-2 text-sm'}`} />
+                                <button type="submit" className={`flex items-center gap-1.5 bg-primary px-4 font-bold tracking-wide text-primary-foreground uppercase transition-all duration-300 hover:bg-primary/90 ${scrolled ? 'text-[10px]' : 'text-xs'}`}>
                                     <span>Cari</span>
                                     <Search className={`transition-all duration-300 ${scrolled ? 'h-3 w-3' : 'h-3.5 w-3.5'}`} />
                                 </button>

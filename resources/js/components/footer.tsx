@@ -108,7 +108,7 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                     {/* Categories - Modern List */}
                     <div className="lg:col-span-3">
                         <h3 className="mb-6 font-sans text-xl font-bold text-foreground">Kategori</h3>
-                        <div className="h-1 mb-6 w-12 rounded-full bg-primary"></div>
+                        <div className="mb-6 h-1 w-12 rounded-full bg-primary"></div>
                         {categories.length > 0 ? (
                             <ul className="space-y-3">
                                 {categories.slice(0, 8).map((cat) => (
@@ -128,7 +128,7 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                     {/* Info Links - Modern */}
                     <div className="lg:col-span-2">
                         <h3 className="mb-6 font-sans text-xl font-bold text-foreground">Informasi</h3>
-                        <div className="h-1 mb-6 w-12 rounded-full bg-primary"></div>
+                        <div className="mb-6 h-1 w-12 rounded-full bg-primary"></div>
                         <ul className="space-y-3">
                             {[
                                 { title: 'Tentang Kami', url: '#' },
