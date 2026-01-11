@@ -223,6 +223,9 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($newsArticles as $index => $article) {
+            // MENGGUNAKAN LIPSUM.APP DENGAN UKURAN 1600x900
+            $imageUrl = 'https://lipsum.app/random/1600x900?sig=' . $index;
+
             $news = News::create([
                 'user_id' => $user->id,
                 'category_id' => $categoryModels[$article['category']]->id,
@@ -231,6 +234,7 @@ class DatabaseSeeder extends Seeder
                 'slug' => Str::slug($article['title']),
                 'excerpt' => Str::limit(strip_tags($article['content']), 200),
                 'content' => $article['content'],
+                'thumbnail' => $imageUrl, // <-- PERBAIKAN DI SINI (DULUNYA 'image')
                 'status' => 'published',
                 'views' => $article['views'],
                 'is_featured' => $article['is_featured'],
