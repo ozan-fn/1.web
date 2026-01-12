@@ -35,7 +35,7 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         // Ambil Site Settings dari Cache untuk performa maksimal
-        $settings = Cache::rememberForever('site_settings', function () {
+        $settings = Cache::remember('site_settings', 60, function () {
             return SiteSetting::first();
         });
 
