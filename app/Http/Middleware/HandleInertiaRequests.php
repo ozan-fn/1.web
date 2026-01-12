@@ -46,10 +46,10 @@ class HandleInertiaRequests extends Middleware
             // Tambahkan data settings agar bisa diakses di semua halaman React
             'settings' => $settings,
             'seo' => [
-                'site_name' => $settings->site_name ?? config('app.name'),
-                'description' => $settings->description ?? 'Portal Berita Terpercaya',
-                'logo' => $settings->logo ? asset('storage/' . $settings->logo) : null,
-                'favicon' => $settings->favicon ? asset('storage/' . $settings->favicon) : asset('favicon.ico'),
+                'site_name' => $settings?->site_name ?? config('app.name'),
+                'description' => $settings?->description ?? 'Portal Berita Terpercaya',
+                'logo' => $settings?->logo ? asset('storage/' . $settings->logo) : null,
+                'favicon' => $settings?->favicon ? asset('storage/' . $settings->favicon) : asset('favicon.ico'),
             ],
 
             'quote' => [
