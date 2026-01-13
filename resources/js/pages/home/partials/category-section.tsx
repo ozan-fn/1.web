@@ -10,9 +10,9 @@ const CategorySection: React.FC<Props> = ({ category }) => {
     // JOS: Cek apakah ada berita, jika tidak ada jangan render apapun
     if (!category.news || category.news.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center border-2 sm:border-4 border-dashed border-foreground/10 dark:border-foreground/10 py-12 sm:py-20 text-center">
-                <div className="mb-4 text-2xl sm:text-4xl font-black text-foreground/5 dark:text-foreground/10 uppercase italic">NO_SIGNAL</div>
-                <p className="text-[10px] sm:text-xs font-black tracking-[0.3em] sm:tracking-[0.4em] text-foreground/40 dark:text-foreground/40 uppercase">Broadcast data currently unavailable for this node.</p>
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-foreground/10 py-12 text-center sm:border-4 sm:py-20 dark:border-foreground/10">
+                <div className="mb-4 text-2xl font-black text-foreground/5 uppercase italic sm:text-4xl dark:text-foreground/10">NO_SIGNAL</div>
+                <p className="text-[10px] font-black tracking-[0.3em] text-foreground/40 uppercase sm:text-xs sm:tracking-[0.4em] dark:text-foreground/40">Broadcast data currently unavailable for this node.</p>
             </div>
         );
     }
@@ -34,7 +34,7 @@ const CategorySection: React.FC<Props> = ({ category }) => {
                         <ListCard item={item} />
 
                         {/* Industrial Label for each slot */}
-                        <div className="mt-3 sm:mt-4 flex items-center justify-between text-[6px] sm:text-[8px] font-black opacity-30">
+                        <div className="mt-3 flex items-center justify-between text-[6px] font-black opacity-30 sm:mt-4 sm:text-[8px]">
                             <span>SLOT_{idx < 9 ? `0${idx + 1}` : idx + 1}</span>
                             <span className="hidden sm:inline">TYPE://ITEM_INDEX_LITERAL</span>
                         </div>

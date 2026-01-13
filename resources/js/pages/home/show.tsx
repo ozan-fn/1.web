@@ -76,19 +76,19 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
     };
 
     return (
-        <div className="min-h-screen bg-background dark:bg-background font-sans text-foreground dark:text-foreground transition-colors">
+        <div className="min-h-screen bg-background font-sans text-foreground transition-colors dark:bg-background dark:text-foreground">
             {/* Meta Tags dihandle app.blade.php */}
             <Head title={post.title} />
 
             <Navbar />
 
-            <main className="mx-auto max-w-[1700px] border-x-2 sm:border-x-4 border-foreground dark:border-foreground bg-background dark:bg-background px-0">
+            <main className="mx-auto max-w-[1700px] border-x-2 border-foreground bg-background px-0 sm:border-x-4 dark:border-foreground dark:bg-background">
                 <div className="grid grid-cols-1 lg:grid-cols-12">
                     {/* LEFT SIDEBAR - Industrial Pivot */}
-                    <div className="order-2 border-t-2 sm:border-t-4 border-foreground dark:border-foreground lg:order-1 lg:col-span-3 lg:border-t-0 lg:border-r-2 lg:sm:border-r-4">
-                        <div className="sticky top-24 p-4 sm:p-8 transition-all duration-500">
-                            <div className="mb-6 sm:mb-10 flex items-center justify-between border-b-2 border-foreground dark:border-foreground pb-3 sm:pb-4">
-                                <span className="text-[8px] sm:text-[10px] font-black tracking-[0.3em] sm:tracking-widest uppercase">System_Nav</span>
+                    <div className="order-2 border-t-2 border-foreground sm:border-t-4 lg:order-1 lg:col-span-3 lg:border-t-0 lg:border-r-2 lg:sm:border-r-4 dark:border-foreground">
+                        <div className="sticky top-24 p-4 transition-all duration-500 sm:p-8">
+                            <div className="mb-6 flex items-center justify-between border-b-2 border-foreground pb-3 sm:mb-10 sm:pb-4 dark:border-foreground">
+                                <span className="text-[8px] font-black tracking-[0.3em] uppercase sm:text-[10px] sm:tracking-widest">System_Nav</span>
                                 <div className="h-2 w-2 animate-pulse bg-primary dark:bg-primary"></div>
                             </div>
                             <Sidebar trendingNews={trendingNews as any} latestNews={latestNews as any} />
@@ -98,7 +98,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                     {/* MAIN CONTENT - Right Column */}
                     <div className="order-1 p-4 sm:p-8 lg:order-2 lg:col-span-9 lg:p-16">
                         {/* Fragmented Breadcrumb */}
-                        <div className="mb-12 sm:mb-16 flex flex-wrap items-center gap-2 sm:gap-4 text-[8px] sm:text-[10px] font-black tracking-[0.2em] sm:tracking-[0.3em] uppercase opacity-40">
+                        <div className="mb-12 flex flex-wrap items-center gap-2 text-[8px] font-black tracking-[0.2em] uppercase opacity-40 sm:mb-16 sm:gap-4 sm:text-[10px] sm:tracking-[0.3em]">
                             <Link href="/" className="transition-colors hover:text-primary dark:hover:text-primary">
                                 ROOT
                             </Link>
@@ -117,42 +117,42 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                         <article className="relative">
                             {/* Massive Ghost Title Background */}
                             <div className="relative mb-16 sm:mb-24">
-                                <div className="pointer-events-none absolute -top-20 sm:-top-40 -left-6 sm:-left-10 -z-10 text-[12vw] sm:text-[15vw] leading-none font-black whitespace-nowrap text-foreground/[0.04] dark:text-foreground/[0.08] uppercase italic select-none">{post.category?.name}</div>
-                                <h1 className="text-3xl sm:text-5xl leading-[0.85] font-black tracking-tighter text-foreground dark:text-foreground uppercase md:text-5xl lg:text-7xl xl:text-[100px]">{post.title}</h1>
-                                <div className="mt-8 sm:mt-12 flex h-2 sm:h-3 w-full bg-foreground/10 dark:bg-foreground/10">
+                                <div className="pointer-events-none absolute -top-20 -left-6 -z-10 text-[12vw] leading-none font-black whitespace-nowrap text-foreground/[0.04] uppercase italic select-none sm:-top-40 sm:-left-10 sm:text-[15vw] dark:text-foreground/[0.08]">{post.category?.name}</div>
+                                <h1 className="text-3xl leading-[0.85] font-black tracking-tighter text-foreground uppercase sm:text-5xl md:text-5xl lg:text-7xl xl:text-[100px] dark:text-foreground">{post.title}</h1>
+                                <div className="mt-8 flex h-2 w-full bg-foreground/10 sm:mt-12 sm:h-3 dark:bg-foreground/10">
                                     <div className="h-full w-1/3 bg-primary dark:bg-primary"></div>
                                 </div>
                             </div>
 
                             {/* Grid Meta Data */}
-                            <div className="mb-12 sm:mb-20 grid grid-cols-1 divide-y-2 sm:divide-y-4 divide-foreground dark:divide-foreground border-y-2 sm:border-y-4 border-foreground dark:border-foreground font-black uppercase md:grid-cols-3 md:divide-x-2 md:sm:divide-x-4 md:divide-y-0">
+                            <div className="mb-12 grid grid-cols-1 divide-y-2 divide-foreground border-y-2 border-foreground font-black uppercase sm:mb-20 sm:divide-y-4 sm:border-y-4 md:grid-cols-3 md:divide-x-2 md:divide-y-0 md:sm:divide-x-4 dark:divide-foreground dark:border-foreground">
                                 <div className="p-4 sm:p-6">
-                                    <span className="mb-2 block text-[8px] sm:text-[10px] opacity-40">OPERATOR_ID</span>
-                                    <span className="text-lg sm:text-xl text-primary dark:text-primary italic">@{post.user?.name}</span>
+                                    <span className="mb-2 block text-[8px] opacity-40 sm:text-[10px]">OPERATOR_ID</span>
+                                    <span className="text-lg text-primary italic sm:text-xl dark:text-primary">@{post.user?.name}</span>
                                 </div>
                                 <div className="p-4 sm:p-6">
-                                    <span className="mb-2 block text-[8px] sm:text-[10px] opacity-40">TIMESTAMP</span>
+                                    <span className="mb-2 block text-[8px] opacity-40 sm:text-[10px]">TIMESTAMP</span>
                                     <span className="text-xs sm:text-sm">
                                         {formattedDate} // {new Date(post.published_at).toLocaleTimeString('id-ID')}
                                     </span>
                                 </div>
                                 <div className="flex items-end justify-between p-4 sm:p-6">
                                     <div>
-                                        <span className="mb-2 block text-[8px] sm:text-[10px] opacity-40">METRIC_LOGS</span>
+                                        <span className="mb-2 block text-[8px] opacity-40 sm:text-[10px]">METRIC_LOGS</span>
                                         <span className="text-xs sm:text-sm">{post.views.toLocaleString()} VIEWS</span>
                                     </div>
-                                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-primary dark:text-primary" />
+                                    <Eye className="h-4 w-4 text-primary sm:h-5 sm:w-5 dark:text-primary" />
                                 </div>
                             </div>
 
                             {/* Fragmented Hero Media */}
                             {post.thumbnail_url && (
                                 <div className="group relative mb-16 sm:mb-24">
-                                    <div className="absolute -top-3 sm:-top-6 -left-3 sm:-left-6 -z-10 h-full w-full border-2 sm:border-4 border-primary dark:border-primary transition-all group-hover:top-0 group-hover:left-0"></div>
-                                    <div className="overflow-hidden border-4 sm:border-8 border-foreground dark:border-foreground bg-foreground dark:bg-foreground">
+                                    <div className="absolute -top-3 -left-3 -z-10 h-full w-full border-2 border-primary transition-all group-hover:top-0 group-hover:left-0 sm:-top-6 sm:-left-6 sm:border-4 dark:border-primary"></div>
+                                    <div className="overflow-hidden border-4 border-foreground bg-foreground sm:border-8 dark:border-foreground dark:bg-foreground">
                                         <img src={post.thumbnail ? `/storage/${post.thumbnail}` : post.thumbnail_url} alt={post.title} className="w-full object-cover brightness-90 grayscale transition-all duration-1000 group-hover:scale-105 group-hover:grayscale-0" />
                                     </div>
-                                    <div className="mt-3 sm:mt-4 flex justify-between text-[8px] sm:text-[10px] font-black tracking-[0.3em] sm:tracking-widest uppercase italic opacity-60">
+                                    <div className="mt-3 flex justify-between text-[8px] font-black tracking-[0.3em] uppercase italic opacity-60 sm:mt-4 sm:text-[10px] sm:tracking-widest">
                                         <span>IMG_REF_001: {post.title.substring(0, 15)}</span>
                                         <span className="hidden sm:inline">(SOURCE: INTERFACE_SYSTEM)</span>
                                     </div>
@@ -160,15 +160,18 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                             )}
 
                             {/* Industrial Content Typography */}
-                            <div className="prose prose-lg sm:prose-xl max-w-none text-foreground/90 dark:text-foreground/90 prose-invert prose-headings:font-black prose-headings:tracking-tighter prose-headings:uppercase prose-p:leading-relaxed prose-a:text-primary dark:prose-a:text-primary prose-a:underline prose-strong:text-primary dark:prose-strong:text-primary prose-li:marker:text-primary dark:prose-li:marker:text-primary" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            <div
+                                className="prose prose-lg max-w-none text-foreground/90 prose-invert sm:prose-xl dark:text-foreground/90 prose-headings:font-black prose-headings:tracking-tighter prose-headings:uppercase prose-p:leading-relaxed prose-a:text-primary prose-a:underline dark:prose-a:text-primary prose-strong:text-primary dark:prose-strong:text-primary prose-li:marker:text-primary dark:prose-li:marker:text-primary"
+                                dangerouslySetInnerHTML={{ __html: post.content }}
+                            />
 
                             {/* System Tags */}
-                            <div className="mt-20 sm:mt-32 border-t-4 sm:border-t-8 border-foreground dark:border-foreground pt-8 sm:pt-12">
-                                <label className="mb-6 sm:mb-8 block text-center text-xs sm:text-sm font-black tracking-[0.4em] sm:tracking-[0.5em] uppercase italic opacity-30 md:text-left">CLASSIFIED_TAGS</label>
+                            <div className="mt-20 border-t-4 border-foreground pt-8 sm:mt-32 sm:border-t-8 sm:pt-12 dark:border-foreground">
+                                <label className="mb-6 block text-center text-xs font-black tracking-[0.4em] uppercase italic opacity-30 sm:mb-8 sm:text-sm sm:tracking-[0.5em] md:text-left">CLASSIFIED_TAGS</label>
                                 <div className="flex flex-wrap gap-2 sm:gap-4">
                                     {post.tags.map((tag) => (
-                                        <Link key={tag.id} href={`/tag/${tag.name}`} className="group flex items-center gap-2 border-2 border-foreground dark:border-foreground bg-transparent px-4 sm:px-6 py-2 sm:py-3 text-[10px] sm:text-xs font-black tracking-[0.2em] sm:tracking-widest uppercase transition-all hover:bg-foreground dark:hover:bg-foreground hover:text-background dark:hover:text-background">
-                                            <div className="h-2 w-2 bg-primary dark:bg-primary group-hover:bg-background dark:group-hover:bg-background"></div>
+                                        <Link key={tag.id} href={`/tag/${tag.name}`} className="group flex items-center gap-2 border-2 border-foreground bg-transparent px-4 py-2 text-[10px] font-black tracking-[0.2em] uppercase transition-all hover:bg-foreground hover:text-background sm:px-6 sm:py-3 sm:text-xs sm:tracking-widest dark:border-foreground dark:hover:bg-foreground dark:hover:text-background">
+                                            <div className="h-2 w-2 bg-primary group-hover:bg-background dark:bg-primary dark:group-hover:bg-background"></div>
                                             {tag.name}
                                         </Link>
                                     ))}
@@ -176,19 +179,19 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                             </div>
 
                             {/* Social Grid */}
-                            <div className="mt-12 sm:mt-20 grid grid-cols-1 overflow-hidden border-2 sm:border-4 border-foreground dark:border-foreground md:grid-cols-4">
-                                <div className="flex flex-col justify-center bg-foreground dark:bg-foreground p-6 sm:p-8 md:col-span-2">
-                                    <h4 className="text-2xl sm:text-3xl leading-none font-black tracking-tighter text-background dark:text-background uppercase italic">
+                            <div className="mt-12 grid grid-cols-1 overflow-hidden border-2 border-foreground sm:mt-20 sm:border-4 md:grid-cols-4 dark:border-foreground">
+                                <div className="flex flex-col justify-center bg-foreground p-6 sm:p-8 md:col-span-2 dark:bg-foreground">
+                                    <h4 className="text-2xl leading-none font-black tracking-tighter text-background uppercase italic sm:text-3xl dark:text-background">
                                         TRANSFER_DATA <br /> TO_BROADCAST
                                     </h4>
                                 </div>
-                                <button onClick={() => handleShare('facebook')} className="group flex h-24 sm:h-32 flex-col items-center justify-center gap-2 border-t-2 sm:border-t-4 border-foreground dark:border-foreground transition-colors hover:bg-primary dark:hover:bg-primary md:border-t-0 md:border-l-2 md:sm:border-l-4">
-                                    <span className="text-[8px] sm:text-[10px] font-black text-foreground dark:text-foreground group-hover:text-background dark:group-hover:text-background">FACEBOOK</span>
-                                    <Share2 className="h-5 w-5 sm:h-6 sm:w-6 group-hover:text-background dark:group-hover:text-background" />
+                                <button onClick={() => handleShare('facebook')} className="group flex h-24 flex-col items-center justify-center gap-2 border-t-2 border-foreground transition-colors hover:bg-primary sm:h-32 sm:border-t-4 md:border-t-0 md:border-l-2 md:sm:border-l-4 dark:border-foreground dark:hover:bg-primary">
+                                    <span className="text-[8px] font-black text-foreground group-hover:text-background sm:text-[10px] dark:text-foreground dark:group-hover:text-background">FACEBOOK</span>
+                                    <Share2 className="h-5 w-5 group-hover:text-background sm:h-6 sm:w-6 dark:group-hover:text-background" />
                                 </button>
-                                <button onClick={() => handleShare('whatsapp')} className="group flex h-24 sm:h-32 flex-col items-center justify-center gap-2 border-l-2 sm:border-l-4 border-foreground dark:border-foreground transition-colors hover:bg-primary dark:hover:bg-primary">
-                                    <span className="text-[8px] sm:text-[10px] font-black text-foreground dark:text-foreground group-hover:text-background dark:group-hover:text-background">WHATSAPP</span>
-                                    <Share2 className="h-5 w-5 sm:h-6 sm:w-6 group-hover:text-background dark:group-hover:text-background" />
+                                <button onClick={() => handleShare('whatsapp')} className="group flex h-24 flex-col items-center justify-center gap-2 border-l-2 border-foreground transition-colors hover:bg-primary sm:h-32 sm:border-l-4 dark:border-foreground dark:hover:bg-primary">
+                                    <span className="text-[8px] font-black text-foreground group-hover:text-background sm:text-[10px] dark:text-foreground dark:group-hover:text-background">WHATSAPP</span>
+                                    <Share2 className="h-5 w-5 group-hover:text-background sm:h-6 sm:w-6 dark:group-hover:text-background" />
                                 </button>
                             </div>
                         </article>
@@ -196,13 +199,13 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                         {/* CROSS-LINKED FEEDS (Related) */}
                         <div className="mt-32 sm:mt-56">
                             <div className="relative mb-12 sm:mb-20">
-                                <h3 className="text-4xl sm:text-6xl leading-none font-black tracking-tighter uppercase italic text-foreground dark:text-foreground">CROSS_FEEDS</h3>
-                                <div className="absolute right-0 -bottom-2 sm:-bottom-4 text-[8px] sm:text-[10px] font-black opacity-30">SYSTEM_RECO_V.4.0</div>
-                                <div className="mt-4 sm:mt-6 h-2 w-full bg-foreground dark:bg-foreground"></div>
+                                <h3 className="text-4xl leading-none font-black tracking-tighter text-foreground uppercase italic sm:text-6xl dark:text-foreground">CROSS_FEEDS</h3>
+                                <div className="absolute right-0 -bottom-2 text-[8px] font-black opacity-30 sm:-bottom-4 sm:text-[10px]">SYSTEM_RECO_V.4.0</div>
+                                <div className="mt-4 h-2 w-full bg-foreground sm:mt-6 dark:bg-foreground"></div>
                             </div>
                             <div className="grid grid-cols-1 gap-8 sm:gap-12 md:grid-cols-2">
                                 {relatedPosts.map((related: any) => (
-                                    <div key={related.id} className="border-b-2 sm:border-b-4 border-foreground dark:border-foreground pb-8 sm:pb-12">
+                                    <div key={related.id} className="border-b-2 border-foreground pb-8 sm:border-b-4 sm:pb-12 dark:border-foreground">
                                         <ListCard item={related} />
                                     </div>
                                 ))}
