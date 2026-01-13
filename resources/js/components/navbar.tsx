@@ -53,7 +53,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
             <div className="mx-auto flex h-20 items-center justify-between px-6 lg:px-20">
                 <Link href="/" className="flex items-center gap-6">
                     <div className="flex h-10 w-10 items-center justify-center border border-foreground bg-foreground font-mono text-xl font-bold text-background">{firstPart.charAt(0)}</div>
-                    <span className="hidden font-mono text-xs font-bold tracking-[0.4em] uppercase lg:block">{siteSettings?.site_name || 'URBAN_JOURNAL'}</span>
+                    <span className="hidden font-mono text-xs font-bold tracking-[0.4em] uppercase lg:block">{siteSettings?.site_name || ''}</span>
                 </Link>
 
                 <nav className="hidden items-center gap-10 lg:flex">

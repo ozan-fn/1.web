@@ -46,13 +46,9 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                             <span className="h-[1px] w-12 bg-primary" />
                             <span className="font-mono text-[10px] font-bold tracking-[0.4em] text-primary uppercase">Edition 2026</span>
                         </div>
-                        <h1 className="text-6xl leading-[0.9] font-bold tracking-tighter text-foreground md:text-8xl lg:text-[120px]">
-                            URBAN
-                            <br />
-                            <span className="text-muted-foreground/30">JOURNAL</span>
-                        </h1>
+                        <h1 className="text-6xl leading-[0.9] font-bold tracking-tighter text-foreground md:text-8xl lg:text-[120px]">{siteSettings?.site_name || 'Portal Berita Terpercaya'}</h1>
                     </div>
-                    <div className="flex flex-col gap-6 lg:pb-4">
+                    {/* <div className="flex flex-col gap-6 lg:pb-4">
                         <p className="max-w-md font-mono text-sm leading-relaxed tracking-tight text-muted-foreground uppercase">A curated selection of stories exploring the intersection of culture, technology, and modern living in the digital age.</p>
                         <div className="flex items-center gap-6">
                             <div className="flex -space-x-3">
@@ -62,7 +58,7 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                             </div>
                             <span className="font-mono text-[10px] font-bold text-foreground">500+ DAILY SUBSCRIBERS</span>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="grid grid-cols-1 gap-20 lg:grid-cols-1">
