@@ -8,38 +8,38 @@ interface Props {
 }
 
 const ListCard: React.FC<Props> = ({ item }) => (
-    <Link href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group relative flex flex-col items-center gap-8 border-4 border-foreground bg-background p-6 transition-all hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] md:flex-row dark:hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]">
+    <Link href={item.sub_category ? `/${item.category?.slug}/${item.sub_category?.slug}/${item.slug}` : `/${item.category?.slug}/${item.slug}`} className="group relative flex flex-col items-center gap-6 sm:gap-8 border-2 sm:border-4 border-foreground dark:border-foreground bg-background dark:bg-background p-4 sm:p-6 transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sm:hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] sm:dark:hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] md:flex-row">
         {/* Large Decorative Category Text in background of card */}
-        <div className="pointer-events-none absolute top-2 right-4 text-4xl leading-none font-black text-foreground/[0.04] uppercase italic select-none">{item.category?.name?.substring(0, 3)}</div>
+        <div className="pointer-events-none absolute top-2 right-2 sm:right-4 text-2xl sm:text-4xl leading-none font-black text-foreground/[0.04] dark:text-foreground/[0.08] uppercase italic select-none">{item.category?.name?.substring(0, 3)}</div>
 
         {/* Thumbnail with Heavy Border */}
-        <div className="relative aspect-square w-full shrink-0 overflow-hidden border-4 border-foreground bg-foreground md:w-48">
-            {item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-110 group-hover:grayscale-0" /> : <div className="flex h-full w-full items-center justify-center text-[10px] font-black tracking-widest text-background uppercase italic">[ NO_SIGNAL ]</div>}
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                <div className="bg-primary p-1 text-background">
-                    <Maximize2 className="h-3 w-3" />
+        <div className="relative aspect-square w-full shrink-0 overflow-hidden border-2 sm:border-4 border-foreground dark:border-foreground bg-foreground dark:bg-foreground md:w-32 lg:w-48">
+            {item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-110 group-hover:grayscale-0" /> : <div className="flex h-full w-full items-center justify-center text-[8px] sm:text-[10px] font-black tracking-widest text-background dark:text-background uppercase italic">[ NO_SIGNAL ]</div>}
+            <div className="absolute top-1 sm:top-2 right-1 sm:right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="bg-primary dark:bg-primary p-1 text-background dark:text-background">
+                    <Maximize2 className="h-2 w-2 sm:h-3 sm:w-3" />
                 </div>
             </div>
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-1 flex-col gap-4">
-            <div className="flex items-center gap-3">
-                <span className="bg-primary px-3 py-1 text-[10px] font-black tracking-widest text-background uppercase italic">{item.category?.name || 'LOG'}</span>
-                <div className="h-px flex-1 bg-foreground/10"></div>
-                <ArrowUpRight className="h-4 w-4 text-primary opacity-40 transition-opacity group-hover:opacity-100" />
+        <div className="flex flex-1 flex-col gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+                <span className="bg-primary dark:bg-primary px-2 sm:px-3 py-1 text-[8px] sm:text-[10px] font-black tracking-widest text-background dark:text-background uppercase italic">{item.category?.name || 'LOG'}</span>
+                <div className="h-px flex-1 bg-foreground/10 dark:bg-foreground/10"></div>
+                <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary dark:text-primary opacity-40 transition-opacity group-hover:opacity-100" />
             </div>
 
-            <h3 className="line-clamp-2 text-xl leading-tight font-black tracking-tighter text-foreground uppercase italic transition-colors group-hover:text-primary md:text-2xl lg:text-3xl">{item.title}</h3>
+            <h3 className="line-clamp-2 text-lg sm:text-xl leading-tight font-black tracking-tighter text-foreground dark:text-foreground uppercase italic transition-colors group-hover:text-primary dark:group-hover:text-primary md:text-xl lg:text-2xl xl:text-3xl">{item.title}</h3>
 
-            <div className="flex items-center justify-between border-t-2 border-foreground/5 pt-4">
+            <div className="flex items-center justify-between border-t-2 border-foreground/5 dark:border-foreground/5 pt-3 sm:pt-4">
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase opacity-40">PUBLISH_ID</span>
-                    <span className="text-xs font-black uppercase">{new Date(item.published_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                    <span className="text-[8px] sm:text-[10px] font-black uppercase opacity-40">PUBLISH_ID</span>
+                    <span className="text-[10px] sm:text-xs font-black uppercase text-foreground dark:text-foreground">{new Date(item.published_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
                 </div>
                 <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-black uppercase opacity-40">VIEW_LOGS</span>
-                    <span className="text-xs font-black text-primary italic">{(item.views || 0).toLocaleString()} ACC</span>
+                    <span className="text-[8px] sm:text-[10px] font-black uppercase opacity-40">VIEW_LOGS</span>
+                    <span className="text-[10px] sm:text-xs font-black text-primary dark:text-primary italic">{(item.views || 0).toLocaleString()} ACC</span>
                 </div>
             </div>
         </div>
