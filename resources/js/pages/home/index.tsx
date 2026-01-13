@@ -82,7 +82,7 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                         {/* MIDDLE SECTION: Mosaic Category Display */}
                         <div className="p-4 sm:p-8 lg:p-16">
                             <div className="mb-16 flex flex-col items-center justify-between border-b-2 border-foreground pb-4 sm:mb-32 sm:items-end sm:border-b-4 sm:pb-8 md:flex-row dark:border-foreground">
-                                <h3 className="text-[12vw] leading-none font-black tracking-tighter text-foreground uppercase italic sm:text-[10vw] md:text-[6vw] dark:text-foreground">
+                                <h3 className="text-3xl leading-none font-black tracking-tighter text-foreground uppercase italic sm:text-4xl md:text-5xl lg:text-6xl dark:text-foreground">
                                     BROADCAST_<span className="text-primary dark:text-primary">FEEDS</span>
                                 </h3>
                                 <div className="hidden text-center sm:text-right lg:block">
@@ -97,7 +97,7 @@ export default function Index({ heroNews, sideHeroNews = [], trendingNews = [], 
                                         <div className="mb-8 flex flex-col justify-between gap-4 border-l-4 border-primary pl-4 sm:mb-12 sm:gap-8 sm:border-l-8 sm:pl-8 md:flex-row md:items-end dark:border-primary">
                                             <div className="relative">
                                                 <div className="absolute -top-10 -left-8 font-mono text-[80px] leading-none font-black text-foreground/[0.04] italic select-none sm:-top-20 sm:-left-16 sm:text-[180px] dark:text-foreground/[0.08]">{idx + 1}</div>
-                                                <h2 className="relative text-3xl font-black tracking-tighter text-foreground uppercase sm:text-6xl md:text-5xl lg:text-8xl dark:text-foreground">{category.name}</h2>
+                                                <h2 className="relative text-2xl font-black tracking-tighter text-foreground uppercase sm:text-3xl md:text-4xl lg:text-5xl dark:text-foreground">{category.name}</h2>
                                                 <div className="mt-4 flex gap-2">
                                                     <span className="h-1 w-8 bg-primary sm:h-2 sm:w-12 dark:bg-primary"></span>
                                                     <span className="h-1 w-1 bg-foreground sm:h-2 sm:w-2 dark:bg-foreground"></span>

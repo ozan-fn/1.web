@@ -50,7 +50,7 @@ const HeroSection: React.FC<Props> = ({ heroNews, sideHeroNews }) => (
                         <Maximize2 className="h-3 w-3 opacity-20 sm:h-4 sm:w-4" />
                     </div>
                     <Link href={heroNews.sub_category ? `/${heroNews.category?.slug}/${heroNews.sub_category?.slug}/${heroNews.slug}` : `/${heroNews.category?.slug}/${heroNews.slug}`}>
-                        <h1 className="text-2xl leading-[0.9] font-black tracking-tighter text-foreground uppercase decoration-primary hover:underline sm:text-4xl md:text-4xl lg:text-6xl dark:text-foreground dark:decoration-primary">{heroNews.title}</h1>
+                        <h1 className="text-xl leading-[0.9] font-black tracking-tighter text-foreground uppercase decoration-primary hover:underline sm:text-2xl md:text-3xl lg:text-4xl dark:text-foreground dark:decoration-primary">{heroNews.title}</h1>
                     </Link>
                     <div className="mt-6 flex h-1 w-12 bg-primary sm:mt-8 sm:w-20 dark:bg-primary"></div>
                 </div>

@@ -56,7 +56,7 @@ export default function CategoryPage({ category, news, trendingNews, latestNews 
                             <div className="pointer-events-none absolute -top-6 -right-6 text-[15vw] leading-none font-black text-foreground/[0.03] uppercase italic select-none sm:-top-10 sm:-right-10 sm:text-[20vw] dark:text-foreground/[0.06]">ARCHIVE</div>
                             <div className="relative z-10">
                                 <span className="mb-3 inline-block bg-primary px-2 py-1 text-[8px] font-black tracking-[0.3em] text-background uppercase italic sm:mb-4 sm:px-3 sm:text-[10px] sm:tracking-widest dark:bg-primary dark:text-background">DATA_SECTOR_01</span>
-                                <h1 className="text-4xl leading-none font-black tracking-tighter text-foreground uppercase sm:text-6xl md:text-6xl lg:text-8xl xl:text-9xl dark:text-foreground">{category.name}</h1>
+                                <h1 className="text-3xl leading-none font-black tracking-tighter text-foreground uppercase sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl dark:text-foreground">{category.name}</h1>
                                 <p className="mt-4 max-w-md text-base font-black text-foreground italic opacity-60 sm:mt-8 sm:text-lg lg:max-w-xl dark:text-foreground">// {category.description || 'COLLECTING_RELEVANT_DATA_SETS_IN_REAL_TIME'}</p>
                             </div>
                         </div>

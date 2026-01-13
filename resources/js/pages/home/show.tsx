@@ -118,7 +118,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                             {/* Massive Ghost Title Background */}
                             <div className="relative mb-16 sm:mb-24">
                                 <div className="pointer-events-none absolute -top-20 -left-6 -z-10 text-[12vw] leading-none font-black whitespace-nowrap text-foreground/[0.04] uppercase italic select-none sm:-top-40 sm:-left-10 sm:text-[15vw] dark:text-foreground/[0.08]">{post.category?.name}</div>
-                                <h1 className="text-3xl leading-[0.85] font-black tracking-tighter text-foreground uppercase sm:text-5xl md:text-5xl lg:text-7xl xl:text-[100px] dark:text-foreground">{post.title}</h1>
+                                <h1 className="text-2xl leading-[0.85] font-black tracking-tighter text-foreground uppercase sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl dark:text-foreground">{post.title}</h1>
                                 <div className="mt-8 flex h-2 w-full bg-foreground/10 sm:mt-12 sm:h-3 dark:bg-foreground/10">
                                     <div className="h-full w-1/3 bg-primary dark:bg-primary"></div>
                                 </div>
@@ -199,7 +199,7 @@ export default function PostShow({ post, relatedPosts, trendingNews, latestNews 
                         {/* CROSS-LINKED FEEDS (Related) */}
                         <div className="mt-32 sm:mt-56">
                             <div className="relative mb-12 sm:mb-20">
-                                <h3 className="text-4xl leading-none font-black tracking-tighter text-foreground uppercase italic sm:text-6xl dark:text-foreground">CROSS_FEEDS</h3>
+                                <h3 className="text-2xl leading-none font-black tracking-tighter text-foreground uppercase italic sm:text-3xl lg:text-4xl dark:text-foreground">CROSS_FEEDS</h3>
                                 <div className="absolute right-0 -bottom-2 text-[8px] font-black opacity-30 sm:-bottom-4 sm:text-[10px]">SYSTEM_RECO_V.4.0</div>
                                 <div className="mt-4 h-2 w-full bg-foreground sm:mt-6 dark:bg-foreground"></div>
                             </div>
