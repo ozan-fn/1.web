@@ -69,7 +69,7 @@ class HandleInertiaRequests extends Middleware
 
             'app' => [
                 // Prioritas: 1. DB, 2. Logic Domain tadi, 3. Config .env
-                'name' => $settings->site_name ?? $brandName ?? $appName,
+                'name' => $brandName,
                 'url' => $request->url(),
                 'domain' => $domain,
             ],
@@ -78,7 +78,7 @@ class HandleInertiaRequests extends Middleware
 
             // BAGIAN SEO YANG KAMU MINTA
             'seo' => [
-                'title' => $settings->site_name ?? $brandName ?? $appName,
+                'title' => $brandName,
                 'description' => $settings->description ?? 'Portal Berita Terpercaya',
                 // Logo dari Storage atau null
                 'logo' => ($settings && $settings->logo) ? asset('storage/' . $settings->logo) : null,
