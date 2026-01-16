@@ -1,19 +1,22 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useAppearance } from '@/hooks/use-appearance'; // Pastikan path sesuai
+import { useAppearance } from '@/hooks/use-appearance';
 import { Link, router, usePage } from '@inertiajs/react';
 import { ChevronRight, Menu, Monitor, Moon, Search, Sun } from 'lucide-react';
 import React, { useState } from 'react';
 
+// Tipe data Category
 interface Category {
     id: number;
     name: string;
     slug: string;
 }
 
-interface SiteSettings {
+// Tipe data Settings (Sesuai dengan derivedSiteSettings di Index.tsx)
+export interface SiteSettings {
     site_name: string;
-    tagline: string | null;
-    logo: string | null;
+    tagline?: string | null;
+    logo?: string | null;
+    description?: string | null;
 }
 
 interface Props {
@@ -22,11 +25,13 @@ interface Props {
 }
 
 const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: propSiteSettings }) => {
+    // Ambil fallback data dari usePage jika props tidak dikirim langsung
     const { url, props } = usePage<any>();
-    const { appearance, updateAppearance } = useAppearance(); // Menggunakan hook baru
+    const { appearance, updateAppearance } = useAppearance();
 
     const categories = propCategories || props.categories || [];
     const siteSettings = propSiteSettings || props.siteSettings;
+
     const [search, setSearch] = useState('');
 
     const handleSearch = (e: React.FormEvent) => {
@@ -36,14 +41,14 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
         }
     };
 
-    // Fungsi untuk rotasi tema: Light -> Dark -> System
     const toggleTheme = () => {
         if (appearance === 'light') updateAppearance('dark');
-        // else if (appearance === 'dark') updateAppearance('system');
         else updateAppearance('light');
     };
 
-    const siteNameParts = siteSettings?.site_name.split(' ') || ['NEWS', 'PORTAL'];
+    // Logic: Split nama site untuk styling (Warna Primary & Foreground)
+    // Contoh: "Tribun Jateng" -> "Tribun" (Merah), "Jateng" (Hitam/Putih)
+    const siteNameParts = siteSettings?.site_name?.split(' ') || ['NEWS', 'PORTAL'];
     const firstPart = siteNameParts[0];
     const restParts = siteNameParts.slice(1).join(' ');
 
@@ -52,6 +57,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
             {/* Top Bar */}
             <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
                 <div className="flex items-center gap-4">
+                    {/* Mobile Menu Trigger */}
                     <Sheet>
                         <SheetTrigger asChild>
                             <button className="rounded-lg p-2 text-muted-foreground hover:bg-muted lg:hidden">
@@ -76,7 +82,7 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                     Home
                                     <ChevronRight className="h-4 w-4" />
                                 </Link>
-                                {categories.map((cat) => (
+                                {categories.map((cat: Category) => (
                                     <Link key={cat.id} href={`/${cat.slug}`} className={`flex items-center justify-between px-6 py-3 text-sm font-bold uppercase transition-colors ${url === `/${cat.slug}` ? 'bg-primary/10 text-primary' : 'text-foreground/80 hover:bg-muted'}`}>
                                         {cat.name}
                                         <ChevronRight className="h-4 w-4" />
@@ -86,34 +92,52 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                         </SheetContent>
                     </Sheet>
 
+                    {/* Logo & Brand Name */}
                     <Link href="/" className="flex items-center gap-3">
-                        {siteSettings?.logo && <img src={`/storage/${siteSettings.logo}`} alt={siteSettings.site_name} className="h-10 w-auto object-contain" />}
+                        {/* UPDATE PENTING:
+                            Hapus '/storage/' karena logo sekarang adalah URL lengkap 
+                            yang digenerate oleh Middleware/Asset Helper.
+                        */}
+                        {siteSettings?.logo && (
+                            <img
+                                src={siteSettings.logo}
+                                alt={siteSettings.site_name}
+                                className="h-10 w-auto object-contain"
+                            />
+                        )}
+
                         <div className="flex flex-col leading-none">
                             <span className="text-2xl font-black tracking-tighter text-primary uppercase italic">
                                 {firstPart}
                                 <span className="text-foreground">{restParts ? ` ${restParts}` : ''}</span>
                             </span>
-                            <span className="text-[9px] font-bold tracking-[0.2em] text-muted-foreground uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</span>
+                            <span className="text-[9px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
+                                {siteSettings?.tagline || 'Informasi Terpercaya'}
+                            </span>
                         </div>
                     </Link>
                 </div>
 
-                {/* Search Bar */}
+                {/* Search Bar (Desktop) */}
                 <form onSubmit={handleSearch} className="mx-8 hidden max-w-md flex-1 rounded-sm border-b border-border bg-background px-2 py-2 transition-colors focus-within:border-primary md:flex">
-                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari berita..." className="w-full bg-transparent text-sm font-medium text-foreground placeholder-muted-foreground outline-none" />
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder={`Cari di ${siteSettings?.site_name || 'sini'}...`}
+                        className="w-full bg-transparent text-sm font-medium text-foreground placeholder-muted-foreground outline-none"
+                    />
                     <button type="submit" className="px-2 text-muted-foreground transition-colors hover:text-primary">
                         <Search className="h-4 w-4" />
                     </button>
                 </form>
 
+                {/* Right Actions */}
                 <div className="flex items-center gap-2">
-                    {/* Theme Toggle Button */}
                     <button onClick={toggleTheme} className="flex items-center gap-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary" title={`Mode: ${appearance}`}>
                         {appearance === 'light' && <Sun className="h-5 w-5" />}
                         {appearance === 'dark' && <Moon className="h-5 w-5" />}
                         {appearance === 'system' && <Monitor className="h-5 w-5" />}
-
-                        {/* Indikator teks opsional (bisa dihapus jika ingin icon saja) */}
                         <span className="hidden text-[10px] font-bold uppercase lg:block">{appearance}</span>
                     </button>
 
@@ -123,14 +147,14 @@ const Navbar: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                 </div>
             </div>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation Category */}
             <nav className="hidden border-t border-border bg-background lg:block">
                 <div className="no-scrollbar container mx-auto max-w-7xl overflow-x-auto px-4">
                     <div className="flex gap-8 py-3 text-[13px] font-black tracking-tight whitespace-nowrap uppercase">
                         <Link href="/" className={`border-b-2 py-1 transition-colors ${url === '/' ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}>
                             Home
                         </Link>
-                        {categories.map((cat) => {
+                        {categories.map((cat: Category) => {
                             const href = `/${cat.slug}`;
                             const isActive = url === href || url.startsWith(`${href}/`);
                             return (
