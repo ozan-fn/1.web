@@ -22,11 +22,40 @@ class HandleInertiaRequests extends Middleware
         $domain = $request->getHost();
         $appName = config('app.name');
 
-        $domainParts = explode('.', $domain);
-        $brandName = ucfirst(collect($domainParts)->reverse()->values()->get(1) ?? 'Localhost');
+        // --- MULAI LOGIC BARU (PERBAIKAN) ---
+        if ($domain === 'localhost') {
+            $brandName = 'Localhost';
+        } else {
+            $parts = explode('.', $domain);
+            $count = count($parts);
+
+            // Daftar ekstensi domain yang punya 2 bagian (Second Level Domain)
+            // Tambahkan di sini jika ada yang kurang (misal: 'my', 'biz', dll)
+            $doubleTlds = ['co', 'web', 'go', 'ac', 'sch', 'or', 'mil', 'net', 'desa', 'ponpes'];
+
+            // Ambil bagian kedua dari belakang (misal: 'web' dari lensa-publik.web.id)
+            $secondLastPart = ($count >= 2) ? $parts[$count - 2] : '';
+
+            // Cek apakah domain ini strukturnya panjang (seperti .web.id)
+            if ($count >= 3 && in_array($secondLastPart, $doubleTlds)) {
+                // Contoh: lensa-publik.web.id
+                // Kita ambil 'lensa-publik' (urutan ke-3 dari belakang)
+                $rawName = $parts[$count - 3];
+            } else {
+                // Contoh: google.com
+                // Kita ambil 'google' (urutan ke-2 dari belakang)
+                $rawName = ($count >= 2) ? $parts[$count - 2] : $parts[0];
+            }
+
+            // Ubah format: "lensa-publik" menjadi "Lensa Publik"
+            // str_replace('-', ' ', ...) membuang tanda strip
+            // ucwords(...) membuat huruf depan jadi besar
+            $brandName = ucwords(str_replace('-', ' ', $rawName));
+        }
+        // --- SELESAI LOGIC BARU ---
 
 
-        // 2. Ambil Tema (Tetap menggunakan function getAppTheme yang hardcoded)
+        // 2. Ambil Tema (Biarkan function getAppTheme yang hardcoded)
         $theme = $this->getAppTheme($domain);
 
         // 3. Quote
@@ -35,22 +64,21 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
 
-            // Inject settings agar bisa dipakai di Footer/Navbar jika perlu
+            // Inject settings
             'siteSettings' => $settings,
 
             'app' => [
-                // Gunakan nama dari DB, kalau kosong pakai config env
-                'name' => $brandName,
+                // Prioritas: 1. DB, 2. Logic Domain tadi, 3. Config .env
+                'name' => $settings->site_name ?? $brandName ?? $appName,
                 'url' => $request->url(),
                 'domain' => $domain,
             ],
 
-            // Kirim data tema lengkap ke Frontend
             'theme' => $theme,
 
-            // INI BAGIAN YANG DIUBAH SESUAI REQUEST
+            // BAGIAN SEO YANG KAMU MINTA
             'seo' => [
-                'title' => $brandName,
+                'title' => $settings->site_name ?? $brandName ?? $appName,
                 'description' => $settings->description ?? 'Portal Berita Terpercaya',
                 // Logo dari Storage atau null
                 'logo' => ($settings && $settings->logo) ? asset('storage/' . $settings->logo) : null,
