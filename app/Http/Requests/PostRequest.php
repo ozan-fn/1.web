@@ -14,7 +14,8 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
+            'category_name' => ['nullable', 'string', 'max:255', 'required_without:category_id'],
             'sub_category_id' => 'nullable|exists:sub_categories,id',
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
