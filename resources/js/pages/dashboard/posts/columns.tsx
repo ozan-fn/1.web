@@ -3,7 +3,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import dashboard from '@/routes/dashboard';
 import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Edit2, Eye, Image as ImageIcon, MoreHorizontal, Trash2 } from 'lucide-react';
+import { ArrowUpDown, Copy, Edit2, Eye, Image as ImageIcon, MoreHorizontal, Trash2 } from 'lucide-react';
+import React from 'react';
 
 export interface Post {
     id: number;
@@ -12,7 +13,7 @@ export interface Post {
     thumbnail_url: string | null;
     status: 'draft' | 'published' | 'archived';
     views: number;
-    category: { name: string } | null;
+    category: { name: string; slug?: string } | null;
     user: { name: string };
 }
 
@@ -82,28 +83,52 @@ export const columns = (onDelete: (post: Post) => void): ColumnDef<Post>[] => [
     },
     {
         id: 'actions',
-        cell: ({ row }) => (
-            <div className="text-right">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <Link href={dashboard.posts.edit(row.original.id).url}>
-                                <Edit2 className="mr-2 h-4 w-4" /> Edit Post
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete(row.original)}>
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-        ),
+        cell: ({ row }) => {
+            const [copied, setCopied] = React.useState(false);
+
+            const handleCopyLink = () => {
+                const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+                const categorySlug = row.original.category?.slug || row.original.category?.name?.toLowerCase().replace(/\s+/g, '-') || '';
+                const postSlug = row.original.slug;
+                
+                // Routes dari web.php:
+                // Route::get('/{category}/{post}', ...)->name('posts.show');
+                // Route::get('/{category}/{subcategory}/{post}', ...)->name('posts.sub.show');
+                const postLink = `${baseUrl}/${categorySlug}/${postSlug}`;
+                
+                navigator.clipboard.writeText(postLink).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                });
+            };
+
+            return (
+                <div className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem asChild>
+                                <Link href={dashboard.posts.edit(row.original.id).url}>
+                                    <Edit2 className="mr-2 h-4 w-4" /> Edit Post
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+                                <Copy className="mr-2 h-4 w-4" />
+                                {copied ? 'Link Copied!' : 'Copy Link'}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete(row.original)}>
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            );
+        },
     },
 ];

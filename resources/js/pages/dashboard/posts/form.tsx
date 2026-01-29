@@ -22,16 +22,18 @@ import { SubCategorySelect } from './components/SubCategorySelect';
 import { TagsInput } from './components/TagsInput';
 import { ThumbnailUpload } from './components/ThumbnailUpload';
 import { TitleSlugInput } from './components/TitleSlugInput';
+import { UrlExtractor } from './components/UrlExtractor';
 
 export default function PostForm() {
     const { props } = usePage<SharedData>();
-    const { categories = [], sub_categories = [], tags = [], post = null, flash = {} } = (props as any) || {};
+    const { categories: initialCategories = [], sub_categories = [], tags = [], post = null, flash = {} } = (props as any) || {};
 
     const isEdit = Boolean(post);
     const editorRef = useRef<any>(null);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(post?.thumbnail_url || null);
     const [isSmallScreen, setIsSmallScreen] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
     const [useDarkMode, setUseDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+    const [categories, setCategories] = useState(initialCategories);
 
     const { data, setData, processing, errors } = useForm<any>({
         category_id: post?.category_id || 1,
@@ -40,12 +42,16 @@ export default function PostForm() {
         slug: post?.slug || '',
         excerpt: post?.excerpt || '',
         content: post?.content || '',
-        status: post?.status || 'draft',
+        status: post?.status || 'published',
         is_featured: post?.is_featured || false,
         thumbnail: null,
         tags: post?.tags.map((t: any) => t.name) || [],
-        published_at: post?.published_at || null,
+        published_at: post?.published_at || new Date().toISOString().split('T')[0],
     });
+
+    const handleCategoryCreated = useCallback((newCategory: any) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -101,6 +107,47 @@ export default function PostForm() {
             );
         },
         [data.tags, setData],
+    );
+
+    const handleUrlExtractSuccess = useCallback(
+        (extractedData: any) => {
+            if (extractedData.title) {
+                setData('title', extractedData.title);
+                if (!isEdit) {
+                    setData(
+                        'slug',
+                        extractedData.title
+                            .toLowerCase()
+                            .trim()
+                            .replace(/[^\w\s-]/g, '')
+                            .replace(/[\s_-]+/g, '-')
+                            .replace(/^-+|-+$/g, ''),
+                    );
+                }
+            }
+            if (extractedData.content) {
+                setData('content', extractedData.content);
+            }
+            if (extractedData.thumbnail) {
+                setThumbnailPreview(extractedData.thumbnail);
+                // Create a blob from the thumbnail URL for the form
+                fetch(extractedData.thumbnail)
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        const file = new File([blob], 'extracted-thumbnail.jpg', { type: blob.type });
+                        setData('thumbnail', file);
+                    });
+            }
+            if (extractedData.tags && Array.isArray(extractedData.tags)) {
+                const newTags = extractedData.tags
+                    .map((tag: string) => tag.toLowerCase().trim())
+                    .filter((tag: string) => tag && !data.tags.includes(tag));
+                if (newTags.length > 0) {
+                    setData('tags', [...data.tags, ...newTags]);
+                }
+            }
+        },
+        [setData, isEdit, data.tags],
     );
 
     const imageHandler = useCallback(
@@ -160,6 +207,10 @@ export default function PostForm() {
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
                         <AlertDescription className="text-green-600">{flash.success}</AlertDescription>
                     </Alert>
+                )}
+
+                {!isEdit && (
+                    <UrlExtractor onExtractSuccess={handleUrlExtractSuccess} isLoading={processing} />
                 )}
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -229,6 +280,7 @@ export default function PostForm() {
                                             setData('sub_category_id', null);
                                         }}
                                         error={errors.category_id}
+                                        onCategoryCreated={handleCategoryCreated}
                                     />
                                 </div>
                                 <div className="grid gap-2">
