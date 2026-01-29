@@ -1,12 +1,14 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { resizeImage } from '@/lib/image-compression'; // Fungsi resize Anda
+import { resizeImage } from '@/lib/image-compression';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Wand2 } from 'lucide-react';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 // Component Imports
@@ -26,17 +28,33 @@ import { UrlExtractor } from './components/UrlExtractor';
 
 export default function PostForm() {
     const { props } = usePage<SharedData>();
-    const { categories: initialCategories = [], sub_categories = [], tags = [], post = null, flash = {} } = (props as any) || {};
+    const { categories = [], sub_categories = [], tags = [], post = null, flash = {} } = (props as any) || {};
 
     const isEdit = Boolean(post);
     const editorRef = useRef<any>(null);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(post?.thumbnail_url || null);
     const [isSmallScreen, setIsSmallScreen] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
     const [useDarkMode, setUseDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
-    const [categories, setCategories] = useState(initialCategories);
+    const [autoFillUrl, setAutoFillUrl] = useState('');
+    const [autoFillError, setAutoFillError] = useState<string | null>(null);
+    const [autoFillLoading, setAutoFillLoading] = useState(false);
 
-    const { data, setData, processing, errors } = useForm<any>({
-        category_id: post?.category_id || 1,
+    const { data, setData, processing, errors } = useForm<{
+        category_id: number | null;
+        category_name: string;
+        sub_category_id: number | null;
+        title: string;
+        slug: string;
+        excerpt: string;
+        content: string;
+        status: string;
+        is_featured: boolean;
+        thumbnail: File | null;
+        tags: string[];
+        published_at: string | null;
+    }>({
+        category_id: post?.category_id || null,
+        category_name: '',
         sub_category_id: post?.sub_category_id || null,
         title: post?.title || '',
         slug: post?.slug || '',
@@ -44,14 +62,31 @@ export default function PostForm() {
         content: post?.content || '',
         status: post?.status || 'published',
         is_featured: post?.is_featured || false,
-        thumbnail: null,
+        thumbnail: null as File | null,
         tags: post?.tags.map((t: any) => t.name) || [],
-        published_at: post?.published_at || new Date().toISOString().split('T')[0],
+        published_at: post?.published_at || (!post ? new Date().toISOString().split('T')[0] : null),
     });
 
-    const handleCategoryCreated = useCallback((newCategory: any) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
+    const setThumbnailFromUrl = useCallback(
+        async (url: string) => {
+            try {
+                const response = await axios.get(url, {
+                    responseType: 'blob',
+                    headers: { 'Accept': 'image/*' },
+                });
+                const blob = response.data;
+                const filename = url.split('/').pop()?.split('?')[0] || 'thumbnail.jpg';
+                const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+                const objectUrl = URL.createObjectURL(blob);
+                setThumbnailPreview(objectUrl);
+                setData('thumbnail', file);
+            } catch (error) {
+                console.error('Error fetching thumbnail:', error);
+                setThumbnailPreview(url);
+            }
+        },
+        [setData],
+    );
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -101,42 +136,35 @@ export default function PostForm() {
 
     const removeTag = useCallback(
         (tag: string) => {
-            setData(
-                'tags',
-                data.tags.filter((t: any) => t !== tag),
-            );
+            setData('tags', data.tags.filter((t: string) => t !== tag));
         },
         [data.tags, setData],
     );
 
     const handleUrlExtractSuccess = useCallback(
-        (extractedData: any) => {
+        async (extractedData: { title: string; thumbnail: string; content: string; tags: string[] }) => {
             if (extractedData.title) {
-                setData('title', extractedData.title);
-                if (!isEdit) {
-                    setData(
-                        'slug',
-                        extractedData.title
-                            .toLowerCase()
-                            .trim()
-                            .replace(/[^\w\s-]/g, '')
-                            .replace(/[\s_-]+/g, '-')
-                            .replace(/^-+|-+$/g, ''),
-                    );
-                }
+                handleTitleChange(extractedData.title);
             }
             if (extractedData.content) {
                 setData('content', extractedData.content);
             }
             if (extractedData.thumbnail) {
-                setThumbnailPreview(extractedData.thumbnail);
-                // Create a blob from the thumbnail URL for the form
-                fetch(extractedData.thumbnail)
-                    .then((res) => res.blob())
-                    .then((blob) => {
-                        const file = new File([blob], 'extracted-thumbnail.jpg', { type: blob.type });
-                        setData('thumbnail', file);
+                try {
+                    const response = await axios.get(extractedData.thumbnail, {
+                        responseType: 'blob',
+                        headers: { 'Accept': 'image/*' },
                     });
+                    const blob = response.data;
+                    const filename = extractedData.thumbnail.split('/').pop()?.split('?')[0] || 'thumbnail.jpg';
+                    const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+                    const objectUrl = URL.createObjectURL(blob);
+                    setThumbnailPreview(objectUrl);
+                    setData('thumbnail', file);
+                } catch (error) {
+                    console.error('Failed to fetch thumbnail:', error);
+                    setThumbnailPreview(extractedData.thumbnail);
+                }
             }
             if (extractedData.tags && Array.isArray(extractedData.tags)) {
                 const newTags = extractedData.tags
@@ -147,7 +175,7 @@ export default function PostForm() {
                 }
             }
         },
-        [setData, isEdit, data.tags],
+        [handleTitleChange, setData, data.tags],
     );
 
     const imageHandler = useCallback(
@@ -274,18 +302,29 @@ export default function PostForm() {
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">Category</Label>
                                     <CategorySelect
                                         categories={categories}
-                                        value={String(data.category_id)}
-                                        onChange={(val) => {
+                                        value={data.category_id ? String(data.category_id) : ''}
+                                        onChange={(val: string) => {
                                             setData('category_id', parseInt(val));
+                                            setData('category_name', '');
                                             setData('sub_category_id', null);
                                         }}
-                                        error={errors.category_id}
-                                        onCategoryCreated={handleCategoryCreated}
+                                        onCreateCategory={(name: string) => {
+                                            setData('category_id', null as any);
+                                            setData('category_name', name);
+                                            setData('sub_category_id', null);
+                                        }}
+                                        error={errors.category_id || errors.category_name}
                                     />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">Sub Category</Label>
-                                    <SubCategorySelect subCategories={sub_categories} categoryId={data.category_id} value={data.sub_category_id} onChange={(val) => setData('sub_category_id', val)} error={errors.sub_category_id} />
+                                    <SubCategorySelect 
+                                        subCategories={sub_categories} 
+                                        categoryId={data.category_id || 0} 
+                                        value={data.sub_category_id} 
+                                        onChange={(val: string | null) => setData('sub_category_id', val ? parseInt(val) : null)} 
+                                        error={errors.sub_category_id} 
+                                    />
                                 </div>
                             </CardContent>
                         </Card>

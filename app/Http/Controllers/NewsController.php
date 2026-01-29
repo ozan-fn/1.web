@@ -18,7 +18,7 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         return Inertia::render('dashboard/posts/index', [
-            'posts' => News::with(['category', 'subCategory', 'user'])
+            'posts' => News::with(['category:id,name,slug', 'subCategory:id,name,slug', 'user'])
                 ->when($request->search, function ($query, $search) {
                     $query->where('title', 'like', "%{$search}%")
                         ->orWhere('excerpt', 'like', "%{$search}%");
@@ -53,6 +53,16 @@ class NewsController extends Controller
             $validated['user_id'] = auth()->id();
             $validated['slug'] = $validated['slug'] ?: Str::slug($validated['title']);
 
+            // Handle category auto-creation
+            if (!empty($request->category_name)) {
+                $category = Category::firstOrCreate(
+                    ['name' => $request->category_name],
+                    ['order' => Category::max('order') + 1]
+                );
+                $validated['category_id'] = $category->id;
+            }
+            unset($validated['category_name']);
+
             // IMPROVED AUTO EXCERPT
             if (empty($validated['excerpt'])) {
                 $validated['excerpt'] = $this->generateJosExcerpt($validated['content']);
@@ -85,6 +95,16 @@ class NewsController extends Controller
         {
             $validated = $request->validated();
             $validated['slug'] = $validated['slug'] ?: Str::slug($validated['title']);
+
+            // Handle category auto-creation
+            if (!empty($request->category_name)) {
+                $category = Category::firstOrCreate(
+                    ['name' => $request->category_name],
+                    ['order' => Category::max('order') + 1]
+                );
+                $validated['category_id'] = $category->id;
+            }
+            unset($validated['category_name']);
 
             // IMPROVED AUTO EXCERPT
             if (empty($validated['excerpt'])) {

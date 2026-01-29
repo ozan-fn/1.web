@@ -14,6 +14,7 @@ export interface Post {
     status: 'draft' | 'published' | 'archived';
     views: number;
     category: { name: string; slug?: string } | null;
+    sub_category?: { name: string; slug?: string } | null;
     user: { name: string };
 }
 
@@ -88,13 +89,17 @@ export const columns = (onDelete: (post: Post) => void): ColumnDef<Post>[] => [
 
             const handleCopyLink = () => {
                 const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-                const categorySlug = row.original.category?.slug || row.original.category?.name?.toLowerCase().replace(/\s+/g, '-') || '';
-                const postSlug = row.original.slug;
+                const post = row.original;
+                const categorySlug = post.category?.slug || post.category?.name?.toLowerCase().replace(/\s+/g, '-') || '';
+                const subCategorySlug = post.sub_category?.slug || post.sub_category?.name?.toLowerCase().replace(/\s+/g, '-');
+                const postSlug = post.slug;
                 
                 // Routes dari web.php:
                 // Route::get('/{category}/{post}', ...)->name('posts.show');
                 // Route::get('/{category}/{subcategory}/{post}', ...)->name('posts.sub.show');
-                const postLink = `${baseUrl}/${categorySlug}/${postSlug}`;
+                const postLink = post.sub_category && subCategorySlug
+                    ? `${baseUrl}/${categorySlug}/${subCategorySlug}/${postSlug}`
+                    : `${baseUrl}/${categorySlug}/${postSlug}`;
                 
                 navigator.clipboard.writeText(postLink).then(() => {
                     setCopied(true);
