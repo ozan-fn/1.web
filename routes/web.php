@@ -9,8 +9,6 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('dashboard/site-settings', [SiteSettingController::class, 'index'])->name('dashboard.site-settings');
@@ -63,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Public Search & Tag Routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [\App\Http\Controllers\PostController::class, 'search'])->name('search');
 Route::get('/tag/{tag}', [\App\Http\Controllers\PostController::class, 'tag'])->name('tag.show');
 

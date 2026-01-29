@@ -8,17 +8,18 @@ interface Category {
     slug: string;
 }
 
-interface SiteSettings {
+// Interface disesuaikan agar fields opsional (karena data database sudah tidak ada)
+export interface SiteSettings {
     site_name: string;
-    tagline: string | null;
-    description: string | null;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-    social_facebook: string | null;
-    social_instagram: string | null;
-    social_twitter: string | null;
-    social_youtube: string | null;
+    tagline?: string | null;
+    description?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    social_facebook?: string | null;
+    social_instagram?: string | null;
+    social_twitter?: string | null;
+    social_youtube?: string | null;
 }
 
 interface Props {
@@ -27,24 +28,37 @@ interface Props {
 }
 
 const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: propSiteSettings }) => {
+    // 1. Ambil Data Global dari Middleware (app & seo)
     const { props } = usePage<any>();
-    const categories = propCategories || props.categories || [];
-    const siteSettings = propSiteSettings || props.siteSettings;
+    const { app, seo } = props;
 
-    // Split site name for styling
-    const siteNameParts = siteSettings?.site_name?.split(' ') || ['NEWS', 'PORTAL'];
+    // 2. Logic Fallback: Jika props tidak dikirim, gunakan data Middleware
+    // Ini menjamin Footer tetap aman diakses di halaman selain Index
+    const categories = propCategories || props.categories || [];
+
+    const siteSettings: SiteSettings = propSiteSettings || {
+        site_name: app?.name || 'News Portal',
+        description: seo?.description,
+        email: app?.domain ? `redaksi@${app.domain}` : null,
+        tagline: null,
+        phone: null,
+        address: null,
+        social_facebook: null,
+        social_instagram: null,
+        social_twitter: null,
+        social_youtube: null,
+    };
+
+    // 3. Styling Nama Site (Split Warna)
+    const siteNameParts = siteSettings.site_name?.split(' ') || ['NEWS', 'PORTAL'];
     const firstPart = siteNameParts[0];
     const restParts = siteNameParts.slice(1).join(' ');
 
     const socials = [
-        { key: 'facebook', icon: Facebook, url: siteSettings?.social_facebook },
-        {
-            key: 'instagram',
-            icon: Instagram,
-            url: siteSettings?.social_instagram,
-        },
-        { key: 'twitter', icon: Twitter, url: siteSettings?.social_twitter },
-        { key: 'youtube', icon: Youtube, url: siteSettings?.social_youtube },
+        { key: 'facebook', icon: Facebook, url: siteSettings.social_facebook },
+        { key: 'instagram', icon: Instagram, url: siteSettings.social_instagram },
+        { key: 'twitter', icon: Twitter, url: siteSettings.social_twitter },
+        { key: 'youtube', icon: Youtube, url: siteSettings.social_youtube },
     ].filter((s) => s.url);
 
     return (
@@ -60,25 +74,29 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                                     <span className="text-gray-400"> {restParts}</span>
                                 </h2>
                             </Link>
-                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{siteSettings?.tagline || 'Informasi Terpercaya'}</p>
+                            <p className="mt-2 text-[10px] font-bold tracking-[0.3em] text-primary uppercase">
+                                {siteSettings.tagline || 'Informasi Terpercaya'}
+                            </p>
                         </div>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">{siteSettings?.description || `Portal berita ${siteSettings?.site_name || 'Lensa Publik'} menyajikan informasi tercepat, akurat, dan mendalam dari seluruh penjuru negeri.`}</p>
+                        <p className="mb-6 text-sm leading-relaxed text-gray-400">
+                            {siteSettings.description || `Portal berita ${siteSettings.site_name} menyajikan informasi tercepat, akurat, dan mendalam.`}
+                        </p>
 
                         <div className="mb-8 space-y-4">
-                            {siteSettings?.address && (
+                            {siteSettings.address && (
                                 <div className="flex gap-3 text-xs leading-normal text-gray-400">
                                     <MapPin className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
                                     <span>{siteSettings.address}</span>
                                 </div>
                             )}
 
-                            {siteSettings?.email && (
+                            {siteSettings.email && (
                                 <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
                                     <Mail className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
                                     <span>{siteSettings.email}</span>
                                 </div>
                             )}
-                            {siteSettings?.phone && (
+                            {siteSettings.phone && (
                                 <div className="flex items-center gap-3 text-xs font-medium text-gray-400">
                                     <Phone className="text-opacity-80 h-4 w-4 shrink-0 text-primary" />
                                     <span>{siteSettings.phone}</span>
@@ -89,7 +107,13 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
                         {socials.length > 0 && (
                             <div className="flex gap-3">
                                 {socials.map((social) => (
-                                    <a key={social.key} href={social.url!} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white">
+                                    <a
+                                        key={social.key}
+                                        href={social.url!}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-zinc-800 bg-zinc-900 transition-all hover:border-primary hover:bg-primary hover:text-white"
+                                    >
                                         <social.icon className="h-4 w-4" />
                                     </a>
                                 ))}
@@ -99,10 +123,12 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                     {/* Quick Links */}
                     <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Kategori Populer</h3>
+                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">
+                            Kategori Populer
+                        </h3>
                         {categories.length > 0 ? (
                             <ul className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs font-bold tracking-tight uppercase">
-                                {categories.slice(0, 10).map((cat) => (
+                                {categories.slice(0, 10).map((cat: Category) => (
                                     <li key={cat.id}>
                                         <Link href={`/${cat.slug}`} className="transition-colors hover:text-primary">
                                             {cat.name}
@@ -117,7 +143,9 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                     {/* Info Links */}
                     <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Informasi</h3>
+                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">
+                            Informasi
+                        </h3>
                         <ul className="space-y-4 text-xs font-bold tracking-tight uppercase">
                             {[
                                 { title: 'Tentang Kami', url: '#' },
@@ -138,8 +166,12 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                     {/* Redaksi / Office */}
                     <div className="col-span-1">
-                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">Bantuan & Redaksi</h3>
-                        <p className="mb-6 text-sm leading-relaxed text-gray-400">Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.</p>
+                        <h3 className="mb-8 border-l-4 border-primary pl-4 text-sm font-black tracking-widest text-white uppercase">
+                            Bantuan & Redaksi
+                        </h3>
+                        <p className="mb-6 text-sm leading-relaxed text-gray-400">
+                            Punya informasi berita atau ingin bekerjasama dengan redaksi kami? Silakan hubungi kami melalui saluran berikut.
+                        </p>
                         <div className="space-y-3">
                             <Link href="#" className="flex w-full items-center justify-center rounded-sm bg-primary px-4 py-3 text-xs font-black tracking-widest text-primary-foreground uppercase transition hover:bg-primary-foreground hover:text-primary">
                                 Kirim Berita (WA)
@@ -153,7 +185,7 @@ const Footer: React.FC<Props> = ({ categories: propCategories, siteSettings: pro
 
                 <div className="border-t border-zinc-900 pt-8 text-center md:flex md:items-center md:justify-between">
                     <p className="text-[11px] font-medium tracking-widest uppercase">
-                        © {new Date().getFullYear()} {siteSettings?.site_name || 'Lensa Publik'}. Seluruh Hak Cipta Dilindungi.
+                        © {new Date().getFullYear()} {siteSettings.site_name}. Seluruh Hak Cipta Dilindungi.
                     </p>
                     <div className="mt-4 flex justify-center gap-6 md:mt-0">
                         <Link href="/login" className="text-[10px] font-bold text-gray-700 uppercase transition-colors hover:text-primary">

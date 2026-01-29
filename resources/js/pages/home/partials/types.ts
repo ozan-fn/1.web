@@ -21,6 +21,7 @@ export interface NewsItem {
     published_at: string;
     timestamp?: string; // For mock/display if needed
     views?: number;
+    excerpt?: string; // For mock/display if needed
 }
 
 export interface VideoItem {
