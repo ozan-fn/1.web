@@ -22,6 +22,7 @@ import { SubCategorySelect } from './components/SubCategorySelect';
 import { TagsInput } from './components/TagsInput';
 import { ThumbnailUpload } from './components/ThumbnailUpload';
 import { TitleSlugInput } from './components/TitleSlugInput';
+import { UrlExtractor } from './components/UrlExtractor';
 
 export default function PostForm() {
     const { props } = usePage<SharedData>();
@@ -33,18 +34,32 @@ export default function PostForm() {
     const [isSmallScreen, setIsSmallScreen] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
     const [useDarkMode, setUseDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
 
-    const { data, setData, processing, errors } = useForm<any>({
-        category_id: post?.category_id || 1,
+    const { data, setData, processing, errors } = useForm<{
+        category_id: number | null;
+        category_name: string;
+        sub_category_id: number | null;
+        title: string;
+        slug: string;
+        excerpt: string;
+        content: string;
+        status: string;
+        is_featured: boolean;
+        thumbnail: File | null;
+        tags: string[];
+        published_at: string | null;
+    }>({
+        category_id: post?.category_id || null,
+        category_name: '',
         sub_category_id: post?.sub_category_id || null,
         title: post?.title || '',
         slug: post?.slug || '',
         excerpt: post?.excerpt || '',
         content: post?.content || '',
-        status: post?.status || 'draft',
+        status: post?.status || 'published',
         is_featured: post?.is_featured || false,
         thumbnail: null,
         tags: post?.tags.map((t: any) => t.name) || [],
-        published_at: post?.published_at || null,
+        published_at: post?.published_at || (!post ? new Date().toISOString().split('T')[0] : null),
     });
 
     const handleTitleChange = useCallback(
@@ -83,6 +98,42 @@ export default function PostForm() {
             }
         },
         [setData],
+    );
+
+    const handleUrlExtractSuccess = useCallback(
+        async (extractedData: { title: string; thumbnail: string; content: string; tags: string[] }) => {
+            if (extractedData.title) {
+                handleTitleChange(extractedData.title);
+            }
+            if (extractedData.content) {
+                setData('content', extractedData.content);
+            }
+            if (extractedData.thumbnail) {
+                try {
+                    const response = await axios.get(extractedData.thumbnail, {
+                        responseType: 'blob',
+                        headers: { 'Accept': 'image/*' },
+                    });
+                    const blob = response.data;
+                    const filename = extractedData.thumbnail.split('/').pop()?.split('?')[0] || 'thumbnail.jpg';
+                    const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+                    const objectUrl = URL.createObjectURL(blob);
+                    setThumbnailPreview(objectUrl);
+                    setData('thumbnail', file);
+                } catch (error) {
+                    console.error('Failed to fetch thumbnail:', error);
+                }
+            }
+            if (extractedData.tags && Array.isArray(extractedData.tags)) {
+                const newTags = extractedData.tags
+                    .map((tag: string) => tag.toLowerCase().trim())
+                    .filter((tag: string) => tag && !data.tags.includes(tag));
+                if (newTags.length > 0) {
+                    setData('tags', [...data.tags, ...newTags]);
+                }
+            }
+        },
+        [handleTitleChange, setData, data.tags],
     );
 
     const addTag = useCallback(
@@ -162,6 +213,10 @@ export default function PostForm() {
                     </Alert>
                 )}
 
+                {!isEdit && (
+                    <UrlExtractor onExtractSuccess={handleUrlExtractSuccess} isLoading={processing} />
+                )}
+
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
                     {/* AREA KIRI: EDITOR UTAMA */}
                     <div className="space-y-6 lg:col-span-9">
@@ -223,17 +278,29 @@ export default function PostForm() {
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">Category</Label>
                                     <CategorySelect
                                         categories={categories}
-                                        value={String(data.category_id)}
-                                        onChange={(val) => {
+                                        value={data.category_id ? String(data.category_id) : ''}
+                                        onChange={(val: string) => {
                                             setData('category_id', parseInt(val));
+                                            setData('category_name', '');
                                             setData('sub_category_id', null);
                                         }}
-                                        error={errors.category_id}
+                                        onCreateCategory={(name: string) => {
+                                            setData('category_id', null);
+                                            setData('category_name', name);
+                                            setData('sub_category_id', null);
+                                        }}
+                                        error={errors.category_id || errors.category_name}
                                     />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">Sub Category</Label>
-                                    <SubCategorySelect subCategories={sub_categories} categoryId={data.category_id} value={data.sub_category_id} onChange={(val) => setData('sub_category_id', val)} error={errors.sub_category_id} />
+                                    <SubCategorySelect 
+                                        subCategories={sub_categories} 
+                                        categoryId={data.category_id || 0} 
+                                        value={data.sub_category_id} 
+                                        onChange={(val: string | null) => setData('sub_category_id', val ? parseInt(val) : null)} 
+                                        error={errors.sub_category_id} 
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
