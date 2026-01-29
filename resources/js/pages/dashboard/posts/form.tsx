@@ -1,12 +1,14 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { resizeImage } from '@/lib/image-compression'; // Fungsi resize Anda
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Wand2 } from 'lucide-react';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 // Component Imports
@@ -32,20 +34,41 @@ export default function PostForm() {
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(post?.thumbnail_url || null);
     const [isSmallScreen, setIsSmallScreen] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
     const [useDarkMode, setUseDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+    const [autoFillUrl, setAutoFillUrl] = useState('');
+    const [autoFillError, setAutoFillError] = useState<string | null>(null);
+    const [autoFillLoading, setAutoFillLoading] = useState(false);
 
     const { data, setData, processing, errors } = useForm<any>({
-        category_id: post?.category_id || 1,
+        category_id: post?.category_id || null,
+        category_name: '',
         sub_category_id: post?.sub_category_id || null,
         title: post?.title || '',
         slug: post?.slug || '',
         excerpt: post?.excerpt || '',
         content: post?.content || '',
-        status: post?.status || 'draft',
+        status: post?.status || 'published',
         is_featured: post?.is_featured || false,
         thumbnail: null,
         tags: post?.tags.map((t: any) => t.name) || [],
-        published_at: post?.published_at || null,
+        published_at: post?.published_at || (!post ? new Date().toISOString() : null),
     });
+
+    const setThumbnailFromUrl = useCallback(
+        async (url: string) => {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch thumbnail');
+                const blob = await response.blob();
+                const filename = url.split('/').pop() || 'thumbnail.jpg';
+                const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+                setThumbnailPreview(url);
+                setData('thumbnail', file);
+            } catch (error) {
+                console.error('Error fetching thumbnail:', error);
+            }
+        },
+        [setData],
+    );
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -63,6 +86,29 @@ export default function PostForm() {
         },
         [setData, isEdit],
     );
+
+    const handleAutoFill = useCallback(async () => {
+        const targetUrl = autoFillUrl.trim();
+        if (!targetUrl) return;
+        setAutoFillLoading(true);
+        setAutoFillError(null);
+
+        try {
+            const { data: extracted } = await axios.get('https://test1-gl4j.vercel.app/extract', {
+                params: { url: targetUrl },
+            });
+
+            if (extracted?.title) handleTitleChange(extracted.title);
+            if (extracted?.content) setData('content', extracted.content);
+            if (extracted?.tags?.length) setData('tags', [...new Set(extracted.tags.map((tag: string) => tag.toLowerCase().trim()).filter(Boolean))]);
+            if (extracted?.thumbnail) await setThumbnailFromUrl(extracted.thumbnail);
+        } catch (error) {
+            console.error('Auto fill failed:', error);
+            setAutoFillError('Gagal mengambil data dari URL. Coba lagi.');
+        } finally {
+            setAutoFillLoading(false);
+        }
+    }, [autoFillUrl, handleTitleChange, setData, setThumbnailFromUrl]);
 
     // HANDLER THUMBNAIL DENGAN RESIZE
     const handleThumbnailChange = useCallback(
@@ -165,6 +211,29 @@ export default function PostForm() {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
                     {/* AREA KIRI: EDITOR UTAMA */}
                     <div className="space-y-6 lg:col-span-9">
+                        {!isEdit && (
+                            <Card>
+                                <CardHeader className="space-y-1">
+                                    <CardTitle className="text-lg">Auto Fill</CardTitle>
+                                    <CardDescription>Masukkan URL artikel untuk mengisi otomatis judul, konten, tag, dan thumbnail.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="grid gap-3">
+                                    <div className="flex flex-col gap-2 sm:flex-row">
+                                        <Input
+                                            placeholder="https://..."
+                                            value={autoFillUrl}
+                                            onChange={(e) => setAutoFillUrl(e.target.value)}
+                                        />
+                                        <Button type="button" onClick={handleAutoFill} disabled={autoFillLoading || !autoFillUrl.trim()}>
+                                            <Wand2 className="mr-2 h-4 w-4" />
+                                            {autoFillLoading ? 'Mengisi...' : 'Auto Fill'}
+                                        </Button>
+                                    </div>
+                                    {autoFillError && <p className="text-sm font-medium text-destructive">{autoFillError}</p>}
+                                </CardContent>
+                            </Card>
+                        )}
+
                         <Card>
                             <CardHeader className="space-y-1">
                                 <CardTitle className="text-lg">Content</CardTitle>
@@ -223,12 +292,18 @@ export default function PostForm() {
                                     <Label className="text-xs tracking-wider text-muted-foreground uppercase">Category</Label>
                                     <CategorySelect
                                         categories={categories}
-                                        value={String(data.category_id)}
+                                        value={data.category_id ? String(data.category_id) : ''}
                                         onChange={(val) => {
                                             setData('category_id', parseInt(val));
+                                            setData('category_name', '');
                                             setData('sub_category_id', null);
                                         }}
-                                        error={errors.category_id}
+                                        onCreateCategory={(name) => {
+                                            setData('category_id', null);
+                                            setData('category_name', name);
+                                            setData('sub_category_id', null);
+                                        }}
+                                        error={errors.category_id || errors.category_name}
                                     />
                                 </div>
                                 <div className="grid gap-2">
