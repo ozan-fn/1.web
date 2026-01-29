@@ -1,4 +1,8 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
 
 interface Category {
     id: number;
@@ -8,11 +12,21 @@ interface Category {
 interface CategorySelectProps {
     value: string;
     onChange: (value: string) => void;
+    onCreateCategory: (name: string) => void;
     categories: Category[];
     error?: string;
 }
 
-export function CategorySelect({ value, onChange, categories, error }: CategorySelectProps) {
+export function CategorySelect({ value, onChange, onCreateCategory, categories, error }: CategorySelectProps) {
+    const [newCategory, setNewCategory] = useState('');
+
+    const handleCreate = () => {
+        const name = newCategory.trim();
+        if (!name) return;
+        onCreateCategory(name);
+        setNewCategory('');
+    };
+
     return (
         <div className="grid gap-2">
             <Select value={value} onValueChange={onChange}>
@@ -31,6 +45,18 @@ export function CategorySelect({ value, onChange, categories, error }: CategoryS
                     )}
                 </SelectContent>
             </Select>
+            <div className="flex gap-2">
+                <Input
+                    placeholder="Create new category..."
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreate())}
+                    className="flex-1"
+                />
+                <Button type="button" variant="outline" size="icon" onClick={handleCreate} className="shrink-0">
+                    <Plus className="h-4 w-4" />
+                </Button>
+            </div>
             {error && <p className="text-sm font-medium text-destructive">{error}</p>}
         </div>
     );
